@@ -29,7 +29,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { AuthContext } from '../../context/AuthContext';
-import clinicLogo from '../../assets/clinic-logo.png'; // Importa la imagen
+import clinicLogo from '../../assets/img/clinic-logo.png'; // Importa la imagen
 
 
 
@@ -63,14 +63,21 @@ export default function Navbar() {
             aria-label={'Toggle Navigation'}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
+        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} >
           <Link href="/" _hover={{ textDecoration: 'none' }}>
-              <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px" /> 
+              <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px"/> 
             </Link>
-
+            <Text
+            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+            fontFamily={'heading'}
+            fontWeight="bold"
+            color={useColorModeValue('gray.800', 'white')}>
+            Clinica Veterinaria
+          </Text>
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
+      
         </Flex>
 
         <Stack
