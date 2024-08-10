@@ -15,11 +15,26 @@ connectDB();
 // Middleware para parsear JSON
 app.use(express.json());
 
-app.use(cors({
-    origin: 'https://client-app-eosin.vercel.app/',
-}));
+const allowedOrigins = [
+    'https://client-app-eosin.vercel.app', // Tu aplicación en Vercel
+    'http://localhost:5173', // Tu entorno de desarrollo local
+];
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Permitir solicitudes sin origen (como las que provienen de herramientas como Postman)
+        if (!origin || process.env.NODE_ENV !== 'production') {
+            return callback(null, true);
+        }
 
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+};
 
+app.use(cors(corsOptions));
 // Rutas
 app.use('/api/auth', authRoutes);
 
