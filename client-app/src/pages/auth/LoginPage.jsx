@@ -3,6 +3,7 @@
 import React from 'react';
 import { Container, Flex, Image } from '@chakra-ui/react';
 import LoginForm from '../../components/auth/LoginForm';
+import LogoLogin from '../../assets/img/log.png'; // Importa la imagen
 
 const LoginPage = () => {
   return (
@@ -24,9 +25,7 @@ const LoginPage = () => {
             objectFit={'cover'}
             borderRadius={'lg'}
             w={{ base: 'full', md: 'xl' }}
-            src={
-              'src/assets/img/log.png'
-            }
+            src={LogoLogin}
           />
         </Flex>
       </Flex>
