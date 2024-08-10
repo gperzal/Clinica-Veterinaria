@@ -14,7 +14,10 @@ connectDB();
 
 // Middleware para parsear JSON
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+    origin: 'https://client-app-eosin.vercel.app/',
+}));
 
 
 // Rutas

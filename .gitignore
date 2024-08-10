@@ -29,3 +29,5 @@ yarn-error.log*
 # Archivos de compilación
 *.log
 *.tscache
+
+.vercel
