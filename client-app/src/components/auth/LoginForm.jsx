@@ -54,7 +54,7 @@ export default function LoginForm() {
   };
 
   return (
-    <Stack  direction={{ base: 'column', md: 'row' }} w={'full'} maxW={'2xl'}>
+    <Stack  direction={{ base: 'column', md: 'row' }}>
       <Flex p={8} flex={1} align={'center'} justify={'center'}>
         <Stack spacing={4} w={'full'} maxW={'md'} border="1px solid #E2E8F0" borderRadius="md" p={8} boxShadow="lg">
           <Heading fontSize={'2xl'} textAlign={'center'}>Iniciar sesión </Heading>
@@ -74,7 +74,9 @@ export default function LoginForm() {
                 justify={'space-between'}
               >
                 <Checkbox>Recordarme</Checkbox>
-                <Text color={'blue.500'}>¿Olvidaste tu contraseña?</Text>
+                <Text color={'blue.500'} cursor="pointer" onClick={() => navigate('/forgot-password')}>
+                  ¿Olvidaste tu contraseña?
+                </Text>
               </Stack>
               <Button type="submit" colorScheme={'blue'} variant={'solid'}>
                 Iniciar sesión
