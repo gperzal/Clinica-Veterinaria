@@ -24,6 +24,7 @@ import { login } from '../../services/auth/authService';
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false); 
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const toast = useToast();
@@ -36,6 +37,14 @@ export default function LoginForm() {
       const response = await login({ email, password });
       if (response.status === 200 && response.data.token) {
         const userData = { token: response.data.token, name: response.data.name };
+
+        // Guardar en localStorage o sessionStorage dependiendo de "Recordarme"
+        if (rememberMe) {
+          localStorage.setItem('userData', JSON.stringify(userData));
+        } else {
+          sessionStorage.setItem('userData', JSON.stringify(userData));
+        }
+
         loginContext(userData);
         toast({
           title: 'Inicio de sesión exitoso',
@@ -73,7 +82,9 @@ export default function LoginForm() {
                 align={'start'}
                 justify={'space-between'}
               >
-                <Checkbox>Recordarme</Checkbox>
+                <Checkbox isChecked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
+                  Recordarme
+                </Checkbox>
                 <Text color={'blue.500'} cursor="pointer" onClick={() => navigate('/forgot-password')}>
                   ¿Olvidaste tu contraseña?
                 </Text>

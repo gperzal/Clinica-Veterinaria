@@ -197,10 +197,18 @@ const MobileNavItem = ({ label, href }) => {
   );
 };
 
+// const NAV_ITEMS = [
+//   { label: 'Home', href: '/' },
+//   { label: 'Agendar', href: '/agendar' },
+//   { label: 'Catálogo', href: '/catalogo' },
+//   { label: 'Blogs', href: '/blogs' },
+//   { label: 'Contacto', href: '/contacto' },
+
+
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
-  { label: 'Agendar', href: '/agendar' },
-  { label: 'Catálogo', href: '/catalogo' },
-  { label: 'Blogs', href: '/blogs' },
-  { label: 'Contacto', href: '/contacto' },
+  { label: 'Agendar', href: '/coming-soon' },
+  { label: 'Catálogo', href: '/coming-soon' },
+  { label: 'Blogs', href: '/coming-soon' },
+  { label: 'Contacto', href: '/coming-soon' },
 ];

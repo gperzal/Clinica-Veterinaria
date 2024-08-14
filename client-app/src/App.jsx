@@ -9,7 +9,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'; 
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-
+import ComingSoonPage from './pages/ComingSoonPage';
 import { Box, Flex } from '@chakra-ui/react';
 
 
@@ -18,10 +18,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-      <Flex
-        direction="column"
-        minH="100vh"
-      >
+      <Flex direction="column" minH="100vh">
         <Navbar />
         <Box flex="1">
         <Routes>
@@ -30,6 +27,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
+          <Route path="/coming-soon" element={<ComingSoonPage />} />
         </Routes>
         </Box>
         <Footer />

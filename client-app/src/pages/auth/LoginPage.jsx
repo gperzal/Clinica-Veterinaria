@@ -7,7 +7,7 @@ import LogoLogin from '../../assets/img/log.png'; // Importa la imagen
 
 const LoginPage = () => {
   return (
-    <Container maxW={'10xl'} minH={'100vh'}  alignItems={'center'} justifyContent={'center'}>
+    <Container maxW={'10xl'}  alignItems={'center'} justifyContent={'center'}>
       <Flex
         direction={{ base: 'column', md: 'row' }}
         alignItems={'center'}

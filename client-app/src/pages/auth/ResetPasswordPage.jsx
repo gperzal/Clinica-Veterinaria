@@ -5,7 +5,7 @@ import ResetPasswordForm from '../../components/auth/ResetPasswordForm';
 
 const ResetPasswordPage = () => {
   return (
-    <Container maxW={'10xl'} minH={'100vh'} alignItems={'center'} justifyContent={'center'}>
+    <Container maxW={'10xl'}  alignItems={'center'} justifyContent={'center'}>
       <Flex
         direction={{ base: 'column', md: 'row' }}
         alignItems={'center'}
@@ -14,7 +14,7 @@ const ResetPasswordPage = () => {
         h={'100%'} 
         gap={10}
       >
-        <Flex flex={1} justifyContent="center" alignItems="center">
+        <Flex flex={1} justifyContent="center" alignItems="center" order={{ base: 1, md: 2 }}>
           <ResetPasswordForm />
         </Flex>
       </Flex>
