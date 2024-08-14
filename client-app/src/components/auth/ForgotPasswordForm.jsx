@@ -37,13 +37,14 @@ export default function ForgotPasswordForm() {
         reset_link: `${import.meta.env.VITE_FRONTEND_URL}/reset-password/${resetToken}`,
       };
 
-      // 3. Enviar el correo usando EmailJS
+      // // 3. Enviar el correo usando EmailJS
       const result = await emailjs.send(
         import.meta.env.VITE_SERVICE_ID, 
         import.meta.env.VITE_TEMPLATE_ID, 
         templateParams,
         import.meta.env.VITE_PUBLIC_KEY 
       );
+
 
       if (result.status === 200) {
         toast({

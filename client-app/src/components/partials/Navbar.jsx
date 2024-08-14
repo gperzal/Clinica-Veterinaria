@@ -5,39 +5,36 @@ import {
   Box,
   Flex,
   Image,
-  Text,
   IconButton,
   Button,
   Stack,
   Collapse,
-  Icon,
   Link,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  useColorModeValue,
-  useBreakpointValue,
-  useDisclosure,
-  Avatar,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   MenuDivider,
-  Center,
   useColorMode,
+  useDisclosure,
+  Avatar,
+  Center,
+  useColorModeValue,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
+import {
+  HamburgerIcon,
+  CloseIcon,
+  MoonIcon,
+  SunIcon,
+} from '@chakra-ui/icons';
 import { AuthContext } from '../../context/AuthContext';
-import clinicLogo from '../../assets/img/clinic-logo.png'; // Importa la imagen
-
-
+import clinicLogo from '../../assets/img/clinic-logo.png';
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { user, logout } = useContext(AuthContext);
   const { colorMode, toggleColorMode } = useColorMode();
-  
+
   return (
     <Box>
       <Flex
@@ -63,23 +60,14 @@ export default function Navbar() {
             aria-label={'Toggle Navigation'}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} >
+        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Link href="/" _hover={{ textDecoration: 'none' }}>
-              <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px"/> 
-            </Link>
-            <Text
-            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-            fontFamily={'heading'}
-            fontWeight="bold"
-            color={useColorModeValue('gray.800', 'white')}>
-            Clinica Veterinaria
-          </Text>
+            <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px" /> 
+          </Link>
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
-      
         </Flex>
-
         <Stack
           flex={{ base: 1, md: 0 }}
           justify={'flex-end'}
@@ -105,14 +93,21 @@ export default function Navbar() {
                 </Center>
                 <br />
                 <MenuDivider />
-                <MenuItem >Mi Perfil</MenuItem>
-                <MenuItem >Historial</MenuItem>
+                <MenuItem>Mi Perfil</MenuItem>
+                <MenuItem>Historial</MenuItem>
                 <MenuItem onClick={logout}>Cerrar Sesión</MenuItem>
               </MenuList>
             </Menu>
           ) : (
             <>
-              <Button as={Link} fontSize={'sm'} fontWeight={400} variant={'link'} href={'/login'}>
+              <Button
+                as={Link}
+                fontSize={'sm'}
+                fontWeight={400}
+                variant={'link'}
+                href={'/login'}
+                display={{ base: 'none', md: 'inline-flex' }}
+              >
                 Iniciar Sesión
               </Button>
               <Button
@@ -133,7 +128,7 @@ export default function Navbar() {
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav user={user} logout={logout} />
       </Collapse>
     </Box>
   );
@@ -148,162 +143,64 @@ const DesktopNav = () => {
     <Stack direction={'row'} spacing={4}>
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? '#'}
-                fontSize={'sm'}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={'xl'}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={'xl'}
-                minW={'sm'}
-              >
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
+          <Link
+            p={2}
+            href={navItem.href ?? '#'}
+            fontSize={'sm'}
+            fontWeight={500}
+            color={linkColor}
+            _hover={{
+              textDecoration: 'none',
+              color: linkHoverColor,
+            }}
+          >
+            {navItem.label}
+          </Link>
         </Box>
       ))}
     </Stack>
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }) => {
-  return (
-    <Link
-      href={href}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}
-    >
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text
-            transition={'all .3s ease'}
-            _groupHover={{ color: 'pink.400' }}
-            fontWeight={500}
-          >
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}
-        >
-          <Icon color={'pink.400'} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
-  );
-};
-
-const MobileNav = () => {
+const MobileNav = ({ user, logout }) => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
+      {!user && (
+        <>
+          <Button as={Link} href={'/login'} w="full" mt={4} colorScheme="teal">
+            Iniciar Sesión
+          </Button>
+          <Button as={Link} href={'/register'} w="full" mt={4} colorScheme="teal" variant="outline">
+            Registrarse
+          </Button>
+        </>
+      )}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }) => {
-  const { isOpen, onToggle } = useDisclosure();
-
+const MobileNavItem = ({ label, href }) => {
   return (
-    <Stack spacing={4} onClick={children && onToggle}>
-      <Flex
-        py={2}
-        as={Link}
-        href={href ?? '#'}
-        justify={'space-between'}
-        align={'center'}
-        _hover={{
-          textDecoration: 'none',
-        }}
-      >
-        <Text fontWeight={600} color={useColorModeValue('gray.600', 'gray.200')}>
-          {label}
-        </Text>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition={'all .25s ease-in-out'}
-            transform={isOpen ? 'rotate(180deg)' : ''}
-            w={6}
-            h={6}
-          />
-        )}
-      </Flex>
-
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.700')}
-          align={'start'}
-        >
-          {children &&
-            children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
-                {child.label}
-              </Link>
-            ))}
-        </Stack>
-      </Collapse>
-    </Stack>
+    <Link
+      py={2}
+      href={href}
+      display={'block'}
+      _hover={{ textDecoration: 'none' }}
+      fontWeight={600}
+      color={useColorModeValue('gray.600', 'gray.200')}
+    >
+      {label}
+    </Link>
   );
 };
 
 const NAV_ITEMS = [
-  {
-    label: 'Home',
-    href: '/',
-  },
-  {
-    label: 'Agendar',
-    href: '/agendar',
-  },
-  {
-    label: 'Catálogo',
-    href: '/catalogo',
-  },
-  {
-    label: 'Blogs',
-    href: '/blogs',
-  },
-  {
-    label: 'Contacto',
-    href: '/contacto',
-  },
+  { label: 'Home', href: '/' },
+  { label: 'Agendar', href: '/agendar' },
+  { label: 'Catálogo', href: '/catalogo' },
+  { label: 'Blogs', href: '/blogs' },
+  { label: 'Contacto', href: '/contacto' },
 ];
