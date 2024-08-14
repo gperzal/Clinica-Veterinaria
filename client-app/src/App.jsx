@@ -3,17 +3,27 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/partials/Navbar';
+import Footer from './components/partials/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'; 
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
+import { Box, Flex } from '@chakra-ui/react';
+
+
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+      <Flex
+        direction="column"
+        minH="100vh"
+      >
         <Navbar />
+        <Box flex="1">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -21,6 +31,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
         </Routes>
+        </Box>
+        <Footer />
+      </Flex>
       </Router>
     </AuthProvider>
   );
