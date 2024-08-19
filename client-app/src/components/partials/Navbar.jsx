@@ -1,3 +1,4 @@
+// src/components/partials/Navbar.jsx
 import React, { useContext } from 'react';
 import {
   Box,
@@ -18,21 +19,24 @@ import {
   Avatar,
   Center,
   useColorModeValue,
+  Icon,
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
   CloseIcon,
   MoonIcon,
-  SunIcon,
+  SunIcon
 } from '@chakra-ui/icons';
+import { FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
 import { AuthContext } from '../../context/AuthContext';
 import clinicLogo from '../../assets/img/clinic-logo.png';
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { user, logout } = useContext(AuthContext);
   const { colorMode, toggleColorMode } = useColorMode();
-
+  const navigate = useNavigate();
   return (
     <Box>
       <Flex
@@ -77,6 +81,7 @@ export default function Navbar() {
           </Button>
           {user ? (
             <Menu>
+            
               <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
                 <Avatar size={'sm'} src={user.imageUrl} name={user.name} />
               </MenuButton>
@@ -91,9 +96,19 @@ export default function Navbar() {
                 </Center>
                 <br />
                 <MenuDivider />
-                <MenuItem>Mi Perfil</MenuItem>
-                <MenuItem>Historial</MenuItem>
-                <MenuItem onClick={logout}>Cerrar Sesión</MenuItem>
+                <MenuItem onClick={() => navigate('/dashboard/notifications')}>
+                <Icon as={FiBell} mr={2} />
+                Notificaciones
+                <Box as="span" ml="2" color="red.500" fontWeight="bold">(3)</Box>
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/dashboard')}>
+                <Icon as={FiSettings} mr={2} />
+                Panel de Control
+              </MenuItem>
+              <MenuItem onClick={logout}>
+                <Icon as={FiLogOut} mr={2} />
+                Cerrar Sesión
+               </MenuItem>
               </MenuList>
             </Menu>
           ) : (

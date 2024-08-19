@@ -1,4 +1,3 @@
-// /components/dashboard/SidebarWithHeader.jsx
 import React from 'react';
 import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import SidebarContent from './SidebarContent';
@@ -8,8 +7,8 @@ const SidebarWithHeader = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-      <SidebarContent onClose={onClose} display={{ base: 'none', md: 'block' }} />
+    <Box minH="100vh">
+      <SidebarContent onClose={() => onClose} display={{ base: 'none', md: 'block' }} />
       <Drawer
         autoFocus={false}
         isOpen={isOpen}

@@ -10,28 +10,104 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'; 
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
+import ProfilePage from './pages/dashboard/ProfilePage';
 import { Box, Flex } from '@chakra-ui/react';
-
+import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; // Importa el layout del dashboard
 
 function App() {
-
   return (
     <AuthProvider>    
       <Router>
-      <Flex direction="column" minH="100vh">
-        <Navbar />
-        <Box flex="1">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
-          <Route path="/coming-soon" element={<ComingSoonPage />} />
+          {/* Rutas generales con Navbar y Footer */}
+          <Route 
+            path="/" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <HomePage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
+            path="/login" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <LoginPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <RegisterPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
+            path="/forgot-password" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <ForgotPasswordPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
+            path="/reset-password/:resetToken" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <ResetPasswordPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
+            path="/coming-soon" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <ComingSoonPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          
+          {/* Rutas del dashboard sin Navbar y Footer */}
+          <Route 
+            path="/dashboard/*" 
+            element={
+              <SidebarWithHeader>
+                <Routes>
+                  <Route path="" element={<DashboardPage />} /> {/* Dashboard principal */}
+                  <Route path="profile" element={<ProfilePage />} /> Perfil del usuario
+                  {/* Aquí puedes añadir otras rutas del dashboard */}
+                </Routes>
+              </SidebarWithHeader>
+            } 
+          />
         </Routes>
-        </Box>
-        <Footer />
-      </Flex>
       </Router>
     </AuthProvider>
   );

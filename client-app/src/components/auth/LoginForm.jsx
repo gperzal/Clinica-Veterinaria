@@ -20,8 +20,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { login } from '../../services/auth/authService';
 
-import { gapi } from 'gapi-script';
-import GoogleLogin from 'react-google-login';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -32,50 +30,7 @@ export default function LoginForm() {
   const toast = useToast();
   const { login: loginContext } = useContext(AuthContext);  // Aquí obtenemos la función de login del contexto
 
-  const [googleButtonVisible, setGoogleButtonVisible] = useState(true);
-  const clientID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-  useEffect(() => {
-    const start = () => {
-      gapi.auth2.init({
-        clientId: clientID,
-      });
-    };
-    gapi.load('client:auth2', start);
-  }, [clientID]);
-
-  const onSuccess = (response) => {
-    const userProfile = response.profileObj;
-
-    // Aquí actualizamos el contexto de autenticación
-    loginContext({
-      name: userProfile.name,
-      imageUrl: userProfile.imageUrl,
-      email: userProfile.email,
-      token: response.tokenId,
-    });
-
-    setGoogleButtonVisible(false); 
-    toast({
-      title: 'Inicio de sesión con Google exitoso',
-      description: `Bienvenido ${userProfile.name}`,
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-    navigate('/'); // Redirigir a la página principal
-  };
-
-  const onFailure = (response) => {
-    console.log("Something went wrong", response);
-    toast({
-      title: 'Error al iniciar sesión con Google',
-      description: 'Hubo un problema al iniciar sesión con Google.',
-      status: 'error',
-      duration: 5000,
-      isClosable: true,
-    });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -147,22 +102,12 @@ export default function LoginForm() {
             o inicia sesión con
           </Text>
           <Stack >
-            {googleButtonVisible && (
-              <GoogleLogin
-                clientId={clientID}
-                render={renderProps => (
-                  <Button w={'full'} maxW={'md'} variant={'outline'} leftIcon={<FcGoogle />} onClick={renderProps.onClick} disabled={renderProps.disabled}>
-                    <Center>
-                      <Text>Continue with Google</Text>
-                    </Center>
-                  </Button>
-                )}
-                onSuccess={onSuccess}
-                onFailure={onFailure}
-                cookiePolicy={'single_host_origin'}
-              />
-            )}
-            <Button w={'full'} colorScheme={'facebook'} leftIcon={<FaFacebook />}>
+                <Button w={'full'} variant={'outline'} leftIcon={<FcGoogle />}>
+              <Center>
+                <Text>Iniciar sesión con Google</Text>
+              </Center>
+            </Button>
+            <Button w={'full'} colorScheme={'facebook'} leftIcon={<FaFacebook />} >
               <Center>
                 <Text>Iniciar sesión con Facebook</Text>
               </Center>

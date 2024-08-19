@@ -1,20 +1,22 @@
-// /components/dashboard/SidebarContent.jsx
+// src/components/dashboard/SidebarContent.jsx
 import React from 'react';
-import { Box, CloseButton, Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Icon, useColorModeValue, Text } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { FiHome, FiUser, FiClipboard, FiShoppingCart, FiCreditCard, FiSettings } from 'react-icons/fi';
 
 const LinkItems = [
-  { name: 'Principal', icon: FiHome },
-  { name: 'Perfil', icon: FiUser },
-  { name: 'Historial Mascota', icon: FiClipboard },
-  { name: 'Historial Compra', icon: FiShoppingCart },
-  { name: 'Wallet', icon: FiCreditCard },
-  { name: 'Configuración', icon: FiSettings },
+  { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
+  { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
+  { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/medical-history' },
+  { name: 'Historial  Compras', icon: FiShoppingCart, path: '/dashboard/purchase-history' },
+  { name: 'Billetera', icon: FiCreditCard, path: '/dashboard/wallet' },
+  { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
 ];
 
 const SidebarContent = ({ onClose, ...rest }) => {
   return (
     <Box
+      transition="3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
@@ -24,12 +26,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Clinica Mascotas
+          Logo
         </Text>
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} path={link.path}>
           {link.name}
         </NavItem>
       ))}
@@ -37,25 +38,34 @@ const SidebarContent = ({ onClose, ...rest }) => {
   );
 };
 
-const NavItem = ({ icon, children, ...rest }) => {
+const NavItem = ({ icon, children, path, ...rest }) => {
   return (
-    <Flex
-      align="center"
-      p="4"
-      mx="4"
-      borderRadius="lg"
-      role="group"
-      cursor="pointer"
-      _hover={{
-        bg: 'cyan.400',
-        color: 'white',
-      }}
-      {...rest}>
-      {icon && (
-        <Box mr="4" fontSize="16" as={icon} />
-      )}
-      {children}
-    </Flex>
+    <Link to={path} style={{ textDecoration: 'none' }}>
+      <Flex
+        align="center"
+        p="4"
+        mx="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        _hover={{
+          bg: 'cyan.400',
+          color: 'white',
+        }}
+        {...rest}>
+        {icon && (
+          <Icon
+            mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: 'white',
+            }}
+            as={icon}
+          />
+        )}
+        {children}
+      </Flex>
+    </Link>
   );
 };
 
