@@ -1,3 +1,5 @@
+// src/components/partials/Navbar.jsx
+
 import React, { useContext } from 'react';
 import {
   Box,
@@ -78,12 +80,12 @@ export default function Navbar() {
           {user ? (
             <Menu>
               <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
-                <Avatar size={'sm'} src={user.imageUrl} name={user.name} />
+                <Avatar size={'sm'} name={user.name} />
               </MenuButton>
               <MenuList>
                 <br />
                 <Center>
-                  <Avatar size={'2xl'} src={user.imageUrl} name={user.name} />
+                  <Avatar size={'2xl'} name={user.name} />
                 </Center>
                 <br />
                 <Center>
@@ -194,6 +196,14 @@ const MobileNavItem = ({ label, href }) => {
     </Link>
   );
 };
+
+// const NAV_ITEMS = [
+//   { label: 'Home', href: '/' },
+//   { label: 'Agendar', href: '/agendar' },
+//   { label: 'Catálogo', href: '/catalogo' },
+//   { label: 'Blogs', href: '/blogs' },
+//   { label: 'Contacto', href: '/contacto' },
+
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },

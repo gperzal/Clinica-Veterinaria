@@ -13,10 +13,10 @@ import ComingSoonPage from './pages/ComingSoonPage';
 import { Box, Flex } from '@chakra-ui/react';
 
 
-
 function App() {
+
   return (
-    <AuthProvider>
+    <AuthProvider>    
       <Router>
       <Flex direction="column" minH="100vh">
         <Navbar />
