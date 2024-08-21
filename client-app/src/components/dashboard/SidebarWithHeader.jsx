@@ -66,8 +66,8 @@ const menuSections = [
   {
     sectionName: 'Admin',
     items: [
-      { name: 'Usuarios', icon: FiUser, path: '/dashboard/coming-soon' }, // path: '/dashboard/users'
-      { name: 'Roles', icon: FiUser, path: '/dashboard/coming-soon' }, //  path: '/dashboard/roles'
+      { name: 'Usuarios', icon: FiUser,path: '/dashboard/users' }, 
+      { name: 'Roles', icon: FiUser,  path: '/dashboard/roles' }, 
     ],
   },
 ];
