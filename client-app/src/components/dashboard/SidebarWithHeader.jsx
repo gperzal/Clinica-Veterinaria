@@ -20,7 +20,8 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Avatar
+  Avatar,
+  Button
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -40,33 +41,33 @@ const menuSections = [
   {
     sectionName: 'Generales',
     items: [
-      { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
+      { name: 'Dashboard', icon: FiHome, path: '/dashboard' }, 
       { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
-      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/medical-history' },
-      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/purchase-history' },
+      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' }, // path: '/dashboard/medical-history'
+      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/coming-soon' }, //path: '/dashboard/purchase-history'
       { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
     ],
   },
   {
     sectionName: 'Administrativo',
     items: [
-      { name: 'Catalogo', icon: FiClipboard, path: '/dashboard/catalog' },
-      { name: 'Inventario', icon: FiShoppingCart, path: '/dashboard/inventory' },
-      { name: 'Citas Medicas', icon: FiClipboard, path: '/dashboard/medical-appointments' },
-      { name: 'Citas Estilisticas', icon: FiClipboard, path: '/dashboard/esthetic-appointments' },
+      { name: 'Catalogo', icon: FiClipboard, path: '/dashboard/catalog'}, 
+      { name: 'Inventario', icon: FiShoppingCart, path: '/dashboard/inventory' }, 
+      { name: 'Citas Medicas', icon: FiClipboard,path: '/dashboard/coming-soon' }, // path: '/dashboard/medical-appointments'
+      { name: 'Citas Estilisticas', icon: FiClipboard, path: '/dashboard/coming-soon' }, // path: '/dashboard/esthetic-appointments'
     ],
   },
   {
     sectionName: 'Veterinario',
     items: [
-      { name: 'Citas', icon: FiClipboard, path: '/dashboard/appointments' },
+      { name: 'Citas', icon: FiClipboard, path: '/dashboard/coming-soon'}, // path: '/dashboard/appointments' 
     ],
   },
   {
     sectionName: 'Admin',
     items: [
-      { name: 'Usuarios', icon: FiUser, path: '/dashboard/users' },
-      { name: 'Roles', icon: FiUser, path: '/dashboard/roles' },
+      { name: 'Usuarios', icon: FiUser, path: '/dashboard/coming-soon' }, // path: '/dashboard/users'
+      { name: 'Roles', icon: FiUser, path: '/dashboard/coming-soon' }, //  path: '/dashboard/roles'
     ],
   },
 ];
@@ -84,9 +85,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Link to="/">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+           Dashboard
         </Text>
+        </Link>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {menuSections.map((section) => (
@@ -181,15 +184,8 @@ const MobileNav = ({ onOpen, ...rest }) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-
-      <Text
-        display={{ base: 'flex', md: 'none' }}
-        fontSize="2xl"
-        fontFamily="monospace"
-        fontWeight="bold"
-      >
-        Logo
-      </Text>
+    
+  
 
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />

@@ -74,6 +74,8 @@ const ProfilePage = () => {
     ]
   };
 
+
+
   return (
     <Box p={4}>
       {/* Información Personal */}

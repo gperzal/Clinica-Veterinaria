@@ -6,7 +6,7 @@ const DashboardPage = () => {
   return (
     <Box p={4}>
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        Panel de Control
+        Estadisticas
       </Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
         <Stat
