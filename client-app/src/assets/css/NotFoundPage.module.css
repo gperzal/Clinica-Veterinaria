@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide&display=swap');
+
+
+.container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
+  overflow: hidden;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.glitch {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 10rem; /* Aumentado para ser más grande */
+  color: #fff;
+  position: relative;
+  animation: glitch-animation 2s infinite;
+  text-shadow: 2px 2px 5px rgba(255, 0, 93, 0.5), -2px -2px 5px rgba(18, 0, 10, 0.8);
+  line-height: 1;
+}
+
+.glitch:before, .glitch:after {
+  content: '404';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  text-shadow: -2px -2px 5px rgba(255, 0, 93, 0.7);
+  animation: glitch-animation 2s infinite;
+}
+
+.glitch:before {
+  left: 2px;
+  text-shadow: -2px -2px 5px rgba(255, 0, 93, 0.7);
+  animation: glitch-animation 1s infinite reverse;
+}
+
+.glitch:after {
+  left: -2px;
+  text-shadow: -2px -2px 5px rgba(255, 0, 93, 0.7);
+  animation: glitch-animation 1.5s infinite reverse;
+}
+
+.message {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 1.5rem;
+  color: #ff005d;
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: 2px 2px 5px rgba(255, 0, 93, 0.5);
+  animation: fadeInText 3s ease-in 3.5s forwards, flicker 5s linear 7.5s infinite;
+}
+
+.message2 {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 1.2rem;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  animation: fadeInText 2s ease-in 1s forwards;
+  line-height: 1.5;
+}
+
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .glitch {
+    font-size: 6rem; /* Ajustado para pantallas más pequeñas */
+  }
+
+  .message {
+    font-size: 1.2rem;
+  }
+
+  .message2 {
+    font-size: 1rem; 
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+  .button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+@keyframes glitch-animation {
+  0% {
+    clip: rect(44px, 9999px, 56px, 0);
+    transform: skew(0.5deg);
+  }
+  10% {
+    clip: rect(67px, 9999px, 81px, 0);
+    transform: skew(0.5deg);
+  }
+  20% {
+    clip: rect(28px, 9999px, 42px, 0);
+    transform: skew(0.5deg);
+  }
+  30% {
+    clip: rect(99px, 9999px, 113px, 0);
+    transform: skew(0.5deg);
+  }
+  40% {
+    clip: rect(66px, 9999px, 80px, 0);
+    transform: skew(0.5deg);
+  }
+  50% {
+    clip: rect(58px, 9999px, 72px, 0);
+    transform: skew(0.5deg);
+  }
+  60% {
+    clip: rect(105px, 9999px, 119px, 0);
+    transform: skew(0.5deg);
+  }
+  70% {
+    clip: rect(88px, 9999px, 102px, 0);
+    transform: skew(0.5deg);
+  }
+  80% {
+    clip: rect(76px, 9999px, 90px, 0);
+    transform: skew(0.5deg);
+  }
+  90% {
+    clip: rect(43px, 9999px, 57px, 0);
+    transform: skew(0.5deg);
+  }
+  100% {
+    clip: rect(22px, 9999px, 36px, 0);
+    transform: skew(0.5deg);
+  }
+}
+
+.message {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 1.5rem;
+  color: #ff005d;
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: 2px 2px 5px rgba(255, 0, 93, 0.5);
+  animation: fadeInText 3s ease-in 3.5s forwards, flicker 5s linear 7.5s infinite;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.5;
+  }
+  40% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  60% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
