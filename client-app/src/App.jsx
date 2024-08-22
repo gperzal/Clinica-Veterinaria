@@ -5,12 +5,15 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/partials/Navbar';
 import Footer from './components/partials/Footer';
 import HomePage from './pages/HomePage';
+// Modulo de Auth
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'; 
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// Modulo de Pages Comming Soon y Not Found
 import ComingSoonPage from './pages/ComingSoonPage';
 import NotFoundPage from './pages/NotFoundPage';
+// Modulo de Dashboard
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 import SettingPage from './pages/dashboard/SettingPage';
@@ -23,12 +26,20 @@ import EstheticAppointmentsPage from './pages/dashboard/EstheticAppointmentsPage
 import AppointmentsPage from './pages/dashboard/AppointmentsPage';
 import UsersPage from './pages/dashboard/UsersPage';
 import RolesPage from './pages/dashboard/RolesPage';
+import ReportsPage from './pages/dashboard/ReportsPage';
+// Modulo de Citas
+import ScheduleAppointmentPage from './pages/Appointments/ScheduleAppointmentPage';
+import AppointmentHistoryPage from './pages/Appointments/AppointmentHistoryPage';
+import ManageOverbookingsPage from './pages/Appointments/ManageOverbookingsPage';
+import { AppointmentsProvider } from './context/AppointmentsContext';
+
 import { Box, Flex } from '@chakra-ui/react';
 import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
 
 function App() {
   return (
-    <AuthProvider>    
+    <AuthProvider>  
+      <AppointmentsProvider>  
       <Router>
         <Routes>
           {/* Rutas generales con Navbar y Footer */}
@@ -92,7 +103,24 @@ function App() {
               </Flex>
             } 
           />
-          
+    
+            {/* Rutas del módulo de citas */}
+            <Route 
+                          path="/appointments" 
+                          element={
+                            <Flex direction="column" minH="100vh">
+                              <Navbar />
+                              <Box flex="1">
+                                <ScheduleAppointmentPage />
+                              </Box>
+                              <Footer />
+                            </Flex>
+                          } 
+              />
+              <Route path="/appointments/history" element={<AppointmentHistoryPage />} />
+              <Route path="/appointments/manage-overbookings" element={<ManageOverbookingsPage />} />
+
+
           <Route 
             path="/coming-soon" 
             element={
@@ -124,6 +152,7 @@ function App() {
                 <Route path="appointments" element={<AppointmentsPage />} />
                 <Route path="users" element={<UsersPage />} />
                 <Route path="roles" element={<RolesPage />} />
+                <Route path="reports" element={<ReportsPage />} />
                 <Route path="*" element={<ComingSoonPage />} />
               </Routes>
             </SidebarWithHeader>
@@ -131,6 +160,7 @@ function App() {
           />
         </Routes>
       </Router>
+      </AppointmentsProvider>
     </AuthProvider>
   );
 }

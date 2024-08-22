@@ -5,6 +5,7 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon, EditIcon, DeleteIcon, ChevronLeftIcon, ChevronRightIcon, InfoIcon, AddIcon } from '@chakra-ui/icons';
 import UserModal from '../../components/dashboard/UserModal';
+import UserInfoModal from '../../components/dashboard/UserInfoModal';
 
 const UsersPage = () => {
   const [users, setUsers] = useState([
@@ -22,7 +23,10 @@ const UsersPage = () => {
     setSelectedUser(user);
     onOpen();
   };
-
+  const handleInfoClick = (user) => {
+    setSelectedUser(user);
+    onOpen();
+  };
   const handleUserSave = (updatedUser) => {
     setUsers(users.map(user => (user.id === updatedUser.id ? updatedUser : user)));
     toast({
@@ -106,6 +110,12 @@ const UsersPage = () => {
               <Td>
                 <HStack spacing={2}>
                   <IconButton
+                      icon={<InfoIcon />}
+                      colorScheme="teal"
+                      variant="outline"
+                      onClick={() => handleInfoClick(user)}
+                    />
+                  <IconButton
                     icon={<EditIcon />}
                     colorScheme="blue"
                     variant="outline"
@@ -140,7 +150,13 @@ const UsersPage = () => {
         onClose={onClose}
         onSave={handleUserSave}
       />
+      <UserInfoModal
+        user={selectedUser}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </Box>
+    
   );
 };
 

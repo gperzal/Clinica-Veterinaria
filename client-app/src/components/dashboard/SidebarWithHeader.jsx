@@ -21,16 +21,17 @@ import {
   MenuItem,
   MenuList,
   Avatar,
-  Button
 } from '@chakra-ui/react';
 import {
   FiHome,
   FiUser,
+  FiUsers,
   FiClipboard,
   FiShoppingCart,
   FiSettings,
   FiMenu,
   FiBell,
+  FiFile ,
   FiChevronDown,
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -66,8 +67,9 @@ const menuSections = [
   {
     sectionName: 'Admin',
     items: [
-      { name: 'Usuarios', icon: FiUser,path: '/dashboard/users' }, 
+      { name: 'Usuarios', icon: FiUsers,path: '/dashboard/users' }, 
       { name: 'Roles', icon: FiUser,  path: '/dashboard/roles' }, 
+      { name : 'Reportes', icon: FiFile, path: '/dashboard/reports' },
     ],
   },
 ];
