@@ -28,9 +28,9 @@ import UsersPage from './pages/dashboard/UsersPage';
 import RolesPage from './pages/dashboard/RolesPage';
 import ReportsPage from './pages/dashboard/ReportsPage';
 // Modulo de Citas
-import ScheduleAppointmentPage from './pages/Appointments/ScheduleAppointmentPage';
-import AppointmentHistoryPage from './pages/Appointments/AppointmentHistoryPage';
-import ManageOverbookingsPage from './pages/Appointments/ManageOverbookingsPage';
+import ScheduleAppointmentPage from './pages/appointments/ScheduleAppointmentPage';
+import AppointmentHistoryPage from './pages/appointments/AppointmentHistoryPage';
+import ManageOverbookingsPage from './pages/appointments/ManageOverbookingsPage';
 import { AppointmentsProvider } from './context/AppointmentsContext';
 
 import { Box, Flex } from '@chakra-ui/react';
