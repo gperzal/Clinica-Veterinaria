@@ -1,10 +1,11 @@
 // src/components/catalog/ProductCard.jsx
 import React from 'react';
 import { 
-  Box, Flex, Image, Badge, useColorModeValue, Icon, chakra, Tooltip, Text 
+  Box, Flex, Image, Badge, useColorModeValue, Icon, chakra, Tooltip, Text , Button
 } from '@chakra-ui/react';
 import { BsStar, BsStarFill, BsStarHalf } from 'react-icons/bs';
 import { FiShoppingCart } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 function Rating({ rating, numReviews }) {
   return (
@@ -44,50 +45,58 @@ function ProductCard({ product }) {
         rounded="lg"
         shadow="lg"
         position="relative"
-        textAlign="center"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        height="100%" 
       >
-        {product.isNew && (
-          <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
-            New
-          </Badge>
-        )}
+        {/* Enlace que envuelve toda la tarjeta */}
+        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
+          {product.isNew && (
+            <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
+              New
+            </Badge>
+          )}
+          <Box p="6">
+            <Image 
+              src={product.imageURL} 
+              alt={`Picture of ${product.name}`} 
+              roundedTop="lg" 
+              objectFit="cover" 
+              mx="auto" 
+              boxSize="300px" 
+            />
 
-        <Image src={product.imageURL} alt={`Picture of ${product.name}`} roundedTop="lg" objectFit="cover" mx="auto" />
-
-        <Box p="6">
-          <Box display="flex" alignItems="baseline">
-            {product.isNew && (
-              <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
-                New
-              </Badge>
-            )}
-          </Box>
-          <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight" isTruncated>
-            {product.name}
-          </Box>
-          <Text mt={2} color={useColorModeValue('gray.700', 'gray.400')} noOfLines={2}>
-            {product.description}
-          </Text>
-          <Flex mt="2" justifyContent="space-between" alignContent="center">
-            <Rating rating={product.rating} numReviews={product.numReviews} />
-            <Box fontSize="2xl" color={useColorModeValue('gray.800', 'white')}>
-              <Box as="span" color={'gray.600'} fontSize="lg">
-                $
-              </Box>
-              {product.price.toFixed(2)}
+            <Box display="flex" alignItems="baseline">
+              {product.isNew && (
+                <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
+                  New
+                </Badge>
+              )}
             </Box>
-          </Flex>
+            <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight" isTruncated>
+              {product.name}
+            </Box>
+            <Text mt={2} color={useColorModeValue('gray.700', 'gray.400')} noOfLines={2}>
+              {product.description}
+            </Text>
+            <Flex mt="2" justifyContent="space-between" alignContent="center">
+              <Rating rating={product.rating} numReviews={product.numReviews} />
+              <Box fontSize="2xl" color={useColorModeValue('gray.800', 'white')}>
+                <Box as="span" fontSize="xxl" >
+                  $
+                </Box>
+                {product.price.toFixed(3)}
+              </Box>
+            </Flex>
+          </Box>
+        </Link>
 
-          <Tooltip
-            label="Add to cart"
-            bg="white"
-            placement={'top'}
-            color={'gray.800'}
-            fontSize={'1.2em'}>
-            <chakra.a href={'#'} display={'flex'} alignItems="center" justifyContent="center">
-              <Icon as={FiShoppingCart} h={7} w={7} alignSelf={'center'} />
-            </chakra.a>
-          </Tooltip>
+        {/* Botón para agregar al carrito */}
+        <Box p="6">
+          <Button leftIcon={<FiShoppingCart />} colorScheme="teal" variant="solid">
+            Agregar al Carrito
+          </Button>
         </Box>
       </Box>
     </Flex>

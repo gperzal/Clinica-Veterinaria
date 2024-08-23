@@ -12,6 +12,7 @@ import { FaSortAmountDown, FaThList } from 'react-icons/fa';
 import ProductCard from '../../components/catalog/products/ProductCard';
 import productsData from '../../data/productsData.json';
 
+
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);

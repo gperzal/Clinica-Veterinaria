@@ -35,6 +35,7 @@ import { AppointmentsProvider } from './context/AppointmentsContext';
 // Modulo Catalogo
 import ProductsPage from './pages/catalog/ProductsPage';
 import { CartProvider } from './context/CartContext';
+import ProductDetailsPage from './pages/catalog/ProductDetailsPage';
 
 import { Box, Flex } from '@chakra-ui/react';
 import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
@@ -127,6 +128,17 @@ function App() {
                     <Navbar />
                     <Box flex="1">
                       <ProductsPage />
+                    </Box>
+                    <Footer />
+                  </Flex>
+                } 
+              />
+            <Route path="/products/:productId"
+                element={
+                  <Flex direction="column" minH="100vh">
+                    <Navbar />
+                    <Box flex="1">
+                      <ProductDetailsPage />
                     </Box>
                     <Footer />
                   </Flex>
