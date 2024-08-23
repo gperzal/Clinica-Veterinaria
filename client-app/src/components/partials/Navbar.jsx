@@ -213,7 +213,7 @@ const MobileNavItem = ({ label, href }) => {
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
   { label: 'Agendar', href: '/appointments' },
-  { label: 'Catálogo', href: '/coming-soon' },
+  { label: 'Catálogo', href: '/catalog' },
   { label: 'Blogs', href: '/coming-soon' },
   { label: 'Contacto', href: '/coming-soon' },
 ];

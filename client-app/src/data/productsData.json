@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "name": "Antiparasitario Canino",
+    "category": "Medicamentos",
+    "price": 15.99,
+    "rating": 4.5,
+    "numReviews": 28,
+    "imageURL": "https://dojiw2m9tvv09.cloudfront.net/25287/product/doxi0160.jpg",
+    "description": "Eficaz tratamiento contra parásitos internos y externos para perros."
+  },
+  {
+    "id": 2,
+    "name": "Alimento Seco para Perros",
+    "category": "Comida",
+    "price": 39.99,
+    "rating": 4.7,
+    "numReviews": 45,
+    "imageURL": "https://purina.com.ec/sites/default/files/2023-09/VANITY-MKP-787-329_DC-MAXIMUS-TRIPLE-PROTEINA_CARNE-POLLO-PESCADO_05_AF_cv.png",
+    "description": "Alimento balanceado con nutrientes esenciales para una dieta canina completa."
+  },
+  {
+    "id": 3,
+    "name": "Juguete de Cuerda para Perros",
+    "category": "Juguetes",
+    "price": 9.99,
+    "rating": 4.3,
+    "numReviews": 12,
+    "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6xB9MZ94wvUglMjLd7UTGU6BRiCwdj37mrm-Mtl1JEQ&s",
+    "description": "Juguete resistente para masticar y jugar, ideal para la salud dental canina."
+  },
+  {
+    "id": 4,
+    "name": "Galletas para Gatos",
+    "category": "Comida",
+    "price": 5.99,
+    "rating": 4.8,
+    "numReviews": 55,
+    "imageURL": "https://purina.com.ec/sites/default/files/2023-09/VANITY-MKP-787-329_DC-MAXIMUS-TRIPLE-PROTEINA_CARNE-POLLO-PESCADO_05_AF_cv.png",
+    "description": "Deliciosas galletas crujientes para premiar y consentir a tu gato."
+  },
+  {
+    "id": 5,
+    "name": "Vacuna Triple Felina",
+    "category": "Medicamentos",
+    "price": 25.99,
+    "rating": 4.9,
+    "numReviews": 34,
+    "imageURL": "https://dojiw2m9tvv09.cloudfront.net/25287/product/doxi0160.jpg",
+    "description": "Vacuna esencial para proteger a tu gato contra enfermedades virales comunes."
+  },
+  {
+    "id": 6,
+    "name": "Juguete Ratón para Gatos",
+    "category": "Juguetes",
+    "price": 4.99,
+    "rating": 4.2,
+    "numReviews": 18,
+    "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6xB9MZ94wvUglMjLd7UTGU6BRiCwdj37mrm-Mtl1JEQ&s",
+    "description": "Juguete interactivo que estimula el instinto cazador de tu felino."
+  },
+  {
+    "id": 7,
+    "name": "Suplemento Vitamínico Canino",
+    "category": "Medicamentos",
+    "price": 19.99,
+    "rating": 4.6,
+    "numReviews": 23,
+    "imageURL": "https://dojiw2m9tvv09.cloudfront.net/25287/product/doxi0160.jpg",
+    "description": "Complemento nutricional para fortalecer el sistema inmunológico de tu perro."
+  },
+  {
+    "id": 8,
+    "name": "Alimento Húmedo para Gatos",
+    "category": "Comida",
+    "price": 12.99,
+    "rating": 4.5,
+    "numReviews": 40,
+    "imageURL": "https://purina.com.ec/sites/default/files/2023-09/VANITY-MKP-787-329_DC-MAXIMUS-TRIPLE-PROTEINA_CARNE-POLLO-PESCADO_05_AF_cv.png",
+    "description": "Comida gourmet en lata con alto contenido proteico para gatos exigentes."
+  },
+  {
+    "id": 9,
+    "name": "Pelota de Goma para Perros",
+    "category": "Juguetes",
+    "price": 6.99,
+    "rating": 4.4,
+    "numReviews": 29,
+    "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6xB9MZ94wvUglMjLd7UTGU6BRiCwdj37mrm-Mtl1JEQ&s",
+    "description": "Juguete duradero para juegos de buscar y traer, perfecto para ejercitar a tu perro."
+  },
+  {
+    "id": 10,
+    "name": "Antipulgas para Gatos",
+    "category": "Medicamentos",
+    "price": 14.99,
+    "rating": 4.7,
+    "numReviews": 21,
+    "imageURL": "https://dojiw2m9tvv09.cloudfront.net/25287/product/doxi0160.jpg",
+    "description": "Tratamiento efectivo contra pulgas y garrapatas para la protección de tu gato."
+  }
+]

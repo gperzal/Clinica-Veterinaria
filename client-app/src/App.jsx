@@ -32,6 +32,9 @@ import ScheduleAppointmentPage from './pages/appointments/ScheduleAppointmentPag
 import AppointmentHistoryPage from './pages/appointments/AppointmentHistoryPage';
 import ManageOverbookingsPage from './pages/appointments/ManageOverbookingsPage';
 import { AppointmentsProvider } from './context/AppointmentsContext';
+// Modulo Catalogo
+import ProductsPage from './pages/catalog/ProductsPage';
+import { CartProvider } from './context/CartContext';
 
 import { Box, Flex } from '@chakra-ui/react';
 import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
@@ -40,6 +43,7 @@ function App() {
   return (
     <AuthProvider>  
       <AppointmentsProvider>  
+      <CartProvider>
       <Router>
         <Routes>
           {/* Rutas generales con Navbar y Footer */}
@@ -103,9 +107,7 @@ function App() {
               </Flex>
             } 
           />
-    
-            {/* Rutas del módulo de citas */}
-            <Route 
+          <Route 
                           path="/appointments" 
                           element={
                             <Flex direction="column" minH="100vh">
@@ -116,11 +118,20 @@ function App() {
                               <Footer />
                             </Flex>
                           } 
+          />
+          <Route path="/appointments/history" element={<AppointmentHistoryPage />} />
+          <Route path="/appointments/manage-overbookings" element={<ManageOverbookingsPage />} />        
+          <Route path="/catalog" 
+                element={
+                  <Flex direction="column" minH="100vh">
+                    <Navbar />
+                    <Box flex="1">
+                      <ProductsPage />
+                    </Box>
+                    <Footer />
+                  </Flex>
+                } 
               />
-              <Route path="/appointments/history" element={<AppointmentHistoryPage />} />
-              <Route path="/appointments/manage-overbookings" element={<ManageOverbookingsPage />} />
-
-
           <Route 
             path="/coming-soon" 
             element={
@@ -160,6 +171,7 @@ function App() {
           />
         </Routes>
       </Router>
+      </CartProvider>
       </AppointmentsProvider>
     </AuthProvider>
   );
