@@ -10,6 +10,11 @@ import { FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
 
 function ProductDetailsPage() {
+
+    // Asegúrate de que useColorModeValue se llama fuera de cualquier condición.
+    const bgColor = useColorModeValue('gray.50', 'gray.700');
+    const textColor = useColorModeValue('gray.800', 'white');
+  
   const { productId } = useParams();
   const product = productsData.find(p => p.id === parseInt(productId));
 
@@ -130,58 +135,31 @@ function ProductDetailsPage() {
 
       {/* Tabs */}
       <Box mt={10}>
-        <Tabs variant="soft-rounded" colorScheme="blue">
-          <TabList>
-            <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
-              <HStack spacing={2}>
-                <Icon as={FaInfoCircle} />
-                <Text>Descripción</Text>
-              </HStack>
-            </Tab>
-            <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
-              <HStack spacing={2}>
-                <Icon as={FaClipboardList} />
-                <Text>Ficha Técnica</Text>
-              </HStack>
-            </Tab>
-          </TabList>
-          <TabPanels>
+      <Tabs variant="soft-rounded" colorScheme="blue">
+        <TabList>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
+            <HStack spacing={2}>
+              <Icon as={FaInfoCircle} />
+              <Text>Descripción</Text>
+            </HStack>
+          </Tab>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
+            <HStack spacing={2}>
+              <Icon as={FaClipboardList} />
+              <Text>Ficha Técnica</Text>
+            </HStack>
+          </Tab>
+        </TabList>
+        <TabPanels>
           <TabPanel>
-            <VStack
-              align="start"
-              spacing={4}
-              bg={useColorModeValue('gray.50', 'gray.700')}
-              p={6}
-              borderRadius="lg"
-              boxShadow="lg"
-              border="1px solid"
-              borderColor={useColorModeValue('gray.200', 'gray.600')}
-              transition="all 0.3s ease"
-              _hover={{ transform: 'translateY(-5px)', boxShadow: 'xl' }}
-            >
-              <Text fontSize="2xl" fontWeight="bold" color={useColorModeValue('blue.600', 'blue.300')}>
-                Descripción del Producto
-              </Text>
+            <VStack align="start" spacing={4} bg={bgColor} p={6} borderRadius="md" boxShadow="md">
+              <Text fontSize="xl" fontWeight="bold" color={textColor}>Descripción del Producto</Text>
               <Box dangerouslySetInnerHTML={{ __html: product.details.descriptionFull }} />
             </VStack>
           </TabPanel>
-
           <TabPanel>
-            <VStack
-              align="start"
-              spacing={4}
-              bg={useColorModeValue('gray.50', 'gray.700')}
-              p={6}
-              borderRadius="lg"
-              boxShadow="lg"
-              border="1px solid"
-              borderColor={useColorModeValue('gray.200', 'gray.600')}
-              transition="all 0.3s ease"
-              _hover={{ transform: 'translateY(-5px)', boxShadow: 'xl' }}
-            >
-              <Text fontSize="2xl" fontWeight="bold" color={useColorModeValue('blue.600', 'blue.300')}>
-                Especificaciones Técnicas
-              </Text>
+            <VStack align="start" spacing={4} bg={bgColor} p={6} borderRadius="md" boxShadow="md">
+              <Text fontSize="xl" fontWeight="bold" color={textColor}>Especificaciones Técnicas</Text>
               <Table variant="simple" size="md" mt={4}>
                 <Thead>
                   <Tr>
@@ -190,9 +168,8 @@ function ProductDetailsPage() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {/* Supongamos que las especificaciones vienen en un array de pares clave-valor */}
                   {product.details.specificationsArray.map((spec, index) => (
-                    <Tr key={index}>
+                    <Tr key={`${spec.key}-${index}`}>
                       <Td>{spec.key}</Td>
                       <Td>{spec.value}</Td>
                     </Tr>
@@ -202,8 +179,8 @@ function ProductDetailsPage() {
             </VStack>
           </TabPanel>
         </TabPanels>
-        </Tabs>
-      </Box>
+      </Tabs>
+    </Box>
     </Box>
   );
 }
