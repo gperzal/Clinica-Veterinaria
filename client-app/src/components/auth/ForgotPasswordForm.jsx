@@ -19,6 +19,13 @@ export default function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
+  // variables de email.js
+  const serviceId = 'service_r0ogdid';
+  const templateId = 'template_megtktu';
+  const publicKey = 'tAfZvCjdw7obYxW0f';
+  const URLB = import.meta.env.VITE_BACKEND_API;
+  const URLF = import.meta.env.VITE_FRONTEND_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,13 +44,27 @@ export default function ForgotPasswordForm() {
         reset_link: `${import.meta.env.VITE_FRONTEND_URL}/reset-password/${resetToken}`,
       };
 
+      // 2. Definir los parámetros del template para EmailJS
+      // const templateParams = {
+      //   user_email: email,
+      //   to_name: userName,
+      //   reset_link: ${import.meta.env.VITE_FRONTEND_URL}/reset-password/${resetToken},
+      // };
+
       // // 3. Enviar el correo usando EmailJS
       const result = await emailjs.send(
-        import.meta.env.VITE_SERVICE_ID, 
-        import.meta.env.VITE_TEMPLATE_ID, 
+        serviceId, 
+        templateId,  
         templateParams,
-        import.meta.env.VITE_PUBLIC_KEY 
+        publicKey
       );
+
+      console.log('Service ID:', serviceId);
+      console.log('Template ID:', templateId);
+      console.log('Public Key:',publicKey);
+      console.log('Frontend URL:', URLF);
+      console.log('Backend URL:', URLB);
+
 
 
       if (result.status === 200) {
