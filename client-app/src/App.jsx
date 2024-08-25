@@ -38,6 +38,11 @@ import { CartProvider } from './context/CartContext';
 import ProductDetailsPage from './pages/catalog/ProductDetailsPage';
 
 import { Box, Flex } from '@chakra-ui/react';
+
+// Modulo Contacto
+import ContactPage from './pages/contact/ContactPage';
+import FAQPage from './pages/contact/FAQPage';
+import FeedbackPage from './pages/contact/FeedbackPage';
 import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
 
 function App() {
@@ -144,6 +149,39 @@ function App() {
                   </Flex>
                 } 
               />
+          <Route path="/contact"
+                      element={
+                        <Flex direction="column" minH="100vh">
+                          <Navbar />
+                          <Box flex="1">
+                            <ContactPage />
+                          </Box>
+                          <Footer />
+                        </Flex>
+                      } 
+          />
+           <Route path="/faq"
+                      element={
+                        <Flex direction="column" minH="100vh">
+                          <Navbar />
+                          <Box flex="1">
+                            <FAQPage />
+                          </Box>
+                          <Footer />
+                        </Flex>
+                      } 
+          />
+        <Route path="/feedback"
+                      element={
+                        <Flex direction="column" minH="100vh">
+                          <Navbar />
+                          <Box flex="1">
+                            <FeedbackPage />
+                          </Box>
+                          <Footer />
+                        </Flex>
+                      } 
+          />
           <Route 
             path="/coming-soon" 
             element={

@@ -11,7 +11,6 @@ import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
 
 function ProductDetailsPage() {
 
-    // Asegúrate de que useColorModeValue se llama fuera de cualquier condición.
     const bgColor = useColorModeValue('gray.50', 'gray.700');
     const textColor = useColorModeValue('gray.800', 'white');
   

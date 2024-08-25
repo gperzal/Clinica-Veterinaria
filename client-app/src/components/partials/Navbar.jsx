@@ -1,4 +1,3 @@
-// src/components/partials/Navbar.jsx
 import React, { useContext } from 'react';
 import {
   Box,
@@ -20,14 +19,17 @@ import {
   Center,
   useColorModeValue,
   Icon,
+  Tooltip
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
   CloseIcon,
   MoonIcon,
-  SunIcon
+  SunIcon,
+  QuestionIcon
 } from '@chakra-ui/icons';
 import { FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
+import { RiCustomerService2Fill } from 'react-icons/ri';
 import { AuthContext } from '../../context/AuthContext';
 import clinicLogo from '../../assets/img/clinic-logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +39,7 @@ export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const navigate = useNavigate();
+
   return (
     <Box>
       <Flex
@@ -74,14 +77,59 @@ export default function Navbar() {
           flex={{ base: 1, md: 0 }}
           justify={'flex-end'}
           direction={'row'}
-          spacing={6}
+          spacing={3}
         >
-          <Button onClick={toggleColorMode}>
-            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          </Button>
+         
+         <Tooltip label="Danos tu opinión o reporta un problema">
+    <IconButton
+      icon={<RiCustomerService2Fill />}
+      variant="ghost"
+      aria-label="Feedback"
+      onClick={() => {
+        navigate('/feedback');
+      }}
+      display={{ base: 'none', md: 'inline-block' }}
+      borderColor={useColorModeValue('gray.200', 'gray.700')} 
+      borderRadius="full" 
+      padding="12px"  
+      bg={useColorModeValue('gray.100', 'gray.800')} 
+      _hover={{
+        bg: useColorModeValue('gray.200', 'gray.700'),  
+      }}
+    />
+  </Tooltip>
+
+  <Tooltip label="Preguntas Frecuentes" aria-label="FAQ">
+    <IconButton
+      icon={<QuestionIcon />}
+      variant="ghost"
+      aria-label="Mesa de Ayuda"
+      onClick={() => navigate('/faq')}
+      display={{ base: 'none', md: 'inline-block' }}
+      borderColor={useColorModeValue('gray.200', 'gray.700')}  
+      borderRadius="full" 
+      pb="3px" 
+      bg={useColorModeValue('gray.100', 'gray.800')}  
+      _hover={{
+        bg: useColorModeValue('gray.200', 'gray.700'), 
+      }}
+    />
+  </Tooltip>
+
+  <Button 
+    onClick={toggleColorMode}
+    borderColor={useColorModeValue('gray.200', 'gray.700')}
+    borderRadius="full"
+    padding="6px"
+    bg={useColorModeValue('gray.100', 'gray.800')}
+    _hover={{
+      bg: useColorModeValue('gray.200', 'gray.700'),
+    }}
+  >
+    {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+  </Button>
           {user ? (
             <Menu>
-            
               <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
                 <Avatar size={'sm'} src={user.imageUrl} name={user.name} />
               </MenuButton>
@@ -119,7 +167,7 @@ export default function Navbar() {
                 fontWeight={400}
                 variant={'link'}
                 href={'/login'}
-                display={{ base: 'none', md: 'inline-flex' }}
+                 display={{ base: 'none', md: 'inline-block' }}
               >
                 Iniciar Sesión
               </Button>
@@ -215,5 +263,5 @@ const NAV_ITEMS = [
   { label: 'Agendar', href: '/appointments' },
   { label: 'Catálogo', href: '/catalog' },
   { label: 'Blogs', href: '/coming-soon' },
-  { label: 'Contacto', href: '/coming-soon' },
+  { label: 'Contacto', href: '/contact' },
 ];
