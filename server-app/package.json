@@ -27,6 +27,7 @@
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.2",
     "nodemailer": "^6.9.14",
-    "resend": "^3.5.0"
+    "resend": "^3.5.0",
+    "sib-api-v3-sdk": "^8.5.0"
   }
 }

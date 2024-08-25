@@ -22,8 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiStar, FiSmile, FiSmartphone, FiImage } from 'react-icons/fi';
-import { FaCommentAlt } from "react-icons/fa";
-
+import { GrBug } from "react-icons/gr";
 const MotionBox = motion(Box);
 
 export default function FeedbackForm() {
@@ -67,7 +66,7 @@ export default function FeedbackForm() {
   const getIcon = (type) => {
     switch (type) {
       case 'error':
-        return FaCommentAlt;
+        return GrBug;
       case 'suggestion':
         return FiStar;
       default:

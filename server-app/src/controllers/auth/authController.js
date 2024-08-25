@@ -4,6 +4,8 @@ import User from '../../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { sendMailforgotPassword } from '../../services/sendMailService.js';
+
 
 export const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -82,26 +84,32 @@ export const loginUser = async (req, res) => {
     }
 };
 
-
-export const forgotPassword  = async (req, res) => {
+export const forgotPassword = async (req, res) => {
     const { email } = req.body;
 
     try {
-        // Buscar al usuario por correo electrónico
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        // Crear un token de restablecimiento de contraseña
         const resetToken = crypto.randomBytes(32).toString('hex');
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
 
         await user.save();
 
-        // Devolver el token y el nombre de usuario
-        res.status(200).json({ resetToken, userName: user.name });
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+        console.log('forgotPassword enviando correo...', {
+            to: email,
+            toName: user.name,
+            resetLink: resetLink
+        });
+
+        await sendMailforgotPassword(email, user.name, resetLink);
+
+        res.status(200).json({ message: 'Correo de restablecimiento enviado' });
     } catch (error) {
         console.error('Error en el proceso de restablecimiento de contraseña:', error);
         res.status(500).json({ message: 'Error en el proceso de restablecimiento de contraseña' });
