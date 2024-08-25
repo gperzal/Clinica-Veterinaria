@@ -164,22 +164,26 @@ export default function Navbar() {
               <Button
                 as={Link}
                 fontSize={'sm'}
-                fontWeight={400}
-                variant={'link'}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontWeight={600}
+                color={'neutral.600'}
+                borderRadius={'full'}
+                _hover={{bg: 'blue.900', color: 'white'}}  
                 href={'/login'}
-                 display={{ base: 'none', md: 'inline-block' }}
+         
               >
                 Iniciar Sesión
               </Button>
               <Button
                 as={Link}
-                display={{ base: 'none', md: 'inline-flex' }}
                 fontSize={'sm'}
+                display={{ base: 'none', md: 'inline-flex' }}
                 fontWeight={600}
                 color={'white'}
-                bg={'pink.400'}
+                bg={'pink.200'}
+                borderRadius={'full'}
+                _hover={{ bg: 'pink.700', color: 'white' }}
                 href={'/register'}
-                _hover={{ bg: 'pink.300' }}
               >
                 Registrarse
               </Button>

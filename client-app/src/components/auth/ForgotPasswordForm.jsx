@@ -45,6 +45,12 @@ export default function ForgotPasswordForm() {
         import.meta.env.VITE_PUBLIC_KEY 
       );
 
+      console.log('Service ID:', import.meta.env.VITE_SERVICE_ID);
+      console.log('Template ID:', import.meta.env.VITE_TEMPLATE_ID);
+      console.log('Public Key:', import.meta.env.VITE_PUBLIC_KEY);
+      console.log('Frontend URL:', import.meta.env.VITE_FRONTEND_URL);
+      
+
 
       if (result.status === 200) {
         toast({
