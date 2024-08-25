@@ -19,7 +19,7 @@ export const sendMailforgotPassword = async (to, to_name, reset_link) => {
         };
 
         const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log('Email enviado:', response);
+
     } catch (error) {
         console.error('Error al enviar el correo:', error);
         if (error.response) {

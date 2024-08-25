@@ -11,7 +11,6 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import emailjs from 'emailjs-com';
 import { requestTokenPasswordReset } from '../../services/auth/authService';
 
 export default function ForgotPasswordForm() {
@@ -19,66 +18,24 @@ export default function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
-  // variables de email.js
-  const serviceId = 'service_r0ogdid';
-  const templateId = 'template_megtktu';
-  const publicKey = 'tAfZvCjdw7obYxW0f';
-  const URLB = import.meta.env.VITE_BACKEND_API;
-  const URLF = import.meta.env.VITE_FRONTEND_URL;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-   
-      // 1. Solicitar el token y nombre de usuario al backend
-      const response = await requestTokenPasswordReset(email);
-      const { resetToken, userName } = response.data; 
+      // 1. Solicitar el token y enviar el correo desde el backend
+      await requestTokenPasswordReset(email);
 
-
-      // 2. Definir los parámetros del template para EmailJS
-      const templateParams = {
-        user_email: email,
-        to_name: userName,
-        reset_link: `${import.meta.env.VITE_FRONTEND_URL}/reset-password/${resetToken}`,
-      };
-
-      // 2. Definir los parámetros del template para EmailJS
-      // const templateParams = {
-      //   user_email: email,
-      //   to_name: userName,
-      //   reset_link: ${import.meta.env.VITE_FRONTEND_URL}/reset-password/${resetToken},
-      // };
-
-      // // 3. Enviar el correo usando EmailJS
-      const result = await emailjs.send(
-        serviceId, 
-        templateId,  
-        templateParams,
-        publicKey
-      );
-
-      console.log('Service ID:', serviceId);
-      console.log('Template ID:', templateId);
-      console.log('Public Key:',publicKey);
-      console.log('Frontend URL:', URLF);
-      console.log('Backend URL:', URLB);
-
-
-
-      if (result.status === 200) {
-        toast({
-          title: 'Solicitud Exitosa',
-          description: 'Revisa tu correo electrónico para continuar con el restablecimiento de tu contraseña.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error('Error en el envío del correo.');
-      }
+      // 2. Mostrar un mensaje de éxito al usuario
+      toast({
+        title: 'Solicitud Exitosa',
+        description: 'Revisa tu correo electrónico para continuar con el restablecimiento de tu contraseña. Busca en Spam si no lo encuentras.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
+      // 3. Manejo de errores
       toast({
         title: 'Error',
         description: error.message || 'Algo salió mal. Intenta nuevamente.',
