@@ -4,7 +4,7 @@ import User from '../../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { sendMailforgotPassword } from '../../services/sendMailService.js';
+import { sendMailForgotPassword } from '../../services/sendMailService.js';
 
 
 export const registerUser = async (req, res) => {
@@ -101,13 +101,8 @@ export const forgotPassword = async (req, res) => {
 
         const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-        console.log('forgotPassword enviando correo...', {
-            to: email,
-            toName: user.name,
-            resetLink: resetLink
-        });
 
-        await sendMailforgotPassword(email, user.name, resetLink);
+        await sendMailForgotPassword(email, user.name, resetLink);
 
         res.status(200).json({ message: 'Correo de restablecimiento enviado' });
     } catch (error) {
