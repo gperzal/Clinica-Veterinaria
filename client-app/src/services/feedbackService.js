@@ -10,7 +10,6 @@ export const requestFeedback = async (feedbackData) => {
         return response.data;
     } catch (error) {
         console.error('Error al enviar el feedback:', error);
-        console.error(API_URL);
         throw new Error('Error al enviar el feedback');
     }
 };
