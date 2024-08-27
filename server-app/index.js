@@ -18,7 +18,7 @@ connectDB();
 app.use(express.json());
 
 const allowedOrigins = [
-    'https://client-app-eosin.vercel.app', // Tu aplicación en Vercel
+    'https://client-app-eosin.vercel.app', // URL Frontend
     'http://localhost:5173', // Tu entorno de desarrollo local
 ];
 const corsOptions = {
@@ -34,6 +34,7 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     }
+
 };
 
 // Middleware para agregar encabezados de seguridad
