@@ -18,7 +18,8 @@ import {
   Flex,
   ScaleFade,
   Tooltip,
-  IconButton
+  IconButton,
+  Link
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiStar, FiSmile, FiSmartphone, FiImage, FiPlus, FiTrash } from 'react-icons/fi';
@@ -201,7 +202,7 @@ export default function FeedbackForm() {
                 name={`mediaUrl-${index}`}
                 value={url}
                 onChange={(e) => handleMediaUrlChange(index, e.target.value)}
-                placeholder="ejemplo.com/imagen.jpg"
+                placeholder="https://postimg.cc/Z0v63W0r"
               />
               {formData.mediaUrls.length > 1 && (
                 <IconButton
@@ -214,7 +215,15 @@ export default function FeedbackForm() {
               )}
             </InputGroup>
             <Text fontSize="sm" mt={1} color="gray.500">
-              Sube tu imagen/video a un servicio de alojamiento y pega el enlace aquí
+              Sube tu imagen/video a un servicio de alojamiento ejemplo {' '}
+              <Link href="https://imgbb.com" color="blue.500" isExternal >
+                https://imgbb.com
+              </Link>{' '}
+              o{' '}
+              <Link href="https://postimages.org" color="blue.500" isExternal >
+                https://postimages.org
+              </Link>
+              {' '}y pega el enlace
             </Text>
           </FormControl>
         ))}
