@@ -44,7 +44,7 @@ import ContactPage from './pages/contact/ContactPage';
 import FAQPage from './pages/contact/FAQPage';
 import FeedbackPage from './pages/contact/FeedbackPage';
 import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
-
+import AboutPage from './pages/AboutPage';
 function App() {
   return (
     <AuthProvider>  
@@ -183,6 +183,18 @@ function App() {
                       } 
           />
           <Route 
+            path="/about" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <AboutPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+          <Route 
             path="/coming-soon" 
             element={
               <Flex direction="column" minH="100vh">
@@ -194,6 +206,7 @@ function App() {
               </Flex>
             } 
           />
+
           <Route path="*" element={<NotFoundPage />} />
           {/* Rutas del dashboard sin Navbar y Footer */}
           <Route 

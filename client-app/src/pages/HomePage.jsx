@@ -1,9 +1,9 @@
 import React from 'react';
 import { Container, Stack, Flex, Box, Heading, Text, Button, Image,  Icon, useColorModeValue, useBreakpointValue } from '@chakra-ui/react';
-
+import { Link } from 'react-router-dom';
 
 export default function HomePage() {
-  const overflowXValue = useBreakpointValue({ base: 'hidden', md: 'visible' }); // Aplica overflowX="hidden" solo en móviles
+  const overflowXValue = useBreakpointValue({ base: 'hidden', md: 'visible' }); 
 
 
   return (
@@ -45,28 +45,32 @@ export default function HomePage() {
             En nuestra clínica veterinaria, ofrecemos una amplia gama de servicios para asegurar el bienestar de tus mascotas. Desde consultas veterinarias hasta servicios de peluquería, nos aseguramos de que reciban el mejor cuidado posible. ¡Agenda una cita o explora nuestros productos en línea!
           </Text>
           <Stack spacing={{ base: 4, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
-            <Button
-              rounded={'full'}
-              size={'lg'}
-              fontWeight={'bold'}
-              px={6}
-              colorScheme={'red'}
-              bg={'red.400'}
-              color={'white'} 
-              _hover={{ bg: 'red.500' }}>
-              Agenda una cita
-            </Button>
-            <Button
-              rounded={'full'}
-              size={'lg'}
-              fontWeight={'bold'}
-              px={6}
-              bg={useColorModeValue('gray.300', 'gray.600')} 
-              color={useColorModeValue('black', 'white')}  
-              _hover={{ bg: 'gray.500' }}
-              >
-              Conoce más
-            </Button>
+            <Link to="/appointments" style={{ textDecoration: 'none' }}>
+              <Button
+                rounded={'full'}
+                size={'lg'}
+                fontWeight={'bold'}
+                px={6}
+                colorScheme={'red'}
+                bg={'red.400'}
+                color={'white'} 
+                _hover={{ bg: 'red.500' }}>
+                Agenda una cita
+              </Button>
+              </Link>
+            <Link to="/about" style={{ textDecoration: 'none' }}>
+              <Button
+                rounded={'full'}
+                size={'lg'}
+                fontWeight={'bold'}
+                px={6}
+                bg={useColorModeValue('gray.300', 'gray.600')} 
+                color={useColorModeValue('black', 'white')}  
+                _hover={{ bg: 'gray.500' }}
+                >
+                Conoce más
+              </Button>
+            </Link>
           </Stack>
         </Stack>
         <Flex

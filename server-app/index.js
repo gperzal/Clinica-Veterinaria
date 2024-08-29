@@ -2,8 +2,8 @@ import express from 'express';
 import connectDB from './src/config/db.js';
 import dotenv from 'dotenv';
 import authRoutes from './src/routes/auth/authRoutes.js';
-import feedBackRoutes from './src/routes/feedbackRoutes.js';
-
+import feedBackRoutes from './src/routes/contact/feedbackRoutes.js';
+import contactRoutes from './src/routes//contact/contactRoutes.js';
 import cors from 'cors';
 
 
@@ -49,6 +49,7 @@ app.use(cors(corsOptions));
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/', feedBackRoutes);
+app.use('/api/', contactRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

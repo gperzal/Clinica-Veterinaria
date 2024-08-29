@@ -1,4 +1,4 @@
-import { sendMailFeedback } from '../services/sendMailService.js';
+import { sendMailFeedback } from '../../services/sendMailService.js';
 
 export const handleFeedback = async (req, res) => {
     try {

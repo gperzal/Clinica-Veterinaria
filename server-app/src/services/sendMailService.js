@@ -62,3 +62,36 @@ export const sendMailFeedback = async (to, { email, type, description, deviceInf
         throw new Error('Error al enviar el correo de feedback');
     }
 };
+
+export const sendContactMail = async ({ fullName, email, phone, reason, message, preferredDate }) => {
+    try {
+        const defaultClient = SibApiV3Sdk.ApiClient.instance;
+        const apiKey = defaultClient.authentications['api-key'];
+        apiKey.apiKey = process.env.BREVO_API_KEY;
+
+        const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+        const sendSmtpEmail = {
+            to: [{ email: 'clinica.veterinaria.pets2024@gmail.com', name: 'Clinica Veterinaria' }],
+            sender: { email: 'clinica.veterinaria.pets2024@gmail.com', name: 'Clinica Veterinaria' },
+            templateId: 4,
+            params: {
+                fullName: fullName,
+                email: email,
+                phone: phone || 'No proporcionado',
+                reason: reason,
+                message: message,
+                preferredDate: preferredDate,
+            },
+        };
+
+        const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log('Correo de contacto enviado:', response);
+    } catch (error) {
+        console.error('Error al enviar el correo de contacto:', error);
+        if (error.response) {
+            console.error('Response body:', error.response.body);
+        }
+        throw new Error('Error al enviar el correo de contacto');
+    }
+};
