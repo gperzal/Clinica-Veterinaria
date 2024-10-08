@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import authRoutes from './src/routes/auth/authRoutes.js';
 import feedBackRoutes from './src/routes/contact/feedbackRoutes.js';
 import contactRoutes from './src/routes//contact/contactRoutes.js';
+import profileRoutes from './src/routes/dashboard/profileRoutes.js';
+
 import cors from 'cors';
 
 
@@ -18,7 +20,7 @@ connectDB();
 app.use(express.json());
 
 const allowedOrigins = [
-    'https://client-app-eosin.vercel.app', // URL Frontend
+    'https://pawmart.vercel.app', // URL Frontend
     'http://localhost:5173', // Tu entorno de desarrollo local
 ];
 const corsOptions = {
@@ -50,6 +52,8 @@ app.use(cors(corsOptions));
 app.use('/api/auth', authRoutes);
 app.use('/api/', feedBackRoutes);
 app.use('/api/', contactRoutes);
+
+app.use('/api/dashboard', profileRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

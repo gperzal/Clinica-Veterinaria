@@ -21,7 +21,7 @@ const UserModal = ({ user, isOpen, onClose, onSave }) => {
   const handleSave = () => {
     const updatedUser = { ...userData };
     if (password) {
-      updatedUser.password = password;  // Solo incluimos la contraseña si fue cambiada
+      updatedUser.password = password;  
     }
     onSave(updatedUser);
   };

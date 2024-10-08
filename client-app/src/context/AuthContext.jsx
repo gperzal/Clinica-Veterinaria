@@ -1,33 +1,38 @@
+// AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        const name = localStorage.getItem('userName');
-        if (token && name) {
-            setUser({ token, name });
-        }
-    }, []);
+  useEffect(() => {
+    const storedUserData =
+      JSON.parse(localStorage.getItem('userData')) ||
+      JSON.parse(sessionStorage.getItem('userData'));
+    if (storedUserData && storedUserData.token && storedUserData.name) {
+      setUser({ token: storedUserData.token, name: storedUserData.name });
+    }
+  }, []);
 
-    const login = (userData) => {
-        setUser(userData);
-        localStorage.setItem('token', userData.token);
-        localStorage.setItem('userName', userData.name);
-    };
+  const login = (userData, rememberMe) => {
+    setUser(userData);
+    if (rememberMe) {
+      localStorage.setItem('userData', JSON.stringify(userData));
+    } else {
+      sessionStorage.setItem('userData', JSON.stringify(userData));
+    }
+  };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('userName');
-    };
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('userData');
+    sessionStorage.removeItem('userData');
+  };
 
-    return (
-        <AuthContext.Provider value={{ user, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

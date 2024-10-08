@@ -28,26 +28,21 @@ export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const toast = useToast();
-  const { login: loginContext } = useContext(AuthContext);  // Aquí obtenemos la función de login del contexto
+  const { login: loginContext } = useContext(AuthContext);  
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await login({ email, password });
       if (response.status === 200 && response.data.token) {
         const userData = { token: response.data.token, name: response.data.name };
-
-        // Guardar en localStorage o sessionStorage dependiendo de "Recordarme"
-        if (rememberMe) {
-          localStorage.setItem('userData', JSON.stringify(userData));
-        } else {
-          sessionStorage.setItem('userData', JSON.stringify(userData));
-        }
-
-        loginContext(userData);
+  
+        // Llamar a loginContext con userData y rememberMe
+        loginContext(userData, rememberMe);
+  
         toast({
           title: 'Inicio de sesión exitoso',
           description: `Bienvenido ${response.data.name}`,
@@ -55,7 +50,7 @@ export default function LoginForm() {
           duration: 5000,
           isClosable: true,
         });
-        navigate('/'); // Redirigir a la página principal
+        navigate('/'); 
       } else {
         setErrorMessage('Credenciales incorrectas.');
       }

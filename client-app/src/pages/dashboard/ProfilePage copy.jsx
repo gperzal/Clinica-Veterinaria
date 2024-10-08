@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Heading, SimpleGrid, FormControl, FormLabel, Input, Button, VStack,
   Image, Text, Select, Divider, Card, CardHeader, CardBody, CardFooter,Icon,
-  InputGroup, InputRightElement, IconButton, useToast,
-  NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper
+  InputGroup, InputRightElement, IconButton
 } from '@chakra-ui/react';
 import { FaPaw, FaEye, FaEyeSlash }  from 'react-icons/fa'; // Importamos un icono de paw (huella)
 import Slider from "react-slick";
@@ -46,25 +45,18 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false); 
   const [editingPetId, setEditingPetId] = useState(null); 
 
-  // Inicializamos el hook useToast
-  const toast = useToast();
-
   // Función para cargar los datos de perfil y mascotas desde el backend
   const loadData = async () => {
     try {
       const profileResponse = await getProfile();
+      console.log('Perfil cargado:', profileResponse.data);
       setProfile(profileResponse.data.user);  
+
       const petsResponse = await getPets();
+      console.log('Mascotas cargadas:', petsResponse.data);
       setPets(petsResponse.data.pets);  
     } catch (error) {
       console.error('Error al cargar datos:', error);
-      toast({
-        title: 'Error al cargar los datos.',
-        description: 'No se pudieron cargar los datos del perfil y mascotas.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -82,21 +74,9 @@ const ProfilePage = () => {
   const handleSaveProfile = async () => {
     try {
       await updateProfile(profile);
-      toast({
-        title: 'Perfil actualizado con éxito.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
+      alert('Perfil actualizado con éxito');
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
-      toast({
-        title: 'Error al actualizar el perfil.',
-        description: 'Por favor, inténtalo de nuevo más tarde.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -109,13 +89,7 @@ const ProfilePage = () => {
   // Cambiar contraseña
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmNewPassword) {
-      toast({
-        title: 'Las contraseñas no coinciden.',
-        description: 'Por favor, verifica que las contraseñas sean iguales.',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      });
+      alert('Las contraseñas no coinciden');
       return;
     }
     try {
@@ -123,21 +97,9 @@ const ProfilePage = () => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword 
       });
-      toast({
-        title: 'Contraseña cambiada con éxito.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
+      alert('Contraseña cambiada con éxito');
     } catch (error) {
       console.error('Error al cambiar contraseña:', error);
-      toast({
-        title: 'Error al cambiar la contraseña.',
-        description: error.response?.data?.message || 'Por favor, inténtalo de nuevo más tarde.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -153,22 +115,11 @@ const ProfilePage = () => {
       if (isEditing) {
         // Actualizar mascota
         await updatePet(editingPetId, newPet);
-        toast({
-          title: 'Mascota actualizada con éxito.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
+        alert('Mascota actualizada con éxito');
       } else {
         // Agregar mascota
         await addPet(newPet);
-        await addPet(newPet);
-        toast({
-          title: 'Mascota agregada con éxito.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
+        alert('Mascota agregada con éxito');
       }
 
       // Recargar la lista de mascotas desde el backend
@@ -194,13 +145,6 @@ const ProfilePage = () => {
 
     } catch (error) {
       console.error('Error al agregar o actualizar mascota:', error);
-      toast({
-        title: 'Error al guardar la mascota.',
-        description: error.response?.data?.message || 'Por favor, verifica los datos e inténtalo de nuevo.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -211,21 +155,9 @@ const ProfilePage = () => {
       // Recargar la lista de mascotas desde el backend
       const petsResponse = await getPets();
       setPets(petsResponse.data.pets);
-      toast({
-        title: 'Mascota eliminada con éxito.',
-        status: 'info',
-        duration: 5000,
-        isClosable: true,
-      });
+      alert('Mascota eliminada con éxito');
     } catch (error) {
       console.error('Error al eliminar mascota:', error);
-      toast({
-        title: 'Error al eliminar la mascota.',
-        description: 'Por favor, inténtalo de nuevo más tarde.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -435,24 +367,14 @@ const ProfilePage = () => {
               </FormControl>
               <FormControl>
                 <FormLabel>Edad</FormLabel>
-                  <NumberInput
-                  min={0}
-                  max={100}
+                <Input
+                  placeholder="Edad de la mascota"
+                  name="age"
                   value={newPet.age}
-                  onChange={(valueString) =>
-                    setNewPet({ ...newPet, age: parseInt(valueString) || '' })
-                  }
-                >
-                  <NumberInputField
-                    placeholder="Edad de la mascota"
-                    name="age"
-                  />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                   </NumberInput>
-                </FormControl>
+                  type="number"
+                  onChange={handlePetInputChange}
+                />
+              </FormControl>
               <FormControl>
                 <FormLabel>Raza</FormLabel>
                 <Input
@@ -561,7 +483,7 @@ const ProfilePage = () => {
                     objectFit="cover"
                   />
                   <VStack align="start" spacing={1}>
-                    <Text><strong>Edad:</strong> {pet.age ? `${pet.age} años` : 'Desconocido'}</Text>
+                    <Text><strong>Edad:</strong> {pet.age || 'Desconocido'}</Text>
                     <Text><strong>Raza:</strong> {pet.breed || 'Desconocida'}</Text>
                     <Text><strong>Sexo:</strong> {pet.sex || 'Desconocido'}</Text>
                     <Text><strong>Color:</strong> {pet.color || 'Desconocido'}</Text>

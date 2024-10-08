@@ -209,9 +209,7 @@ function App() {
 
           <Route path="*" element={<NotFoundPage />} />
           {/* Rutas del dashboard sin Navbar y Footer */}
-          <Route 
-            path="/dashboard/*" 
-            element={
+          <Route path="/dashboard/*" element={
               <SidebarWithHeader>
               <Routes>
                 <Route path="" element={<DashboardPage />} /> 
