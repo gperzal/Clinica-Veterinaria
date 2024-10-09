@@ -1,6 +1,6 @@
 // src/components/dashboard/SidebarWithHeader.jsx
-'use client'
 
+import React, { useState, useContext } from 'react';
 import {
   Box,
   CloseButton,
@@ -17,10 +17,8 @@ import {
   HStack,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   MenuList,
-  Avatar,
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -31,53 +29,58 @@ import {
   FiSettings,
   FiMenu,
   FiBell,
-  FiFile ,
+  FiFile,
   FiChevronDown,
 } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useNavigate, Navigate } from 'react-router-dom'; // Importamos useNavigate y Navigate
+import { AuthContext } from '../../context/AuthContext';
 
-// Datos organizados por secciones
+
+// Datos organizados por secciones con roles permitidos
 const menuSections = [
   {
     sectionName: 'Generales',
+    allowedRoles: ['Cliente', 'Administrativo', 'Veterinario', 'Administrador'],
     items: [
-      { name: 'Dashboard', icon: FiHome, path: '/dashboard' }, 
+      { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
       { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
-      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' }, // path: '/dashboard/medical-history'
-      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/coming-soon' }, //path: '/dashboard/purchase-history'
+      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/coming-soon' },
       { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
     ],
   },
   {
     sectionName: 'Administrativo',
+    allowedRoles: ['Administrativo', 'Veterinario', 'Administrador'],
     items: [
-      { name: 'Catalogo', icon: FiClipboard, path: '/dashboard/catalog'}, 
-      { name: 'Inventario', icon: FiShoppingCart, path: '/dashboard/inventory' }, 
-      { name: 'Citas Medicas', icon: FiClipboard,path: '/dashboard/coming-soon' }, // path: '/dashboard/medical-appointments'
-      { name: 'Citas Estilisticas', icon: FiClipboard, path: '/dashboard/coming-soon' }, // path: '/dashboard/esthetic-appointments'
+      { name: 'Catálogo', icon: FiClipboard, path: '/dashboard/catalog' },
+      { name: 'Inventario', icon: FiShoppingCart, path: '/dashboard/inventory' },
+      { name: 'Citas Médicas', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Citas Estilísticas', icon: FiClipboard, path: '/dashboard/coming-soon' },
     ],
   },
   {
     sectionName: 'Veterinario',
+    allowedRoles: ['Veterinario', 'Administrador'],
     items: [
-      { name: 'Citas', icon: FiClipboard, path: '/dashboard/coming-soon'}, // path: '/dashboard/appointments' 
+      { name: 'Citas', icon: FiClipboard, path: '/dashboard/coming-soon' },
     ],
   },
   {
-    sectionName: 'Admin',
+    sectionName: 'Administrador',
+    allowedRoles: ['Administrador'],
     items: [
-      { name: 'Usuarios', icon: FiUsers,path: '/dashboard/users' }, 
-      { name: 'Roles', icon: FiUser,  path: '/dashboard/roles' }, 
-      { name : 'Reportes', icon: FiFile, path: '/dashboard/reports' },
+      { name: 'Usuarios', icon: FiUsers, path: '/dashboard/users' },
+      { name: 'Roles', icon: FiUser, path: '/dashboard/roles' },
+      { name: 'Reportes', icon: FiFile, path: '/dashboard/reports' },
     ],
   },
 ];
 
-const SidebarContent = ({ onClose, ...rest }) => {
+const SidebarContent = ({ onClose, userRole, ...rest }) => {
   return (
     <Box
-      transition="3s ease"
+      transition="0.3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
@@ -88,15 +91,17 @@ const SidebarContent = ({ onClose, ...rest }) => {
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Link to="/">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-           Dashboard
-        </Text>
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+            Dashboard
+          </Text>
         </Link>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {menuSections.map((section) => (
-        <MenuSection key={section.sectionName} section={section} />
-      ))}
+      {menuSections
+        .filter((section) => section.allowedRoles.includes(userRole))
+        .map((section) => (
+          <MenuSection key={section.sectionName} section={section} />
+        ))}
     </Box>
   );
 };
@@ -117,7 +122,7 @@ const MenuSection = ({ section }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Text fontSize="sm" fontWeight="bold" textTransform="uppercase">
-          {section.sectionName}
+          {section.sectionName} 
         </Text>
         <Icon as={FiMenu} />
       </Flex>
@@ -132,7 +137,7 @@ const MenuSection = ({ section }) => {
       </Collapse>
     </Box>
   );
-};
+};;
 
 const NavItem = ({ icon, children, path, ...rest }) => {
   return (
@@ -166,7 +171,14 @@ const NavItem = ({ icon, children, path, ...rest }) => {
   );
 };
 
-const MobileNav = ({ onOpen, ...rest }) => {
+const MobileNav = ({ onOpen, user, logout, ...rest }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/'); // Redirige al inicio o a la página de login
+  };
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -186,8 +198,6 @@ const MobileNav = ({ onOpen, ...rest }) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-    
-  
 
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
@@ -195,41 +205,31 @@ const MobileNav = ({ onOpen, ...rest }) => {
           <Menu>
             <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
               <HStack>
-                <Avatar
-                  size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
-                />
                 <VStack
-                  display={{ base: 'none', md: 'flex' }}
+                  display={{ md: 'flex' }}
                   alignItems="flex-start"
                   spacing="1px"
-                  ml="2">
-                  <Text fontSize="sm">Justina Clark</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    Admin
+                  ml="2"
+                >
+                  <Text fontSize="sm" fontWeight="bold">{user.name}</Text>
+                  <Text fontSize="xs" color="gray.600" fontWeight="bold">
+                    {user.role}
                   </Text>
                 </VStack>
-                <Box display={{ base: 'none', md: 'flex' }}>
+                <Box display={{ md: 'flex' }}>
                   <FiChevronDown />
                 </Box>
               </HStack>
             </MenuButton>
             <MenuList
               bg={useColorModeValue('white', 'gray.900')}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
-              <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+            >
+              <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
       </HStack>
-
-
     </Flex>
   );
 };
@@ -237,9 +237,21 @@ const MobileNav = ({ onOpen, ...rest }) => {
 const SidebarWithHeader = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Obtenemos el usuario desde el contexto
+  const { user, logout } = useContext(AuthContext);
+
+  if (!user) {
+    // Si no hay usuario, redireccionamos al login
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-      <SidebarContent onClose={() => onClose} display={{ base: 'none', md: 'block' }} />
+      <SidebarContent
+        onClose={onClose}
+        userRole={user.role}
+        display={{ base: 'none', md: 'block' }}
+      />
       <Drawer
         isOpen={isOpen}
         placement="left"
@@ -249,15 +261,14 @@ const SidebarWithHeader = ({ children }) => {
         size="full"
       >
         <DrawerContent>
-          <SidebarContent onClose={onClose} />
+          <SidebarContent onClose={onClose} userRole={user.role} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} />
+      <MobileNav onOpen={onOpen} user={user} logout={logout} />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
     </Box>
   );
 };
-
 export default SidebarWithHeader;

@@ -3,9 +3,12 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Heading, SimpleGrid, FormControl, FormLabel, Input, Button, VStack,
   Image, Text, Select, Divider, Card, CardHeader, CardBody, CardFooter,Icon,
-  InputGroup, InputRightElement, IconButton
-} from '@chakra-ui/react';
-import { FaPaw, FaEye, FaEyeSlash }  from 'react-icons/fa'; // Importamos un icono de paw (huella)
+  InputGroup, InputRightElement, IconButton, useToast,
+  NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper,
+  InputLeftAddon, Link,Flex
+  } from '@chakra-ui/react';
+import { FaPaw, FaEye, FaEyeSlash }  from 'react-icons/fa';
+import {  FiImage }  from 'react-icons/fi';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
@@ -39,24 +42,30 @@ const ProfilePage = () => {
     healthStatus: '',
     status: '',
     image: 'https://i.pinimg.com/236x/27/af/c7/27afc74ef24f6902dfdc0f2a5c676d32.jpg',
-    notes: '',
   });
 
   const [isEditing, setIsEditing] = useState(false); 
   const [editingPetId, setEditingPetId] = useState(null); 
 
+  // Inicializamos el hook useToast
+  const toast = useToast();
+
   // Función para cargar los datos de perfil y mascotas desde el backend
   const loadData = async () => {
     try {
       const profileResponse = await getProfile();
-      console.log('Perfil cargado:', profileResponse.data);
       setProfile(profileResponse.data.user);  
-
       const petsResponse = await getPets();
-      console.log('Mascotas cargadas:', petsResponse.data);
       setPets(petsResponse.data.pets);  
     } catch (error) {
       console.error('Error al cargar datos:', error);
+      toast({
+        title: 'Error al cargar los datos.',
+        description: 'No se pudieron cargar los datos del perfil y mascotas.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -74,9 +83,21 @@ const ProfilePage = () => {
   const handleSaveProfile = async () => {
     try {
       await updateProfile(profile);
-      alert('Perfil actualizado con éxito');
+      toast({
+        title: 'Perfil actualizado con éxito.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
+      toast({
+        title: 'Error al actualizar el perfil.',
+        description: 'Por favor, inténtalo de nuevo más tarde.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -89,7 +110,13 @@ const ProfilePage = () => {
   // Cambiar contraseña
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmNewPassword) {
-      alert('Las contraseñas no coinciden');
+      toast({
+        title: 'Las contraseñas no coinciden.',
+        description: 'Por favor, verifica que las contraseñas sean iguales.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
       return;
     }
     try {
@@ -97,9 +124,21 @@ const ProfilePage = () => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword 
       });
-      alert('Contraseña cambiada con éxito');
+      toast({
+        title: 'Contraseña cambiada con éxito.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error al cambiar contraseña:', error);
+      toast({
+        title: 'Error al cambiar la contraseña.',
+        description: error.response?.data?.message || 'Por favor, inténtalo de nuevo más tarde.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -111,15 +150,28 @@ const ProfilePage = () => {
 
   // Agregar o actualizar una mascota
   const handleAddOrUpdatePet = async () => {
+
+
+    
     try {
       if (isEditing) {
         // Actualizar mascota
         await updatePet(editingPetId, newPet);
-        alert('Mascota actualizada con éxito');
+        toast({
+          title: 'Mascota actualizada con éxito.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
       } else {
         // Agregar mascota
         await addPet(newPet);
-        alert('Mascota agregada con éxito');
+        toast({
+          title: 'Mascota agregada con éxito.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
       }
 
       // Recargar la lista de mascotas desde el backend
@@ -137,7 +189,6 @@ const ProfilePage = () => {
         healthStatus: '',
         status: '',
         image: 'https://i.pinimg.com/236x/27/af/c7/27afc74ef24f6902dfdc0f2a5c676d32.jpg',
-        notes: '',
       });
 
       setIsEditing(false);
@@ -145,6 +196,13 @@ const ProfilePage = () => {
 
     } catch (error) {
       console.error('Error al agregar o actualizar mascota:', error);
+      toast({
+        title: 'Error al guardar la mascota.',
+        description: error.response?.data?.message || 'Por favor, verifica los datos e inténtalo de nuevo.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -155,9 +213,21 @@ const ProfilePage = () => {
       // Recargar la lista de mascotas desde el backend
       const petsResponse = await getPets();
       setPets(petsResponse.data.pets);
-      alert('Mascota eliminada con éxito');
+      toast({
+        title: 'Mascota eliminada con éxito.',
+        status: 'info',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error al eliminar mascota:', error);
+      toast({
+        title: 'Error al eliminar la mascota.',
+        description: 'Por favor, inténtalo de nuevo más tarde.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -367,14 +437,24 @@ const ProfilePage = () => {
               </FormControl>
               <FormControl>
                 <FormLabel>Edad</FormLabel>
-                <Input
-                  placeholder="Edad de la mascota"
-                  name="age"
+                  <NumberInput
+                  min={0}
+                  max={100}
                   value={newPet.age}
-                  type="number"
-                  onChange={handlePetInputChange}
-                />
-              </FormControl>
+                  onChange={(valueString) =>
+                    setNewPet({ ...newPet, age: parseInt(valueString) || '' })
+                  }
+                >
+                  <NumberInputField
+                    placeholder="Edad de la mascota"
+                    name="age"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                   </NumberInput>
+                </FormControl>
               <FormControl>
                 <FormLabel>Raza</FormLabel>
                 <Input
@@ -442,14 +522,33 @@ const ProfilePage = () => {
               </FormControl>
             </SimpleGrid>
             <FormControl>
-              <FormLabel>Notas adicionales</FormLabel>
-              <Input
-                placeholder="Notas sobre la mascota"
-                name="notes"
-                value={newPet.notes}
-                onChange={handlePetInputChange}
-              />
-            </FormControl>
+          <FormLabel>
+            <Flex align="center">
+              <Icon as={FiImage} mr={2} />
+              URL de imagen (opcional)
+            </Flex>
+          </FormLabel>
+          <InputGroup>
+            <InputLeftAddon children="https://" />
+            <Input
+              name="image"
+              value={newPet.image}
+              onChange={handlePetInputChange}
+              placeholder="ejemplo.com/imagen.jpg"
+            />
+          </InputGroup>
+          <Text fontSize="sm" mt={1} color="gray.500">
+            Sube tu imagen a un servicio de alojamiento como{' '}
+            <Link href="https://imgbb.com" color="blue.500" isExternal>
+              imgbb.com
+            </Link>{' '}
+            o{' '}
+            <Link href="https://postimages.org" color="blue.500" isExternal>
+              postimages.org
+            </Link>
+            , y pega el enlace aquí.
+          </Text>
+        </FormControl>
             <Button colorScheme="green" onClick={handleAddOrUpdatePet}>
               {isEditing ? 'Actualizar Mascota' : 'Agregar Mascota'}
             </Button>
@@ -483,7 +582,7 @@ const ProfilePage = () => {
                     objectFit="cover"
                   />
                   <VStack align="start" spacing={1}>
-                    <Text><strong>Edad:</strong> {pet.age || 'Desconocido'}</Text>
+                    <Text><strong>Edad:</strong> {pet.age ? `${pet.age} años` : 'Desconocido'}</Text>
                     <Text><strong>Raza:</strong> {pet.breed || 'Desconocida'}</Text>
                     <Text><strong>Sexo:</strong> {pet.sex || 'Desconocido'}</Text>
                     <Text><strong>Color:</strong> {pet.color || 'Desconocido'}</Text>

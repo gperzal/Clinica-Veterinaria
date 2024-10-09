@@ -15,7 +15,7 @@ import {
 import { FcGoogle } from 'react-icons/fc'
 import { FaFacebook } from 'react-icons/fa'
 import { SiLinkedin, SiMessenger } from 'react-icons/si'
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { login } from '../../services/auth/authService';
@@ -28,7 +28,7 @@ export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const toast = useToast();
-  const { login: loginContext } = useContext(AuthContext);  
+  const { login: loginContext } = useContext(AuthContext);
 
 
 
@@ -38,8 +38,11 @@ export default function LoginForm() {
     try {
       const response = await login({ email, password });
       if (response.status === 200 && response.data.token) {
-        const userData = { token: response.data.token, name: response.data.name };
-  
+        const userData = {
+          token: response.data.token,
+          name: response.data.name,
+          role: response.data.role,
+        };
         // Llamar a loginContext con userData y rememberMe
         loginContext(userData, rememberMe);
   

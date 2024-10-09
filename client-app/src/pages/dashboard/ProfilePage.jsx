@@ -4,9 +4,11 @@ import {
   Box, Heading, SimpleGrid, FormControl, FormLabel, Input, Button, VStack,
   Image, Text, Select, Divider, Card, CardHeader, CardBody, CardFooter,Icon,
   InputGroup, InputRightElement, IconButton, useToast,
-  NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper
-} from '@chakra-ui/react';
-import { FaPaw, FaEye, FaEyeSlash }  from 'react-icons/fa'; // Importamos un icono de paw (huella)
+  NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper,
+  InputLeftAddon, Link,Flex
+  } from '@chakra-ui/react';
+import { FaPaw, FaEye, FaEyeSlash }  from 'react-icons/fa';
+import {  FiImage }  from 'react-icons/fi';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
@@ -39,8 +41,7 @@ const ProfilePage = () => {
     chipNumber: '',
     healthStatus: '',
     status: '',
-    image: 'https://i.pinimg.com/236x/27/af/c7/27afc74ef24f6902dfdc0f2a5c676d32.jpg',
-    notes: '',
+    image: '',
   });
 
   const [isEditing, setIsEditing] = useState(false); 
@@ -58,13 +59,6 @@ const ProfilePage = () => {
       setPets(petsResponse.data.pets);  
     } catch (error) {
       console.error('Error al cargar datos:', error);
-      toast({
-        title: 'Error al cargar los datos.',
-        description: 'No se pudieron cargar los datos del perfil y mascotas.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -149,10 +143,31 @@ const ProfilePage = () => {
 
   // Agregar o actualizar una mascota
   const handleAddOrUpdatePet = async () => {
+    // Validaciones (ver siguiente sección)
+    const requiredFields = ['name', 'age', 'breed', 'color', 'sex', 'healthStatus', 'status'];
+    for (let field of requiredFields) {
+      if (!newPet[field]) {
+        toast({
+          title: 'Campos obligatorios incompletos.',
+          description: 'Por favor, completa todos los campos obligatorios.',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        });
+        return; // Salimos de la función si falta algún campo
+      }
+    }
+
+    // Asignar imagen por defecto si no se proporciona una URL
+    const petData = {
+      ...newPet,
+      image: newPet.image || 'https://i.pinimg.com/236x/27/af/c7/27afc74ef24f6902dfdc0f2a5c676d32.jpg',
+    };
+  
     try {
       if (isEditing) {
         // Actualizar mascota
-        await updatePet(editingPetId, newPet);
+        await updatePet(editingPetId, petData);
         toast({
           title: 'Mascota actualizada con éxito.',
           status: 'success',
@@ -161,8 +176,7 @@ const ProfilePage = () => {
         });
       } else {
         // Agregar mascota
-        await addPet(newPet);
-        await addPet(newPet);
+        await addPet(petData);
         toast({
           title: 'Mascota agregada con éxito.',
           status: 'success',
@@ -170,11 +184,11 @@ const ProfilePage = () => {
           isClosable: true,
         });
       }
-
+  
       // Recargar la lista de mascotas desde el backend
       const petsResponse = await getPets();
       setPets(petsResponse.data.pets);
-
+  
       // Resetear el formulario
       setNewPet({
         name: '',
@@ -186,12 +200,11 @@ const ProfilePage = () => {
         healthStatus: '',
         status: '',
         image: 'https://i.pinimg.com/236x/27/af/c7/27afc74ef24f6902dfdc0f2a5c676d32.jpg',
-        notes: '',
       });
-
+  
       setIsEditing(false);
       setEditingPetId(null);
-
+  
     } catch (error) {
       console.error('Error al agregar o actualizar mascota:', error);
       toast({
@@ -241,7 +254,6 @@ const ProfilePage = () => {
       healthStatus: pet.healthStatus || '',
       status: pet.status || '',
       image: pet.image || '',
-      notes: pet.notes || '',
     });
     setIsEditing(true);
     setEditingPetId(pet._id);
@@ -285,7 +297,7 @@ const ProfilePage = () => {
           Información Personal
         </Heading>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Nombre Completo</FormLabel>
             <Input
               name="name"
@@ -294,7 +306,7 @@ const ProfilePage = () => {
               placeholder="Nombre Completo"
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Correo Electrónico</FormLabel>
             <Input
               type="email"
@@ -304,7 +316,7 @@ const ProfilePage = () => {
               placeholder="correo@ejemplo.com"
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Teléfono Principal</FormLabel>
             <Input
               name="phone"
@@ -331,7 +343,7 @@ const ProfilePage = () => {
               onChange={handleProfileChange}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Dirección</FormLabel>
             <Input
               name="address"
@@ -424,7 +436,7 @@ const ProfilePage = () => {
           </Heading>
           <VStack spacing={4} align="start" w="full">
             <SimpleGrid columns={1} spacing={4} w="full">
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Nombre</FormLabel>
                 <Input
                   placeholder="Nombre de la mascota"
@@ -433,7 +445,7 @@ const ProfilePage = () => {
                   onChange={handlePetInputChange}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Edad</FormLabel>
                   <NumberInput
                   min={0}
@@ -453,7 +465,7 @@ const ProfilePage = () => {
                   </NumberInputStepper>
                    </NumberInput>
                 </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Raza</FormLabel>
                 <Input
                   placeholder="Raza de la mascota"
@@ -462,7 +474,7 @@ const ProfilePage = () => {
                   onChange={handlePetInputChange}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Color</FormLabel>
                 <Input
                   placeholder="Color de la mascota"
@@ -473,7 +485,7 @@ const ProfilePage = () => {
               </FormControl>
             </SimpleGrid>
             <SimpleGrid columns={1} spacing={4} w="full">
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Sexo</FormLabel>
                 <Select
                   name="sex"
@@ -485,7 +497,7 @@ const ProfilePage = () => {
                   <option value="Hembra">Hembra</option>
                 </Select>
               </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Número de Chip</FormLabel>
                 <Input
                   placeholder="Número de chip"
@@ -494,7 +506,7 @@ const ProfilePage = () => {
                   onChange={handlePetInputChange}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Estado de Salud General</FormLabel>
                 <Select
                   name="healthStatus"
@@ -506,7 +518,7 @@ const ProfilePage = () => {
                   <option value="En tratamiento">En tratamiento</option>
                 </Select>
               </FormControl>
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Status</FormLabel>
                 <Select
                   name="status"
@@ -519,15 +531,34 @@ const ProfilePage = () => {
                 </Select>
               </FormControl>
             </SimpleGrid>
-            <FormControl>
-              <FormLabel>Notas adicionales</FormLabel>
-              <Input
-                placeholder="Notas sobre la mascota"
-                name="notes"
-                value={newPet.notes}
-                onChange={handlePetInputChange}
-              />
-            </FormControl>
+            <FormControl >
+          <FormLabel>
+            <Flex align="center">
+              <Icon as={FiImage} mr={2} />
+              URL de imagen (opcional)
+            </Flex>
+          </FormLabel>
+          <InputGroup>
+            <InputLeftAddon children="https://" />
+            <Input
+              name="image"
+              value={newPet.image}
+              onChange={handlePetInputChange}
+              placeholder="ejemplo.com/imagen.jpg"
+            />
+          </InputGroup>
+          <Text fontSize="sm" mt={1} color="gray.500">
+            Sube tu imagen a un servicio de alojamiento como{' '}
+            <Link href="https://imgbb.com" color="blue.500" isExternal>
+              imgbb.com
+            </Link>{' '}
+            o{' '}
+            <Link href="https://postimages.org" color="blue.500" isExternal>
+              postimages.org
+            </Link>
+            , y pega el enlace aquí.
+          </Text>
+        </FormControl>
             <Button colorScheme="green" onClick={handleAddOrUpdatePet}>
               {isEditing ? 'Actualizar Mascota' : 'Agregar Mascota'}
             </Button>
@@ -539,10 +570,14 @@ const ProfilePage = () => {
         <Heading fontSize="2xl" fontWeight="bold" mb={4}>
           Lista de Mascotas
         </Heading>
-        <Slider {...carouselSettings}>
-          {pets.map((pet) => (
-            <Box key={pet._id} p={2}>
-              <Card variant="outline" width="100%" height="100%">
+        {pets.length === 0 ? (
+          <Text>No tienes mascotas registradas.</Text>
+        ) : (
+          <Slider {...carouselSettings}>
+            {pets.map((pet) => (
+              <Box key={pet._id} p={2}>
+                {/* ... tarjeta de mascota */}
+                <Card variant="outline" width="100%" height="100%">
                 <CardHeader display="flex" justifyContent="space-between" alignItems="center" bg="teal.500"  color="white" pb={2}>
                   <Icon as={FaPaw} w={6} h={6} mb={2} />
                   <Heading size="lg" fontWeight="bold" textAlign="center" pb={2} >
@@ -574,9 +609,11 @@ const ProfilePage = () => {
                   <Button colorScheme="red" onClick={() => handleDeletePet(pet._id)}>Eliminar</Button>
                 </CardFooter>
               </Card>
-            </Box>
-          ))}
-        </Slider>
+              </Box>
+            ))}
+          </Slider>
+        )}
+        
       </Box>
       </SimpleGrid>
     </Box>

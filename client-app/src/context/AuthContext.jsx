@@ -6,22 +6,14 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const storedUserData =
-      JSON.parse(localStorage.getItem('userData')) ||
-      JSON.parse(sessionStorage.getItem('userData'));
-    if (storedUserData && storedUserData.token && storedUserData.name) {
-      setUser({ token: storedUserData.token, name: storedUserData.name });
-    }
-  }, []);
-
   const login = (userData, rememberMe) => {
-    setUser(userData);
-    if (rememberMe) {
-      localStorage.setItem('userData', JSON.stringify(userData));
-    } else {
-      sessionStorage.setItem('userData', JSON.stringify(userData));
-    }
+    const { token, name, role } = userData;
+
+    const user = { token, name, role };
+    setUser(user);
+
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem('userData', JSON.stringify(user));
   };
 
   const logout = () => {
@@ -29,6 +21,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('userData');
     sessionStorage.removeItem('userData');
   };
+
+  useEffect(() => {
+    const storedUserData =
+      JSON.parse(localStorage.getItem('userData')) ||
+      JSON.parse(sessionStorage.getItem('userData'));
+    if (storedUserData && storedUserData.token) {
+      setUser(storedUserData);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
