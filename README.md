@@ -17,7 +17,8 @@ Este proyecto es una plataforma integral para la gestión de una clínica veteri
 
 El proyecto está dividido en dos partes principales:
 
-1. **📱 Client-app (Frontend)**: 
+1. **📱 Client-app (Frontend)**:
+
    - Framework: **React** con **Vite**
    - UI: **Chakra UI**
    - Objetivo: Proporcionar una interfaz de usuario moderna y responsiva para la gestión de la clínica.
@@ -46,6 +47,7 @@ Para ejecutar este proyecto en un entorno local, asegúrate de tener las siguien
 ### Pasos de Instalación
 
 1. **Clonar el Repositorio**
+
    ```
    git clone https://your-repository-url.git
    ```
@@ -53,12 +55,14 @@ Para ejecutar este proyecto en un entorno local, asegúrate de tener las siguien
 2. **Instalar Dependencias**
 
    Frontend (client-app):
+
    ```
    cd client-app
    npm install
    ```
 
    Backend (server-app):
+
    ```
    cd server-app
    npm install
@@ -78,19 +82,21 @@ Para ejecutar este proyecto en un entorno local, asegúrate de tener las siguien
    En `client-app/`, crea un archivo `.env`:
 
    ```
-   # Client Variables 
+   # Client Variables
    VITE_API_URL=http://localhost:5000/api
    ```
 
 4. **Ejecutar el Proyecto**
 
    Frontend:
+
    ```
    cd client-app
    npm run dev
    ```
 
    Backend:
+
    ```
    cd server-app
    npm run start
@@ -100,40 +106,49 @@ Para ejecutar este proyecto en un entorno local, asegúrate de tener las siguien
 
 ### Autentificación (Login / Register)
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST   | `/api/auth/login` | Iniciar sesión en el sistema |
-| POST   | `/api/auth/register` | Registrar una nueva cuenta en el sistema |
+| Método | Endpoint                    | Descripción                                  |
+| ------ | --------------------------- | -------------------------------------------- |
+| POST   | `/api/auth/login`           | Iniciar sesión en el sistema                 |
+| POST   | `/api/auth/register`        | Registrar una nueva cuenta en el sistema     |
 | POST   | `/api/auth/forgot-password` | Enviar correo para restablecer la contraseña |
-| POST   | `/api/auth/reset-password` | Restablecer la contraseña mediante un token |
+| POST   | `/api/auth/reset-password`  | Restablecer la contraseña mediante un token  |
 
 ### Dashboard - Perfil de Usuario
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET    | `/api/dashboard/profile` | Obtener la información del perfil del usuario autenticado |
-| PUT    | `/api/dashboard/profile` | Actualizar la información del perfil del usuario |
-| PUT    | `/api/dashboard/password` | Cambiar la contraseña del usuario autenticado |
+| Método | Endpoint                  | Descripción                                               |
+| ------ | ------------------------- | --------------------------------------------------------- |
+| GET    | `/api/dashboard/profile`  | Obtener la información del perfil del usuario autenticado |
+| PUT    | `/api/dashboard/profile`  | Actualizar la información del perfil del usuario          |
+| PUT    | `/api/dashboard/password` | Cambiar la contraseña del usuario autenticado             |
 
 ### Dashboard - Gestión de Mascotas
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET    | `/api/dashboard/pets` | Obtener todas las mascotas del usuario |
-| POST   | `/api/dashboard/pets` | Agregar una nueva mascota |
+| Método | Endpoint                     | Descripción                                         |
+| ------ | ---------------------------- | --------------------------------------------------- |
+| GET    | `/api/dashboard/pets`        | Obtener todas las mascotas del usuario              |
+| POST   | `/api/dashboard/pets`        | Agregar una nueva mascota                           |
 | PUT    | `/api/dashboard/pets/:petId` | Actualizar la información de una mascota específica |
-| DELETE | `/api/dashboard/pets/:petId` | Eliminar una mascota específica |
+| DELETE | `/api/dashboard/pets/:petId` | Eliminar una mascota específica                     |
+
+### Dashboard - Gestión de Productos
+
+| Método | Endpoint                      | Descripción                                         |
+| ------ | ----------------------------- | --------------------------------------------------- |
+| GET    | `/api/dashboard/products`     | Obtener todos los productos disponibles             |
+| GET    | `/api/dashboard/products/:id` | Obtener la información de un producto específico    |
+| POST   | `/api/dashboard/products`     | Crear un nuevo producto                             |
+| PUT    | `/api/dashboard/products/:id` | Actualizar la información de un producto específico |
+| DELETE | `/api/dashboard/products/:id` | Eliminar un producto específico                     |
 
 ### Middleware (Roles y Auth)
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
+| Método | Endpoint                     | Descripción                                                                                                                  |
+| ------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | GET    | Cualquier endpoint protegido | Verificar que el usuario autenticado tenga uno de los roles permitidos (Cliente, Administrativo, Veterinario, Administrador) |
-| GET    | Cualquier endpoint protegido | Verificar que el usuario autenticado tenga un token JWT válido |
+| GET    | Cualquier endpoint protegido | Verificar que el usuario autenticado tenga un token JWT válido                                                               |
 
 ## 🌐 Despliegue
 
 El proyecto se encuentra desplegado en Vercel. Puedes acceder a él a través del siguiente enlace:
 
 [![Pawmart](https://img.shields.io/badge/Pawmart-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://pawmart.vercel.app/)
-

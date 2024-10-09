@@ -8,6 +8,8 @@ import { FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 function Rating({ rating, numReviews }) {
+
+  
   return (
     <Box display="flex" alignItems="center">
       {Array(5)
@@ -36,6 +38,13 @@ function Rating({ rating, numReviews }) {
 }
 
 function ProductCard({ product }) {
+
+  // Condicion para mostrar u ocultar el nuevo producto por 30 dias
+  const isNew = (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 15;
+
+  // Verificar si el producto tiene descuento
+  const hasDiscount = product.details.discount > 0;
+  
   return (
     <Flex p={4} w="full" alignItems="center" justifyContent="center">
       <Box
@@ -51,12 +60,8 @@ function ProductCard({ product }) {
         height="100%" 
       >
         {/* Enlace que envuelve toda la tarjeta */}
-        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
-          {product.isNew && (
-            <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
-              New
-            </Badge>
-          )}
+        <Link to={`/products/${product._id}`} style={{ textDecoration: 'none' }}>
+          {/* Contenido de la tarjeta */}
           <Box p="6">
             <Image 
               src={product.imageURL} 
@@ -67,10 +72,31 @@ function ProductCard({ product }) {
               boxSize="300px" 
             />
 
-            <Box display="flex" alignItems="baseline">
-              {product.isNew && (
-                <Badge rounded="full" px="2" fontSize="0.8em" colorScheme="red">
-                  New
+            <Box display="flex" alignItems="baseline" >
+              {isNew && (
+                <Badge rounded="full" px="2" mt="2" fontSize="0.8em"
+                colorScheme="blue"
+    border="2px solid"
+    borderColor="blue.500"
+    boxShadow="0 0 8px blue"
+    animation="pulse 2s infinite" ml={2}>
+                  NUEVO  
+                </Badge>
+              )}
+
+
+              {/* Mostrar badge de descuento */}
+              {hasDiscount && (
+                <Badge position="absolute"
+                top="0"
+                right="0"
+                transform="rotate(45deg)"
+                bg="green.500"
+                color="white"
+                p="2"
+                fontSize="0.8em"
+                boxShadow="lg">
+                  {product.details.discount}% Dcto
                 </Badge>
               )}
             </Box>
@@ -84,8 +110,14 @@ function ProductCard({ product }) {
               <Rating rating={product.rating} numReviews={product.numReviews} />
               <Box fontSize="2xl" color={useColorModeValue('gray.800', 'white')}>
                 <Box as="span" fontSize="xxl" >
-                  $
+                  $ 
                 </Box>
+                {/* Mostrar precio original tachado si hay descuento */}
+                {hasDiscount && (
+                  <Box as="span" fontSize="md" textDecoration="line-through" mr={2}>
+                    {product.details.originalPrice.toFixed(3)}
+                  </Box>
+                )}
                 {product.price.toFixed(3)}
               </Box>
             </Flex>

@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
 
     try {
         // Verificar el token JWT
-        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);  // Extraer el token de "Bearer <token>"
+        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET); 
 
         // Asignar el userId y role del token decodificado al objeto req
         req.userId = decoded.user.id;

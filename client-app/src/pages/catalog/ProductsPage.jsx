@@ -1,50 +1,67 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Box, Container, Flex, SimpleGrid, VStack, Text,  Input, 
-   Button, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, 
+  Box, Container, Flex, SimpleGrid, VStack, Text, Input, 
+  Button, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, 
   DrawerHeader, DrawerBody, CloseButton, InputGroup, InputLeftElement,  
-  Menu, MenuButton, MenuList, MenuItem,  
-  Checkbox, Slider, CheckboxGroup, SliderTrack, SliderFilledTrack, SliderThumb
+  Menu, MenuButton, MenuList, MenuItem, Checkbox, Slider, CheckboxGroup, 
+  SliderTrack, SliderFilledTrack, SliderThumb 
 } from '@chakra-ui/react';
 import { FiFilter } from 'react-icons/fi';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FaSortAmountDown, FaThList } from 'react-icons/fa';
 import ProductCard from '../../components/catalog/products/ProductCard';
-import productsData from '../../data/productsData.json';
-
+import { getProducts } from '../../services/dashboard/productService'; 
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(10);
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const updateVisibleProducts = useCallback((page, perPage) => {
+  const updateVisibleProducts = useCallback((page, perPage, filteredProducts) => {
     const startIndex = (page - 1) * perPage;
-    const selectedProducts = products.slice(startIndex, startIndex + perPage);
+    const selectedProducts = filteredProducts.slice(startIndex, startIndex + perPage);
     setVisibleProducts(selectedProducts);
-  }, [products]);
+  }, []);
 
   useEffect(() => {
-    setProducts(productsData);
-    setTotalProducts(productsData.length);
-    updateVisibleProducts(1, productsPerPage);
+    const fetchProducts = async () => {
+      try {
+        const response = await getProducts();
+        setProducts(response.data);
+        updateVisibleProducts(1, productsPerPage, response.data);
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+      }
+    };
+    
+    fetchProducts();
   }, [productsPerPage, updateVisibleProducts]);
+
+  // Filtrar productos según el término de búsqueda
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    product.details.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    updateVisibleProducts(currentPage, productsPerPage, filteredProducts);
+  }, [currentPage, productsPerPage, searchTerm, updateVisibleProducts, filteredProducts]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    updateVisibleProducts(newPage, productsPerPage);
   };
 
   const handleProductsPerPageChange = (perPage) => {
     setProductsPerPage(perPage);
+    setCurrentPage(1); // Reinicia a la primera página al cambiar la cantidad de productos por página
   };
 
   const handleSort = (criteria) => {
-    let sortedProducts = [...products];
+    let sortedProducts = [...filteredProducts];
     if (criteria === 'price-asc') {
       sortedProducts.sort((a, b) => a.price - b.price);
     } else if (criteria === 'price-desc') {
@@ -53,10 +70,10 @@ function ProductsPage() {
       sortedProducts.sort((a, b) => b.rating - a.rating);
     }
     setProducts(sortedProducts);
-    updateVisibleProducts(currentPage, productsPerPage);
+    updateVisibleProducts(currentPage, productsPerPage, sortedProducts);
   };
 
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   return (
     <Container maxW="8xl" py={8}>
@@ -87,21 +104,25 @@ function ProductsPage() {
           </Flex>
 
           {/* Buscador */}
-          <InputGroup maxW="300px" >
+          <InputGroup maxW="300px">
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.600" />
             </InputLeftElement>
-            <Input placeholder="Buscar por SKU o Nombre" />
+            <Input
+              placeholder="Buscar por SKU o Nombre"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </InputGroup>
         </Flex>
       </Flex>
 
       {/* Lista de productos */}
       <Box>
-        <Text mb={4}>Mostrando {visibleProducts.length} de {totalProducts} productos</Text>
+        <Text mb={4}>Mostrando {visibleProducts.length} de {filteredProducts.length} productos</Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
           {visibleProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product._id} product={product} />
           ))}
         </SimpleGrid>
 

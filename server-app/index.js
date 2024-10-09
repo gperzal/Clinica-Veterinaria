@@ -5,7 +5,7 @@ import authRoutes from './src/routes/auth/authRoutes.js';
 import feedBackRoutes from './src/routes/contact/feedbackRoutes.js';
 import contactRoutes from './src/routes//contact/contactRoutes.js';
 import profileRoutes from './src/routes/dashboard/profileRoutes.js';
-
+import productRoutes from './src/routes/dashboard/productRoutes.js';
 import cors from 'cors';
 
 
@@ -54,6 +54,7 @@ app.use('/api/', feedBackRoutes);
 app.use('/api/', contactRoutes);
 
 app.use('/api/dashboard', profileRoutes);
+app.use('/api/dashboard', productRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

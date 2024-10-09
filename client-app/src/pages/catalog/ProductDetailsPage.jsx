@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
+// /src/pages/catalog/ProductDetailsPage.jsx
+import React, { useState,useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box, Flex, Image, Text, Heading, Badge, Button, Stack, HStack, Select, 
   Input, Tabs, TabList, TabPanels, Tab, TabPanel, IconButton, Grid, VStack, 
   Icon, useColorModeValue, Table, Thead, Tbody, Tr, Th, Td, 
 } from '@chakra-ui/react';
-import productsData from '../../data/productsData';
 import { FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
+import { getProductById } from '../../services/dashboard/productService'; 
+
 
 function ProductDetailsPage() {
-
-    const bgColor = useColorModeValue('gray.50', 'gray.700');
-    const textColor = useColorModeValue('gray.800', 'white');
-  
   const { productId } = useParams();
-  const product = productsData.find(p => p.id === parseInt(productId));
+  const [product, setProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const bgColor = useColorModeValue('gray.50', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'white');
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await getProductById(productId);
+        setProduct(response.data);
+        setSelectedImage(response.data.details.images[0]); 
+      } catch (error) {
+        console.error('Error al cargar producto:', error);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   if (!product) {
-    return <Text>Producto no encontrado</Text>;
+    return <div>Cargando...</div>;
   }
-
-  const [selectedImage, setSelectedImage] = useState(product.details.images[0]);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrevImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : product.details.images.length - 1));
@@ -33,6 +47,10 @@ function ProductDetailsPage() {
     setCurrentIndex((prevIndex) => (prevIndex < product.details.images.length - 1 ? prevIndex + 1 : 0));
     setSelectedImage(product.details.images[currentIndex]);
   };
+
+  if (!product) {
+    return <Text>Producto no encontrado</Text>;
+  }
 
   return (
     <Box maxW="7xl" mx="auto" p={6}>
