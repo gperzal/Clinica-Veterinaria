@@ -4,7 +4,7 @@ import {
   Button, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, 
   DrawerHeader, DrawerBody, CloseButton, InputGroup, InputLeftElement,  
   Menu, MenuButton, MenuList, MenuItem, Checkbox, Slider, CheckboxGroup, 
-  SliderTrack, SliderFilledTrack, SliderThumb 
+  SliderTrack, SliderFilledTrack, SliderThumb,  Skeleton, SkeletonText 
 } from '@chakra-ui/react';
 import { FiFilter } from 'react-icons/fi';
 import { SearchIcon } from '@chakra-ui/icons';
@@ -17,7 +17,8 @@ function ProductsPage() {
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage, setProductsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [loading, setLoading] = useState(true);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -25,16 +26,19 @@ function ProductsPage() {
     const startIndex = (page - 1) * perPage;
     const selectedProducts = filteredProducts.slice(startIndex, startIndex + perPage);
     setVisibleProducts(selectedProducts);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true); 
       try {
         const response = await getProducts();
         setProducts(response.data);
         updateVisibleProducts(1, productsPerPage, response.data);
       } catch (error) {
         console.error('Error al cargar productos:', error);
+        setLoading(false);
       }
     };
     
@@ -57,7 +61,7 @@ function ProductsPage() {
 
   const handleProductsPerPageChange = (perPage) => {
     setProductsPerPage(perPage);
-    setCurrentPage(1); // Reinicia a la primera página al cambiar la cantidad de productos por página
+    setCurrentPage(1); 
   };
 
   const handleSort = (criteria) => {
@@ -117,13 +121,22 @@ function ProductsPage() {
         </Flex>
       </Flex>
 
-      {/* Lista de productos */}
+       {/* Lista de productos o Skeletons */}
       <Box>
         <Text mb={4}>Mostrando {visibleProducts.length} de {filteredProducts.length} productos</Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-          {visibleProducts.map(product => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+        {loading 
+            ? Array.from({ length: productsPerPage }).map((_, i) => (
+              <Box key={i} borderWidth="1px" borderRadius="lg" overflow="hidden" p="6">
+                <Skeleton height="300px" mb="4" />
+                <SkeletonText noOfLines={2} spacing="4" />
+                <Skeleton height="20px" width="40%" mt="4" />
+              </Box>
+            )) 
+            : visibleProducts.map(product => (
+              <ProductCard key={product._id} product={product} />
+            ))
+          }
         </SimpleGrid>
 
         {/* Paginador */}
