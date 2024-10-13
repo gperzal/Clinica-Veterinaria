@@ -16,7 +16,7 @@ import {
 
 const ComingSoonPage = () => {
   const calculateTimeLeft = () => {
-    const difference = +new Date('2024-09-15') - +new Date();
+    const difference = +new Date('2024-11-30') - +new Date();
     let timeLeft = {};
 
     if (difference > 0) {

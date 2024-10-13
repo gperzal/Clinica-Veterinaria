@@ -1,50 +1,52 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/partials/Navbar';
-import Footer from './components/partials/Footer';
+import { Box, Flex } from '@chakra-ui/react';
+import { AuthProvider } from './modules/auth/context/AuthContext';
+
+import Navbar from './layout/Navbar';
+import Footer from './layout/Footer';
 import HomePage from './pages/HomePage';
 // Modulo de Auth
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'; 
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import LoginPage from './modules/auth/pages/LoginPage';
+import RegisterPage from './modules/auth/pages/RegisterPage';
+import ForgotPasswordPage from './modules/auth/pages/ForgotPasswordPage'; 
+import ResetPasswordPage from './modules/auth/pages/ResetPasswordPage';
 // Modulo de Pages Comming Soon y Not Found
 import ComingSoonPage from './pages/ComingSoonPage';
 import NotFoundPage from './pages/NotFoundPage';
 // Modulo de Dashboard
-import DashboardPage from './pages/dashboard/DashboardPage';
-import ProfilePage from './pages/dashboard/ProfilePage';
-import SettingPage from './pages/dashboard/SettingPage';
-import MedicalHistoryPage from './pages/dashboard/MedicalHistoryPage';
-import PurchaseHistoryPage from './pages/dashboard/PurchaseHistoryPage';
-import CatalogPage from './pages/dashboard/CatalogPage';
-import InventoryPage from './pages/dashboard/InventoryPage';
-import MedicalAppointmentsPage from './pages/dashboard/MedicalAppointmentsPage';
-import EstheticAppointmentsPage from './pages/dashboard/EstheticAppointmentsPage';
-import AppointmentsPage from './pages/dashboard/AppointmentsPage';
-import UsersPage from './pages/dashboard/UsersPage';
-import RolesPage from './pages/dashboard/RolesPage';
-import ReportsPage from './pages/dashboard/ReportsPage';
+import DashboardPage from './modules/dashboard/home/pages/DashboardPage';
+import ProfilePage from './modules/dashboard/profile/pages/ProfilePage';
+import SettingPage from './modules/dashboard/setting/pages/SettingPage';
+import MedicalHistoryPage from './modules/dashboard/medical-history/pages/MedicalHistoryPage';
+import PurchaseHistoryPage from './modules/dashboard/purchase-history/pages/PurchaseHistoryPage';
+import CatalogPage from './modules/dashboard/catalog/pages/CatalogPage';
+import InventoryPage from './modules/dashboard/inventory/pages/InventoryPage';
+import MedicalAppointmentsPage from './modules/dashboard/medical-appointments/pages/MedicalAppointmentsPage';
+import EstheticAppointmentsPage from './modules/dashboard/esthetic-appointments/pages/EstheticAppointmentsPage';
+import AppointmentsPage from './modules/dashboard/appointments/pages/AppointmentsPage';
+import UsersPage from './modules/dashboard/users/pages/UsersPage';
+import RolesPage from './modules/dashboard/roles/pages/RolesPage';
+import ReportsPage from './modules/dashboard/reports/pages//ReportsPage';
 // Modulo de Citas
-import ScheduleAppointmentPage from './pages/appointments/ScheduleAppointmentPage';
-import AppointmentHistoryPage from './pages/appointments/AppointmentHistoryPage';
-import ManageOverbookingsPage from './pages/appointments/ManageOverbookingsPage';
-import { AppointmentsProvider } from './context/AppointmentsContext';
+import ScheduleAppointmentPage from './modules/appointments/pages/ScheduleAppointmentPage';
+import AppointmentHistoryPage from './modules/appointments/pages/AppointmentHistoryPage';
+import ManageOverbookingsPage from './modules/appointments/pages/ManageOverbookingsPage';
+import { AppointmentsProvider } from './modules/appointments/context/AppointmentsContext';
 // Modulo Catalogo
-import ProductsPage from './pages/catalog/ProductsPage';
-import { CartProvider } from './context/CartContext';
-import ProductDetailsPage from './pages/catalog/ProductDetailsPage';
-
-import { Box, Flex } from '@chakra-ui/react';
-
+import ProductsPage from './modules/catalog/pages/ProductsPage';
+import { CartProvider } from './modules/catalog/context/CartContext';
+import ProductDetailsPage from './modules/catalog/pages/ProductDetailsPage';
 // Modulo Contacto
-import ContactPage from './pages/contact/ContactPage';
-import FAQPage from './pages/contact/FAQPage';
-import FeedbackPage from './pages/contact/FeedbackPage';
-import SidebarWithHeader from './components/dashboard/SidebarWithHeader'; 
+import ContactPage from './modules/contact/pages/ContactPage';
+import FAQPage from './modules/contact/pages/FAQPage';
+import FeedbackPage from './modules/contact/pages/FeedbackPage';
+// Modulo Dashboard
+import SidebarWithHeader from './layout/SidebarWithHeader'; 
 import AboutPage from './pages/AboutPage';
+
+
 function App() {
   return (
     <AuthProvider>  
