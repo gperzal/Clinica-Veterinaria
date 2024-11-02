@@ -1,4 +1,4 @@
-// src/services/dashboard/profileService.js
+// src/services/modules/dashboard/profileService.js
 import api from '../../../../services/api';
 
 // Obtener perfil del usuario
@@ -34,4 +34,19 @@ export const updatePet = async (petId, petData) => {
 // Eliminar mascota específica
 export const deletePet = async (petId) => {
   return await api.delete(`/api/dashboard/pets/${petId}`);
+};
+
+// Obtener dueño por ID
+export const getOwnerById = async (ownerId) => {
+  return await api.get(`/api/dashboard/owners/${ownerId}`);
+};
+
+// Obtener mascota por ID
+export const getPetById = async (petId) => {
+  return await api.get(`/api/dashboard/pets/${petId}`);
+};
+
+// Obtener todos los veterinarios y estilistas
+export const getSpecialists = async () => {
+  return await api.get('/api/dashboard/specialists');
 };

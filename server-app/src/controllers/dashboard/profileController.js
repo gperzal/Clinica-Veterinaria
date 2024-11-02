@@ -197,3 +197,45 @@ export const changePassword = async (req, res) => {
         res.status(500).json({ message: 'Error al cambiar la contraseña' });
     }
 };
+
+
+// Obtener dueño por ID
+export const getOwnerById = async (req, res) => {
+    const { ownerId } = req.params;
+    try {
+        const owner = await User.findById(ownerId).select('name email phone altPhone address');
+        if (!owner) {
+            return res.status(404).json({ message: 'Dueño no encontrado' });
+        }
+        res.json({ owner });
+    } catch (error) {
+        console.error('Error al obtener el dueño:', error);
+        res.status(500).json({ message: 'Error al obtener el dueño' });
+    }
+};
+
+// Obtener mascota por ID
+export const getPetById = async (req, res) => {
+    const { petId } = req.params;
+    try {
+        const pet = await Pet.findById(petId).populate('owner', 'name email phone');
+        if (!pet) {
+            return res.status(404).json({ message: 'Mascota no encontrada' });
+        }
+        res.json({ pet });
+    } catch (error) {
+        console.error('Error al obtener la mascota:', error);
+        res.status(500).json({ message: 'Error al obtener la mascota' });
+    }
+};
+
+// Obtener todos los veterinarios y estilistas
+export const getSpecialists = async (req, res) => {
+    try {
+        const specialists = await User.find({ role: { $in: ['Veterinario', 'Estilista'] } });
+        res.status(200).json(specialists);
+    } catch (error) {
+        console.error('Error fetching specialists:', error);
+        res.status(500).json({ message: 'Error al obtener especialistas' });
+    }
+};

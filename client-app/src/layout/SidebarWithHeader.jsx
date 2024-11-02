@@ -63,7 +63,7 @@ const menuSections = [
     sectionName: 'Veterinario',
     allowedRoles: ['Veterinario', 'Administrador'],
     items: [
-      { name: 'Citas', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Citas', icon: FiClipboard, path: '/dashboard/appointments' },
     ],
   },
   {

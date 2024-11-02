@@ -7,9 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = (userData, rememberMe) => {
-    const { token, name, role } = userData;
+    const { token, name, role, _id } = userData; 
 
-    const user = { token, name, role };
+    const user = { token, name, role, _id }; 
     setUser(user);
 
     const storage = rememberMe ? localStorage : sessionStorage;

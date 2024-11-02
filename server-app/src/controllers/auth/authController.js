@@ -78,8 +78,8 @@ export const loginUser = async (req, res) => {
         // Generar el token JWT
         const token = generateToken(user);
 
-        // Enviar la respuesta con el token, nombre y rol del usuario
-        res.json({ token, name: user.name, role: user.role });
+        // Enviar la respuesta con el token, nombre, rol del usuario, y el ID
+        res.json({ token, name: user.name, role: user.role, _id: user._id });
     } catch (error) {
         console.error('Error en el inicio de sesión:', error);
         res.status(500).send('Error del servidor');

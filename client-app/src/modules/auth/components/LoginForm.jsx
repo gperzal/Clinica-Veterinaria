@@ -42,6 +42,7 @@ export default function LoginForm() {
           token: response.data.token,
           name: response.data.name,
           role: response.data.role,
+          _id: response.data._id
         };
         // Llamar a loginContext con userData y rememberMe
         loginContext(userData, rememberMe);

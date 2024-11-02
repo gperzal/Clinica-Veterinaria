@@ -1,7 +1,6 @@
-// src/components/catalog/ProductCard.jsx
 import React from 'react';
 import { 
-  Box, Flex, Image, Badge, useColorModeValue, Button, Text, 
+  Box, Flex, Image, Badge, useColorModeValue, Button, Text 
 } from '@chakra-ui/react';
 import { BsStar, BsStarFill, BsStarHalf } from 'react-icons/bs';
 import { FiShoppingCart } from 'react-icons/fi';
@@ -41,6 +40,12 @@ function Rating({ rating, numReviews }) {
 function ProductCard({ product }) {
   const isNew = (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 15;
   const hasDiscount = product.details.discount > 0;
+  const discountPercentage = product.details.discount;
+
+  // Calcula el precio con descuento si existe un descuento
+  const discountedPrice = hasDiscount 
+    ? product.price * (1 - discountPercentage / 100) 
+    : product.price;
 
   return (
     <Flex p={4} w="full" alignItems="center" justifyContent="center">
@@ -88,16 +93,16 @@ function ProductCard({ product }) {
               {product.description}
             </Text>
             <Flex mt="2" justifyContent="space-between" alignContent="center">
-              <CustomRatingIcon  rating={product.rating} numReviews={product.numReviews} />
+              <CustomRatingIcon rating={product.rating} numReviews={product.numReviews} />
               <Box textAlign="right">
-                {/* Mostrar precio original tachado arriba del nuevo precio */}
+                {/* Mostrar precio original tachado arriba del nuevo precio si tiene descuento */}
                 {hasDiscount && (
-                  <Box as="span" fontSize="md" textDecoration="line-through" display="block">
-                    ${product.details.originalPrice}
+                  <Box as="span" fontSize="md" textDecoration="line-through" display="block" color="gray.500">
+                    ${product.price}
                   </Box>
                 )}
                 <Box as="span" fontSize="xl" color={useColorModeValue('gray.800', 'white')}>
-                  ${product.price}
+                  ${discountedPrice}
                 </Box>
               </Box>
             </Flex>

@@ -14,8 +14,6 @@ const WeeklyCalendar = ({ onSelectDate }) => {
     return date;
   });
 
-  const isDateAvailable = (date) => Math.random() > 0.3;
-
   return (
     <VStack spacing={4}>
       <Heading fontSize={'xl'}>Semana del {startOfWeek.toLocaleDateString()}</Heading>
@@ -23,10 +21,9 @@ const WeeklyCalendar = ({ onSelectDate }) => {
         {days.map((date, index) => (
           <Button
             key={index}
-            onClick={() => isDateAvailable(date) && onSelectDate(date.toLocaleDateString())}
-            isDisabled={!isDateAvailable(date)}
-            colorScheme={isDateAvailable(date) ? "blue" : "gray"}
-            variant={isDateAvailable(date) ? "solid" : "outline"}
+            onClick={() => onSelectDate(date.toLocaleDateString())}
+            colorScheme="blue"
+            variant="solid"
             w="full"
             textAlign="center"
             p={isMobile ? 3 : 6}

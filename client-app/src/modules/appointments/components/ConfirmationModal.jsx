@@ -1,3 +1,4 @@
+// src/components/ConfirmationModal.jsx
 import React from 'react';
 import { 
   Modal, 
@@ -13,7 +14,16 @@ import {
   useColorModeValue 
 } from '@chakra-ui/react';
 
-const ConfirmationModal = ({ isOpen, onClose, selectedDoctor, selectedDate, selectedTime, onConfirm }) => {
+const ConfirmationModal = ({ 
+  isOpen, 
+  onClose, 
+  selectedSpecialist, 
+  selectedDate, 
+  selectedTime, 
+  serviceType, 
+  selectedPet, 
+  onConfirm 
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -30,11 +40,23 @@ const ConfirmationModal = ({ isOpen, onClose, selectedDoctor, selectedDate, sele
         <ModalBody textAlign="center" p={6}>
           <Box mb={4}>
             <Text fontSize="lg">Estás a punto de confirmar una cita con:</Text>
-            <Text fontSize="xl" fontWeight="bold" mt={2} mb={4}>{selectedDoctor}</Text>
+            <Text fontSize="xl" fontWeight="bold" mt={2} mb={4}>
+              {selectedSpecialist ? selectedSpecialist.name : "Especialista no seleccionado"}
+            </Text>
           </Box>
           <Box>
-            <Text fontSize="md"><strong>Fecha:</strong> {selectedDate}</Text>
-            <Text fontSize="md" mt={2}><strong>Hora:</strong> {selectedTime}</Text>
+            <Text fontSize="md">
+              <strong>Fecha:</strong> {selectedDate || "Fecha no seleccionada"}
+            </Text>
+            <Text fontSize="md" mt={2}>
+              <strong>Hora:</strong> {selectedTime || "Hora no seleccionada"}
+            </Text>
+            <Text fontSize="md" mt={2}>
+              <strong>Tipo de Servicio:</strong> {serviceType || "Tipo de servicio no seleccionado"}
+            </Text>
+            <Text fontSize="md" mt={2}>
+              <strong>Mascota:</strong> {selectedPet ? selectedPet.name : "Mascota no seleccionada"}
+            </Text>
           </Box>
         </ModalBody>
         <ModalFooter justifyContent="center">

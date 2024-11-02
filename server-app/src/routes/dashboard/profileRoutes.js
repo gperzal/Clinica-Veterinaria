@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProfile, updateProfile, changePassword, getPets, addPet, updatePet, deletePet } from '../../controllers/dashboard/profileController.js';
+import { getProfile, updateProfile, changePassword, getPets, addPet, updatePet, deletePet, getOwnerById, getPetById, getSpecialists } from '../../controllers/dashboard/profileController.js';
 import authMiddleware from '../../middleware/auth/authMiddleware.js';
 import roleMiddleware from '../../middleware/auth/roleMiddleware.js';
 
@@ -25,5 +25,15 @@ router.put('/pets/:petId', authMiddleware, roleMiddleware(['Cliente', 'Administr
 
 // Ruta para eliminar una mascota  
 router.delete('/pets/:petId', authMiddleware, roleMiddleware(['Cliente', 'Administrativo', 'Veterinario', 'Administrador']), deletePet);
+
+
+// Ruta para obtener dueño por ID
+router.get('/owners/:ownerId', getOwnerById);
+
+// Ruta para obtener mascota por ID
+router.get('/pets/:petId', getPetById);
+
+// Ruta para obtener veterinarios y estilistas
+router.get('/specialists', getSpecialists);
 
 export default router;

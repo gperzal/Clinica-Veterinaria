@@ -1,11 +1,10 @@
 // src/pages/dashboard/MedicalAppointmentsPage.jsx
 
-import React from 'react'
+import React, { useState } from 'react'
+export default function MedicalAppointmentsPage() {
 
-const MedicalAppointmentsPage = () => {
-    return (
-        <div> Citas Medicas</div>
-    )
+
+  return (
+    <div>MedicalAppointmentsPage</div>
+  )
 }
-
-export default MedicalAppointmentsPage
