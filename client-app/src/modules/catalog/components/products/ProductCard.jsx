@@ -1,11 +1,14 @@
 import React from 'react';
 import { 
-  Box, Flex, Image, Badge, useColorModeValue, Button, Text 
+  Box, Flex, Image, Badge, useColorModeValue, Button, Text,
+  useNumberInput, HStack, Input
 } from '@chakra-ui/react';
 import { BsStar, BsStarFill, BsStarHalf } from 'react-icons/bs';
 import { FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import CustomRatingIcon from '../icons/CustomRatingIcon';
+import { useCart } from '../../context/CartContext';
+
 
 function Rating({ rating, numReviews }) {
   return (
@@ -38,9 +41,27 @@ function Rating({ rating, numReviews }) {
 }
 
 function ProductCard({ product }) {
+  const { addToCart } = useCart();
   const isNew = (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 15;
   const hasDiscount = product.details.discount > 0;
   const discountPercentage = product.details.discount;
+
+
+  const {
+    getInputProps,
+    getIncrementButtonProps,
+    getDecrementButtonProps,
+    value
+  } = useNumberInput({
+    step: 1,
+    defaultValue: 1,
+    min: 1,
+    max: product.details.inStock,
+  });
+
+  const handleAddToCart = () => {
+    addToCart(product, parseInt(value));
+  };
 
   // Calcula el precio con descuento si existe un descuento
   const discountedPrice = hasDiscount 
@@ -109,7 +130,20 @@ function ProductCard({ product }) {
           </Box>
         </Link>
         <Box p="6">
-          <Button leftIcon={<FiShoppingCart />} colorScheme="teal" variant="solid">
+          <HStack maxW="320px">
+            <Button {...getDecrementButtonProps()}>-</Button>
+            <Input {...getInputProps()} readOnly />
+            <Button {...getIncrementButtonProps()}>+</Button>
+          </HStack>
+          <Button 
+            leftIcon={<FiShoppingCart />} 
+            colorScheme="teal" 
+            variant="solid"
+            mt={2}
+            w="full"
+            onClick={handleAddToCart}
+            isDisabled={!product.details.inStock}
+          >
             Agregar al Carrito
           </Button>
         </Box>

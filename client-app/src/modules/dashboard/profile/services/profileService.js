@@ -1,4 +1,4 @@
-// src/services/modules/dashboard/profileService.js
+// client-app/src/modules/dashboard/profile/services/profileService.js
 import api from '../../../../services/api';
 
 // Obtener perfil del usuario

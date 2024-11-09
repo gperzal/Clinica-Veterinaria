@@ -38,6 +38,7 @@ import { AppointmentsProvider } from './modules/appointments/context/Appointment
 import ProductsPage from './modules/catalog/pages/ProductsPage';
 import { CartProvider } from './modules/catalog/context/CartContext';
 import ProductDetailsPage from './modules/catalog/pages/ProductDetailsPage';
+import ShoppingCart from './modules/catalog/pages/ShoppingCart';
 // Modulo Contacto
 import ContactPage from './modules/contact/pages/ContactPage';
 import FAQPage from './modules/contact/pages/FAQPage';
@@ -208,6 +209,20 @@ function App() {
               </Flex>
             } 
           />
+
+            <Route 
+              path="/catalog/shopping-cart" 
+              element={
+                <Flex direction="column" minH="100vh">
+                  <Navbar />
+                  <Box flex="1">
+                    <ShoppingCart />
+                  </Box>
+                  <Footer />
+                </Flex>
+              } 
+            />
+
 
           <Route path="*" element={<NotFoundPage />} />
           {/* Rutas del dashboard sin Navbar y Footer */}

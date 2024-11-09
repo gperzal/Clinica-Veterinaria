@@ -7,7 +7,7 @@ import { RiHospitalFill } from "react-icons/ri";
 import { FaChartLine } from "react-icons/fa";
 
 import MedicalAppointments from '../components/MedicalAppointments';
-import MedicalFiche from '../components/medical-fiche/MedicalFiche';
+import MedicalFiche from '../components/MedicalFiche';
 import Recipes from '../components/Recipes';
 import Documents from '../components/Documents';
 import TreatmentHistory from '../components/TreatmentHistory';
@@ -63,10 +63,13 @@ const AppointmentsPage = () => {
             <Icon as={LuClipboardList} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Citas Médicas</Text>
           </Tab>
-          
           <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={LuFileText} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Ficha Médica</Text>
+          </Tab>
+          <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!showTreatmentHistory}>
+            <Icon as={RiHospitalFill} mr={2} />
+            <Text fontSize={{ base: "xs", md: "sm" }}>Historial de Tratamientos</Text>
           </Tab>
           <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={LuFilePlus} mr={2} />
@@ -75,10 +78,6 @@ const AppointmentsPage = () => {
           <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={LuFolder} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Documentos</Text>
-          </Tab>
-          <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!showTreatmentHistory}>
-            <Icon as={RiHospitalFill} mr={2} />
-            <Text fontSize={{ base: "xs", md: "sm" }}>Historial de Tratamientos</Text>
           </Tab>
           <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={FaChartLine} mr={2} />
@@ -107,13 +106,13 @@ const AppointmentsPage = () => {
             )}
           </TabPanel>
           <TabPanel>
+            {showTreatmentHistory ? <TreatmentHistory selectedPatient={selectedPatient} /> : null}
+          </TabPanel>
+          <TabPanel>
             {isPatientSelected ? <Recipes /> : <Text>Seleccione un paciente para ver el Recetario.</Text>}
           </TabPanel>
           <TabPanel>
             {isPatientSelected ? <Documents /> : <Text>Seleccione un paciente para ver los Documentos.</Text>}
-          </TabPanel>
-          <TabPanel>
-            {showTreatmentHistory ? <TreatmentHistory selectedPatient={selectedPatient} /> : null}
           </TabPanel>
           <TabPanel>
             {isPatientSelected ? <HealthHistory selectedPatient={selectedPatient} /> : <Text>Seleccione un paciente para ver el Histórico de Salud.</Text>}

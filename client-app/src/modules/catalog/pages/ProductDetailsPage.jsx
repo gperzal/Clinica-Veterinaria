@@ -1,23 +1,46 @@
-// /src/pages/catalog/ProductDetailsPage.jsx
+// client-app/src/modules/catalog/pages/ProductDetailsPage.jsx
 import React, { useState,useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box, Flex, Image, Text, Heading, Badge, Button, Stack, HStack, Select, 
   Input, Tabs, TabList, TabPanels, Tab, TabPanel, IconButton, Grid, VStack, 
-  Icon, useColorModeValue, Table, Thead, Tbody, Tr, Th, Td, Spinner
+  Icon, useColorModeValue, Table, Thead, Tbody, Tr, Th, Td, Spinner,
+  useNumberInput
 } from '@chakra-ui/react';
 import { FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
 import { productServices } from '../../dashboard/catalog/services/catalogService'; 
+import { useCart } from '../context/CartContext';
 
 function ProductDetailsPage() {
   const { productId } = useParams();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
+  const [selectedVariation, setSelectedVariation] = useState('');
   const [selectedImage, setSelectedImage] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const bgColor = useColorModeValue('gray.50', 'gray.700');
   const textColor = useColorModeValue('gray.800', 'white');
+
+  const {
+    getInputProps,
+    getIncrementButtonProps,
+    getDecrementButtonProps,
+    value
+  } = useNumberInput({
+    step: 1,
+    defaultValue: 1,
+    min: 1,
+    max: product?.details.inStock || 1,
+  });
+
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, parseInt(value), selectedVariation); 
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -138,19 +161,36 @@ function ProductDetailsPage() {
           </Text>
           <Box mb={4}>
             <Text mb={2}>Variedad:</Text>
-            <Select placeholder="Selecciona una variedad">
-              {product.details.variations.map((variation, index) => (
-                <option key={index} value={variation}>{variation}</option>
-              ))}
-            </Select>
+            <Select 
+                placeholder="Selecciona una variedad"
+                value={selectedVariation}
+                onChange={(e) => setSelectedVariation(e.target.value)}
+                mb={4}
+              >
+                {product.details.variations.map((variation, index) => (
+                  <option key={index} value={variation}>{variation}</option>
+                ))}
+              </Select>
           </Box>
           <Box mb={6}>
             <Text mb={2}>Cantidad:</Text>
-            <Input type="number" defaultValue={1} min={1} max={product.details.inStock} w="80px" />
+            <HStack maxW="320px">
+              <Button {...getDecrementButtonProps()}>-</Button>
+              <Input {...getInputProps()} readOnly />
+              <Button {...getIncrementButtonProps()}>+</Button>
+            </HStack>
           </Box>
-          <Button leftIcon={<FaShoppingCart />} colorScheme="teal" size="lg" width="100%" disabled={!product.details.inStock}>
-            Agregar al Carrito
-          </Button>
+          <Button 
+              leftIcon={<FaShoppingCart />} 
+              colorScheme="teal" 
+              size="lg" 
+              width="100%" 
+              mt={4}
+              onClick={handleAddToCart}
+              disabled={!product.details.inStock}
+            >
+              Agregar al Carrito
+            </Button>
         </Box>
       </Grid>
 

@@ -1,4 +1,4 @@
-// src/services/dashboard/productService.js
+// src/dashboard/catalog/services/productService.js
 import api from '../../../../services/api';
 
 // Servicios disponibles para cualquier parte de la aplicación

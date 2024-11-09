@@ -7,7 +7,7 @@ import contactRoutes from './src/routes//contact/contactRoutes.js';
 import profileRoutes from './src/routes/dashboard/profileRoutes.js';
 import productRoutes from './src/routes/dashboard/productRoutes.js';
 import appointmentRoutes from './src/routes/appointment/appointmentRoutes.js';
-
+import cartRoutes from './src/routes/cart/cartRoutes.js';
 import cors from 'cors';
 
 
@@ -58,6 +58,9 @@ app.use('/api/appointments', appointmentRoutes);
 
 app.use('/api/dashboard', profileRoutes);
 app.use('/api/dashboard', productRoutes);
+
+app.use('/api/cart', cartRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext,useState  } from 'react';
 import {
   Box,
   Flex,
@@ -19,7 +19,8 @@ import {
   Center,
   useColorModeValue,
   Icon,
-  Tooltip
+  Tooltip,
+  Badge
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
@@ -28,7 +29,7 @@ import {
   SunIcon,
   QuestionIcon
 } from '@chakra-ui/icons';
-import { FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiBell, FiSettings, FiLogOut,FiShoppingCart  } from 'react-icons/fi';
 import { RiCustomerService2Fill } from 'react-icons/ri';
 import { AuthContext } from '../modules/auth/context/AuthContext';
 import clinicLogo from '../assets/img/clinic-logo.png';
@@ -39,6 +40,10 @@ export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const navigate = useNavigate();
+
+  // Mockup de estado de carrito con productos para verificación
+  const [cartItems, setCartItems] = useState(3); // Usado solo para UI mockup
+
 
   return (
     <Box>
@@ -79,6 +84,39 @@ export default function Navbar() {
           direction={'row'}
           spacing={3}
         >
+{/* Carrito de Compras */}
+<Tooltip label="Ver carrito de compras" aria-label="Carrito">
+            <IconButton
+              icon={<FiShoppingCart />}
+              variant="ghost"
+              aria-label="Carrito"
+              onClick={() => navigate('/catalog/shopping-cart')}
+              display={{ base: 'inline-flex', md: 'inline-flex' }}
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+              borderRadius="full"
+              padding="8px"
+              bg={useColorModeValue('gray.100', 'gray.800')}
+              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              position="relative"
+            >
+              {cartItems > 0 && (
+                <Badge
+                  colorScheme="red"
+                  borderRadius="full"
+                  position="absolute"
+                  top="-1"
+                  right="-1"
+                  px={2}
+                  py={0.5}
+                  fontSize="xs"
+                >
+                  {cartItems}
+                </Badge>
+              )}
+            </IconButton>
+          </Tooltip>
+
+
          
          <Tooltip label="Danos tu opinión o reporta un problema">
     <IconButton
