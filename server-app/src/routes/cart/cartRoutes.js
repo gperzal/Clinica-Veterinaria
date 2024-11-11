@@ -6,24 +6,31 @@ import {
     updateCartItem,
     removeFromCart,
     clearCart,
+    syncPrices,
+    checkUpdates
 } from '../../controllers/cart/cartController.js';
 import authMiddleware from '../../middleware/auth/authMiddleware.js';
 
 const router = express.Router();
 
 // Obtener el carrito del usuario autenticado
-router.get('/cart', authMiddleware, getCart);
+router.get('/', authMiddleware, getCart);
 
 // Agregar un producto al carrito del usuario autenticado
-router.post('/cart', authMiddleware, addToCart);
+router.post('/add', authMiddleware, addToCart);
 
 // Actualizar la cantidad de un producto en el carrito
-router.put('/cart/update', authMiddleware, updateCartItem);
+router.put('/update', authMiddleware, updateCartItem);
 
 // Remover un producto específico del carrito
-router.delete('/cart/remove', authMiddleware, removeFromCart);
+router.delete('/remove', authMiddleware, removeFromCart);
 
 // Limpiar todos los productos del carrito del usuario
-router.delete('/cart/clear', authMiddleware, clearCart);
+router.delete('/clear', authMiddleware, clearCart);
+
+// Rutas de sincronización y actualización
+router.post('/sync-prices', authMiddleware, syncPrices);
+router.get('/check-updates', authMiddleware, checkUpdates);
+
 
 export default router;

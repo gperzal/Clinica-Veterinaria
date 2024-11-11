@@ -11,10 +11,14 @@ import { FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
 import { productServices } from '../../dashboard/catalog/services/catalogService'; 
 import { useCart } from '../context/CartContext';
+import useToastNotification from '../../../hooks/useToastNotification'; // Asegúrate de que la ruta sea correcta
+
+
 
 function ProductDetailsPage() {
   const { productId } = useParams();
   const { addToCart } = useCart();
+  const { showErrorToast } = useToastNotification();
   const [product, setProduct] = useState(null);
   const [selectedVariation, setSelectedVariation] = useState('');
   const [selectedImage, setSelectedImage] = useState('');
@@ -32,13 +36,15 @@ function ProductDetailsPage() {
     step: 1,
     defaultValue: 1,
     min: 1,
-    max: product?.details.inStock || 1,
+    max: product?.details.stock || 1,
   });
 
 
   const handleAddToCart = () => {
-    if (product) {
+    if (product && selectedVariation !== "") { 
       addToCart(product, parseInt(value), selectedVariation); 
+    } else {
+      showErrorToast({ title: "Error", error: { message: "Por favor, selecciona una variedad válida." } }); 
     }
   };
 
@@ -143,7 +149,7 @@ function ProductDetailsPage() {
         <Box>
           <Heading as="h2" fontSize="2xl" mb={4}>{product.name}</Heading>
           <Text fontSize="lg" color="gray.500" mb={4}>SKU: {product.details.sku}</Text>
-          {product.details.discount && (
+          {product.details.discount > 0 && (
             <Badge colorScheme="red" fontSize="lg" mb={2}>-{product.details.discount}%</Badge>
           )}
           <HStack spacing={4} mb={6}>
@@ -156,16 +162,17 @@ function ProductDetailsPage() {
               <Text fontSize="3xl" fontWeight="bold">${product.price}</Text>
             )}
           </HStack>
-          <Text fontSize="lg" color={product.details.inStock ? "green.600" : "red.600"} mb={4}>
-            {product.status ? "En stock" : "Agotado"}
+          <Text fontSize="lg" color={product.details.stock ? "green.600" : "red.600"} mb={4}>
+            {product.status ? "En Stock" : "Agotado"}
           </Text>
           <Box mb={4}>
             <Text mb={2}>Variedad:</Text>
             <Select 
                 placeholder="Selecciona una variedad"
                 value={selectedVariation}
-                onChange={(e) => setSelectedVariation(e.target.value)}
+                onChange={(e) => setSelectedVariation(e.target.value) }
                 mb={4}
+                
               >
                 {product.details.variations.map((variation, index) => (
                   <option key={index} value={variation}>{variation}</option>
@@ -187,7 +194,7 @@ function ProductDetailsPage() {
               width="100%" 
               mt={4}
               onClick={handleAddToCart}
-              disabled={!product.details.inStock}
+              disabled={!product.details.stock || selectedVariation === ""} 
             >
               Agregar al Carrito
             </Button>

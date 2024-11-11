@@ -8,6 +8,7 @@ import profileRoutes from './src/routes/dashboard/profileRoutes.js';
 import productRoutes from './src/routes/dashboard/productRoutes.js';
 import appointmentRoutes from './src/routes/appointment/appointmentRoutes.js';
 import cartRoutes from './src/routes/cart/cartRoutes.js';
+import orderRoutes from './src/routes/order/orderRoutes.js';
 import cors from 'cors';
 
 
@@ -60,7 +61,7 @@ app.use('/api/dashboard', profileRoutes);
 app.use('/api/dashboard', productRoutes);
 
 app.use('/api/cart', cartRoutes);
-
+app.use('/api/order', orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

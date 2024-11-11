@@ -1,21 +1,106 @@
 // models/Cart.js
 import mongoose from 'mongoose';
 
+const CART_EXPIRATION_DAYS = 3;
+
 const cartItemSchema = new mongoose.Schema({
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-    quantity: { type: Number, required: true, default: 1 },
-    variation: { type: String },  // En caso de que el producto tenga variaciones (color, tamaño, etc.)
-    price: { type: Number, required: true },
-    originalPrice: { type: Number }, // Precio original antes de descuentos
-    discount: { type: Number, default: 0 }, // Descuento aplicado al producto
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    variation: {
+        type: String,
+        default: ''
+    },
+    priceAtAddition: {
+        type: Number,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    imageUrl: {
+        type: String
+    },
+    sku: {
+        type: String
+    }
 });
 
 const cartSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-    items: [cartItemSchema], // Array de items que contiene los productos en el carrito
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        unique: true
+    },
+    items: [cartItemSchema],
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    },
+    expiresAt: {
+        type: Date,
+        required: true,
+        default: () => new Date(+new Date() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000)
+    }
 }, {
-    timestamps: true,
+    timestamps: true
 });
+
+// Middleware para actualizar la fecha de expiración
+cartSchema.pre('save', function (next) {
+    if (this.isModified('items') || this.isModified('lastUpdated')) {
+        this.expiresAt = new Date(+new Date() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000);
+    }
+    next();
+});
+
+// Método para sincronizar precios
+cartSchema.methods.syncPrices = async function () {
+    const Product = mongoose.model('Product');
+    let hasChanges = false;
+
+    for (let item of this.items) {
+        const currentProduct = await Product.findById(item.product);
+        if (!currentProduct) {
+            this.items = this.items.filter(i => i.product.toString() !== item.product.toString());
+            hasChanges = true;
+            continue;
+        }
+
+        const currentPrice = currentProduct.details?.discount
+            ? currentProduct.price * (1 - currentProduct.details.discount / 100)
+            : currentProduct.price;
+
+        if (currentPrice !== item.priceAtAddition) {
+            item.priceAtAddition = currentPrice;
+            hasChanges = true;
+        }
+
+        item.name = currentProduct.name;
+        item.imageUrl = currentProduct.imageURL || currentProduct.details.images[0];
+        item.sku = currentProduct.details.sku;
+    }
+
+    if (hasChanges) {
+        this.lastUpdated = new Date();
+        await this.save();
+    }
+
+    return hasChanges;
+};
+
+// Índices
+cartSchema.index({ user: 1 }, { unique: true });
+cartSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Cart = mongoose.model('Cart', cartSchema);
 

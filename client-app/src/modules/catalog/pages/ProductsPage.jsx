@@ -1,4 +1,4 @@
-// src/pages/catalog/ProductsPage.jsx
+// client-app/src/modules/catalog/pages/ProductsPage.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { 

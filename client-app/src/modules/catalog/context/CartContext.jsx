@@ -2,51 +2,90 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
+import {cartService} from '../../catalog/services/cartService';
+
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const toast = useToast();
-  const [cartItems, setCartItems] = useState(() => {
-    // Recuperar carrito del localStorage si existe
-    const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    return Array.isArray(savedCart) ? savedCart : [];
-  });
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // Actualizar localStorage cuando el carrito cambie
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    const fetchCart = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('userData')) || 
+                        JSON.parse(sessionStorage.getItem('userData'));
+        
+        if (!userData?.token) {
+          setCartItems([]);
+          setLoading(false);
+          return;
+        }
+        const cart = await cartService.getCart();
+        setCartItems(cart.items || []);
+      } catch (error) {
+        if (error.message !== 'Usuario no autenticado') {
+          toast({
+            title: 'Error al cargar el carrito',
+            description: error.response?.data?.message || error.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+        setCartItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCart();
+  }, [toast]);
 
+  
+
+  // Sincronizar precios al modificar el carrito
+  const syncCartIfNeeded = async () => {
+    try {
+      const { needsUpdate } = await cartService.checkCartUpdates();
+      if (needsUpdate) {
+        const { cart } = await cartService.syncCartPrices();
+        setCartItems(cart.items);
+        toast({
+          title: 'Precios actualizados',
+          description: 'Los precios han sido actualizados según el catálogo actual',
+          status: 'info',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error al sincronizar precios:', error);
+    }
+  };
+  
   // Función para agregar al carrito
-  const addToCart = (product, quantity = 1, variation = '') => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(
-        item => item._id === product._id && item.variation === variation
-      );
-
-      if (existingItem) {
-        return prevItems.map(item =>
-          item._id === product._id && item.variation === variation
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
+  const addToCart = async (product, quantity = 1, variation = '') => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('userData')) || 
+                      JSON.parse(sessionStorage.getItem('userData'));
+                      
+      if (!userData?.token) {
+        toast({
+          title: 'Error',
+          description: 'Debes iniciar sesión para agregar productos al carrito',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
       }
 
-      const newItem = {
-        _id: product._id,
-        name: product.name,
-        price: product.details?.discount 
-          ? product.price * (1 - product.details.discount / 100)
-          : product.price,
-        quantity,
-        variation,
-        imageUrl: product.imageURL || product.details.images[0],
-        sku: product.details.sku,
-        originalPrice: product.price,
-        discount: product.details?.discount || 0
-      };
-
+      const updatedCart = await cartService.addProductToCart(product._id, quantity, variation);
+      setCartItems(updatedCart.items);
+      
       toast({
         title: 'Producto agregado',
         description: `${product.name} ha sido agregado al carrito`,
@@ -55,60 +94,105 @@ export const CartProvider = ({ children }) => {
         isClosable: true,
       });
 
-      return [...prevItems, newItem];
-    });
-  };
-
-  const removeFromCart = (productId, variation = '') => {
-    setCartItems(prevItems => 
-      prevItems.filter(item => !(item._id === productId && item.variation === variation))
-    );
-    toast({
-      title: 'Producto eliminado',
-      description: 'El producto ha sido eliminado del carrito',
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
-  const updateQuantity = (productId, quantity, variation = '') => {
-    if (quantity <= 0) {
-      removeFromCart(productId, variation);
-      return;
+      // Verificar actualizaciones después de modificar el carrito
+      await syncCartIfNeeded();
+    } catch (error) {
+      console.error('Error al agregar al carrito:', error);
+      toast({
+        title: 'Error al agregar al carrito',
+        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item._id === productId && item.variation === variation
-          ? { ...item, quantity }
-          : item
-      )
-    );
   };
 
-  const clearCart = () => {
-    setCartItems([]);
-    localStorage.removeItem('cart');
-    toast({
-      title: 'Carrito vaciado',
-      description: 'Se han eliminado todos los productos del carrito',
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
+
+  const removeFromCart = async (itemId, variation = '') => {
+    try {
+      console.log('Removing from cart:', { itemId, variation }); 
+      const updatedCart = await cartService.removeProductFromCart(itemId, variation);
+      setCartItems(updatedCart.items);
+      
+      toast({
+        title: 'Producto eliminado',
+        description: 'El producto ha sido eliminado del carrito',
+        status: 'info',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error al eliminar del carrito:', error);
+      toast({
+        title: 'Error al eliminar del carrito',
+        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const updateQuantity = async (productId, quantity, variation = '') => {
+    try {
+      if (quantity <= 0) {
+        await removeFromCart(productId, variation);
+        return;
+      }
+
+      const updatedCart = await cartService.updateProductQuantity(productId, quantity, variation);
+      setCartItems(updatedCart.items);
+    } catch (error) {
+      console.error('Error al actualizar cantidad:', error);
+      toast({
+        title: 'Error al actualizar cantidad',
+        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await cartService.clearCartAPI();
+      setCartItems([]);
+      
+      toast({
+        title: 'Carrito vaciado',
+        description: 'Se han eliminado todos los productos del carrito',
+        status: 'info',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error al vaciar el carrito:', error);
+      toast({
+        title: 'Error al vaciar el carrito',
+        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.priceAtAddition * item.quantity), 0);
   };
 
   const getCartCount = () => {
+    console.log('cartItems:', cartItems.reduce((total, item) => total + item.quantity, 0));
     return cartItems.reduce((total, item) => total + item.quantity, 0);
+
   };
 
   return (
     <CartContext.Provider value={{
       cartItems,
+      loading,
       addToCart,
       removeFromCart,
       updateQuantity,

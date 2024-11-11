@@ -22,6 +22,7 @@ const ShoppingCart = () => {
     cartItems, 
     removeFromCart, 
     updateQuantity, 
+    addToCart,
     getCartTotal,
     clearCart 
   } = useCart();
@@ -51,10 +52,15 @@ const ShoppingCart = () => {
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem 
-                  key={`${item._id}-${item.variation}`}
-                  {...item}
-                  onRemove={() => removeFromCart(item._id, item.variation)}
-                  onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity, item.variation)}
+                    key={`${item._id}-${item.variation}`}
+                    {...item}
+                    variations={item.product?.details?.variations || []}
+                    onRemove={() => removeFromCart(item._id, item.variation)} // Usando el _id del item
+                    onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity, item.variation)}
+                    onUpdateVariation={(newVariation) => {
+                        removeFromCart(item._id, item.variation);
+                        addToCart(item.product, item.quantity, newVariation);
+                    }}
                 />
               ))
             ) : (

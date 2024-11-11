@@ -31,3 +31,5 @@ yarn-error.log*
 *.tscache
 
 .vercel
+# Archivos de rar
+.rar

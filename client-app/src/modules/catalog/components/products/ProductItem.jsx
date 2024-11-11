@@ -39,7 +39,7 @@ import {
             <Flex justifyContent="space-between" alignContent="center">
               <Box fontSize="2xl" color={useColorModeValue('gray.800', 'white')}>
                 <Box as="span" color={'gray.600'} fontSize="lg">£</Box>
-                {product.price.toFixed(2)}
+                {product.price}
               </Box>
             </Flex>
           </Box>

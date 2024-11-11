@@ -7,8 +7,6 @@ import {
   Icon,
   Button,
   Divider,
-  Grid,
-  GridItem,
   useColorModeValue,
   HStack,
   Modal,
@@ -184,7 +182,7 @@ const PaymentConfirmation = ({ orderDetails }) => {
                               <Text fontWeight="medium">{item.name}</Text>
                             </HStack>
                             <Text fontWeight="bold">
-                              ${(item.quantity * item.price).toFixed(2)}
+                              ${(item.quantity * item.priceAtAddition)}
                             </Text>
                           </Flex>
                         ))}
@@ -195,11 +193,11 @@ const PaymentConfirmation = ({ orderDetails }) => {
                       <Stack spacing={3}>
                         <Flex justify="space-between">
                           <Text color="gray.600">Subtotal</Text>
-                          <Text>${orderData.subtotal.toFixed(2)}</Text>
+                          <Text>${orderData.subtotal}</Text>
                         </Flex>
                         <Flex justify="space-between">
                           <Text color="gray.600">Envío</Text>
-                          <Text>${orderData.shippingCost.toFixed(2)}</Text>
+                          <Text>${orderData.shippingCost}</Text>
                         </Flex>
                         {orderData.discount > 0 && (
                           <Flex justify="space-between" color="green.500">
@@ -210,7 +208,7 @@ const PaymentConfirmation = ({ orderDetails }) => {
                         <Divider />
                         <Flex justify="space-between" fontSize="xl" fontWeight="bold">
                           <Text>Total</Text>
-                          <Text color={accentColor}>${orderData.total.toFixed(2)}</Text>
+                          <Text color={accentColor}>${orderData.total}</Text>
                         </Flex>
                       </Stack>
                     </VStack>
