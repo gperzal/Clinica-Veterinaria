@@ -6,8 +6,7 @@ import {
     updateCartItem,
     removeFromCart,
     clearCart,
-    syncPrices,
-    checkUpdates
+    syncPrices
 } from '../../controllers/cart/cartController.js';
 import authMiddleware from '../../middleware/auth/authMiddleware.js';
 
@@ -30,7 +29,6 @@ router.delete('/clear', authMiddleware, clearCart);
 
 // Rutas de sincronización y actualización
 router.post('/sync-prices', authMiddleware, syncPrices);
-router.get('/check-updates', authMiddleware, checkUpdates);
 
 
 export default router;

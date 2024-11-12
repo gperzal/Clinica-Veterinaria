@@ -34,10 +34,6 @@ const clearCartAPI = async () => {
   return response.data;
 };
 
-const checkCartUpdates = async () => {
-  const response = await api.get('/api/cart/check-updates');
-  return response.data;
-};
 
 const syncCartPrices = async () => {
   const response = await api.get('/api/cart/sync-prices');
@@ -50,6 +46,5 @@ export const cartService = {
   removeProductFromCart,
   updateProductQuantity,
   clearCartAPI,
-  checkCartUpdates,
   syncCartPrices,
 };

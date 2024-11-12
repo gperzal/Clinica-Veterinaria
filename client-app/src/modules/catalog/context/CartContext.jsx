@@ -5,7 +5,6 @@ import useToastNotification from '../../../hooks/useToastNotification';
 import { cartService } from '../services/cartService';
 import { AuthContext } from '../../auth/context/AuthContext';
 
-
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -13,33 +12,37 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Actualizar localStorage cuando el carrito cambie
-  useEffect(() => {
-    const fetchCart = async () => {
-      if (!user) {
-        setCartItems([]);
-        setLoading(false);
-        return;
-      }
-      try {
-        const cart = await cartService.getCart();
-        setCartItems(cart.items || []);
-      } catch (error) {
+
+  // Función para obtener el carrito desde el servidor
+  const fetchCart = async () => {
+    if (!user) {
+      setCartItems([]);
+      setLoading(false);
+      return;
+    }
+    try {
+      const cart = await cartService.getCart();
+      setCartItems(cart?.items || []); 
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setCartItems([]); 
+      } else {
         showToast({
           title: 'Error al cargar el carrito',
           description: error.response?.data?.message || error.message,
           status: 'error',
         });
-        setCartItems([]);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchCart();
-  }, [user, showToast]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Función para agregar al carrito
+  useEffect(() => {
+    fetchCart();
+  }, [user]);
+  
+
   const addToCart = async (product, quantity = 1, variation = '') => {
     if (!user) {
       showToast({
@@ -56,7 +59,6 @@ export const CartProvider = ({ children }) => {
         variation
       );
       setCartItems(updatedCart.items);
-      getCartCount();
       showToast({
         title: 'Producto agregado',
         description: `${product.name} ha sido agregado al carrito`,
@@ -72,7 +74,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-
   const removeFromCart = async (itemId, variation = '') => {
     try {
       const updatedCart = await cartService.removeProductFromCart(itemId, variation);
@@ -82,7 +83,6 @@ export const CartProvider = ({ children }) => {
         description: 'El producto ha sido eliminado del carrito',
         status: 'info',
       });
-      
     } catch (error) {
       showToast({
         title: 'Error al eliminar del carrito',
@@ -114,7 +114,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       await cartService.clearCartAPI();
-      setCartItems([]);
+      setCartItems([]); 
       showToast({
         title: 'Carrito vaciado',
         description: 'Se han eliminado todos los productos del carrito',
@@ -128,16 +128,17 @@ export const CartProvider = ({ children }) => {
       });
     }
   };
+  
+  
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.priceAtAddition * item.quantity), 0);
+    return Array.isArray(cartItems) ? 
+      cartItems.reduce((total, item) => total + (item.priceAtAddition * item.quantity), 0) : 0;
   };
-
-  const getCartCount = () => {
   
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-
-  };
+  const getCartCount = () => {
+    return Array.isArray(cartItems) ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+  }
 
   return (
     <CartContext.Provider value={{
@@ -155,7 +156,6 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// Hook personalizado para usar el contexto
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

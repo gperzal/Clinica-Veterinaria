@@ -36,7 +36,6 @@ const ShoppingCart = () => {
   };
 
   const handlePaymentComplete = async (newOrder) => {
-    console.log('Completando pago con orden:', newOrder);
     setCurrentStep('confirmation');
     setOrderDetails(newOrder);
   };
@@ -49,12 +48,12 @@ const ShoppingCart = () => {
     switch (currentStep) {
       case 'cart':
         return (
-          <Stack spacing="6">
-            {cartItems.length > 0 ? (
+            <Stack spacing="6">
+            {Array.isArray(cartItems) && cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem 
                   key={`${item._id}-${item.variation}`}
-                  product={item.product} // Pasa el objeto del producto aquí
+                  product={item.product} 
                   _id={item._id}
                   name={item.name}
                   priceAtAddition={item.priceAtAddition}
@@ -83,7 +82,7 @@ const ShoppingCart = () => {
         return (
           <Checkout 
             cartTotal={getCartTotal()} 
-            cartItems={cartItems} 
+            cartItems={cartItems || []}  
             setShippingCost={setShippingCost} 
             setOrderDetails={setOrderDetails} 
             setShippingMethod={setShippingMethod} 
@@ -118,7 +117,8 @@ const ShoppingCart = () => {
     }
   };
 
-  const isPaymentDisabled = currentStep === 'cart' && cartItems.length === 0;
+  const isPaymentDisabled = currentStep === 'cart' && (!Array.isArray(cartItems) || cartItems.length === 0);
+
 
   return (
     <Box
