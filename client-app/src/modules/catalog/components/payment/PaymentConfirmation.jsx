@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// client-app/src/modules/catalog/components/payment/PaymentConfirmation.jsx
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   VStack,
@@ -39,12 +40,39 @@ const PaymentConfirmation = ({ orderDetails }) => {
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
+  useEffect(() => {
+    console.log('OrderDetails recibidos:', orderDetails);
+  }, [orderDetails]);
+
   const orderData = {
-    orderNumber: 'PED-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-    paymentMethod: 'Visa terminada en 4242',
-    date: new Date().toLocaleDateString(),
-    ...orderDetails 
+    orderNumber: orderDetails?.orderNumber || 'PED-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+    paymentMethod: orderDetails?.payment?.method || 'Visa terminada en 4242',
+    date: new Date(orderDetails?.createdAt).toLocaleDateString(),
+    customer: {
+      name: orderDetails?.customer?.name || '',
+      email: orderDetails?.customer?.email || '',
+      phone: orderDetails?.customer?.phone || '',
+      address: orderDetails?.shipping?.address || ''
+    },
+    shipping: {
+      method: orderDetails?.shipping?.method || '',
+      cost: orderDetails?.shipping?.cost || 0,
+      address: orderDetails?.shipping?.address || ''
+    },
+    items: orderDetails?.items || [],
+    subtotal: orderDetails?.subtotal || 0,
+    total: orderDetails?.total || 0,
+    status: orderDetails?.status || 'Pendiente'
   };
+
+    // Función para formatear números
+    const formatMoney = (amount) => {
+      return Number(amount).toLocaleString('es-CL');
+    };
+
+  const shippingMethodDisplay = orderData.shipping.method === 'Express - Entrega en 24 horas' 
+    ? 'Envío Express' 
+    : 'Envío Standard';
 
   return (
     <Container maxW="6xl" py={8}>
@@ -130,10 +158,10 @@ const PaymentConfirmation = ({ orderDetails }) => {
                         </HStack>
                         <VStack align="start" spacing={2} pl={10}>
                           <Text><strong>Nombre:</strong> {orderData.customer.name}</Text>
-                          <Text><strong>Dirección:</strong> {orderData.customer.address}</Text>
+                          <Text><strong>Dirección:</strong> {orderData.shipping.address}</Text>
                           <Text><strong>Teléfono:</strong> {orderData.customer.phone}</Text>
                           <Badge colorScheme="teal" fontSize="sm" px={2} py={1}>
-                            {orderData.shippingMethod}
+                            {shippingMethodDisplay}
                           </Badge>
                         </VStack>
                       </VStack>
@@ -182,7 +210,7 @@ const PaymentConfirmation = ({ orderDetails }) => {
                               <Text fontWeight="medium">{item.name}</Text>
                             </HStack>
                             <Text fontWeight="bold">
-                              ${(item.quantity * item.priceAtAddition)}
+                              ${formatMoney(item.quantity * item.priceAtPurchase)}
                             </Text>
                           </Flex>
                         ))}
@@ -193,22 +221,22 @@ const PaymentConfirmation = ({ orderDetails }) => {
                       <Stack spacing={3}>
                         <Flex justify="space-between">
                           <Text color="gray.600">Subtotal</Text>
-                          <Text>${orderData.subtotal}</Text>
+                          <Text>${formatMoney(orderData.subtotal)}</Text>
                         </Flex>
                         <Flex justify="space-between">
                           <Text color="gray.600">Envío</Text>
-                          <Text>${orderData.shippingCost}</Text>
+                          <Text>${formatMoney(orderData.shipping.cost)}</Text>
                         </Flex>
                         {orderData.discount > 0 && (
                           <Flex justify="space-between" color="green.500">
                             <Text>Descuento Aplicado</Text>
-                            <Text>-${orderData.discount.toFixed(2)}</Text>
+                            <Text>-${formatMoney(orderData.discount)}</Text>
                           </Flex>
                         )}
                         <Divider />
                         <Flex justify="space-between" fontSize="xl" fontWeight="bold">
                           <Text>Total</Text>
-                          <Text color={accentColor}>${orderData.total}</Text>
+                          <Text color={accentColor}>${formatMoney(orderData.total)}</Text>
                         </Flex>
                       </Stack>
                     </VStack>

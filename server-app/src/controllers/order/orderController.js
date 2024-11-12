@@ -1,98 +1,260 @@
-// controllers/orderController.js
-
+// src/controllers/order/orderController.js
 import Order from '../../models/Order.js';
-import Product from '../../models/Product.js';
+import Cart from '../../models/Cart.js';
+import User from '../../models/User.js';
 
-// Crear una nueva orden
+// Crear una nueva orden desde el carrito
 export const createOrder = async (req, res) => {
-    const { items, subtotal, shippingCost, discountTotal, total, paymentMethod, shippingAddress } = req.body;
     try {
-        // Generar un número de pedido único
-        const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        const userId = req.userId;
+        const { shippingMethod, shippingCost, paymentMethod } = req.body;
 
-        // Descontar el stock de cada producto en la orden
-        for (let item of items) {
-            const product = await Product.findById(item.productId);
-            if (!product) {
-                return res.status(404).json({ error: `Producto con ID ${item.productId} no encontrado.` });
-            }
-            if (product.details.stock < item.quantity) {
-                return res.status(400).json({ error: `Stock insuficiente para el producto: ${product.name}` });
-            }
-            product.details.stock -= item.quantity;
-            await product.save();
+        // Obtener el carrito actual
+        const cart = await Cart.findOne({ user: userId }).populate('items.product');
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ message: 'Carrito vacío' });
+        }
+
+        // Obtener información del usuario
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
         // Crear la orden
         const order = new Order({
-            userId: req.user.id,
-            items: items.map(item => ({
-                productId: item.productId,
+            user: userId,
+            items: cart.items.map(item => ({
+                product: item.product._id,
+                name: item.product.name,
                 quantity: item.quantity,
+                priceAtPurchase: item.priceAtAddition,
                 variation: item.variation,
-                priceAtPurchase: item.priceAtPurchase,
-                discountAtPurchase: item.discountAtPurchase,
+                sku: item.product.details.sku,
+                imageUrl: item.product.imageURL || item.product.details.images[0]
             })),
-            subtotal,
-            shippingCost,
-            discountTotal,
-            total,
-            paymentMethod,
-            shippingAddress,
-            orderNumber
+            shipping: {
+                method: shippingMethod,
+                cost: shippingCost,
+                address: user.address
+            },
+            customer: {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+            },
+            payment: {
+                method: paymentMethod,
+                status: 'Pendiente'
+            }
         });
 
+        // Calcular totales
+        order.calculateTotals();
+
+        // Guardar la orden
         await order.save();
+
+        // Limpiar el carrito
+        await Cart.findOneAndUpdate(
+            { user: userId },
+            { $set: { items: [] } }
+        );
+
+        // Agregar evento inicial al tracking
+        await order.addTrackingEvent('Pendiente', 'Orden creada');
+
         res.status(201).json(order);
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear la orden' });
+        console.error('Error al crear orden:', error);
+        res.status(500).json({
+            message: 'Error al crear la orden',
+            error: error.message
+        });
     }
 };
 
 // Obtener todas las órdenes del usuario
-export const getOrders = async (req, res) => {
+export const getUserOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ userId: req.user.id });
-        res.status(200).json(orders);
+        const orders = await Order.find({ user: req.userId })
+            .sort({ createdAt: -1 });
+        res.json(orders);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener las órdenes' });
+        res.status(500).json({
+            message: 'Error al obtener órdenes',
+            error: error.message
+        });
     }
-};
+}
+// Obtener una orden específica
+export const getOrderById = async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            _id: req.params.orderId,
+            user: req.userId
+        });
 
-// Obtener todas las órdenes (para administración)
+        if (!order) {
+            return res.status(404).json({ message: 'Orden no encontrada' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error al obtener la orden',
+            error: error.message
+        });
+    }
+}
+
+// Cancelar una orden
+export const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { reason } = req.body;
+
+        const order = await Order.findOne({
+            _id: orderId,
+            user: req.userId,
+            status: 'Pendiente' // Solo se pueden cancelar órdenes pendientes
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: 'Orden no encontrada o no puede ser cancelada'
+            });
+        }
+
+        order.status = 'Cancelado';
+        order.cancelReason = reason;
+        await order.addTrackingEvent('Cancelado', reason);
+
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error al cancelar la orden',
+            error: error.message
+        });
+    }
+}
+
+// Actualizar estado de la orden (solo para administradores)
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status, comment } = req.body;
+
+        // Verificar si el usuario es administrador
+        if (req.userRole !== 'Administrador') {
+            return res.status(403).json({
+                message: 'No autorizado para actualizar estados de orden'
+            });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Orden no encontrada' });
+        }
+
+        await order.addTrackingEvent(status, comment);
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error al actualizar estado de la orden',
+            error: error.message
+        });
+    }
+}
+
+// Obtener todas las órdenes (solo para administradores)
 export const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find().populate('userId', 'name email');
-        res.status(200).json(orders);
+        if (req.userRole !== 'Administrador') {
+            return res.status(403).json({
+                message: 'No autorizado para ver todas las órdenes'
+            });
+        }
+
+        const { status, page = 1, limit = 10 } = req.query;
+        const query = status ? { status } : {};
+
+        const orders = await Order.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .populate('user', 'name email');
+
+        const total = await Order.countDocuments(query);
+
+        res.json({
+            orders,
+            total,
+            pages: Math.ceil(total / limit),
+            currentPage: page
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener todas las órdenes' });
+        res.status(500).json({
+            message: 'Error al obtener órdenes',
+            error: error.message
+        });
     }
-};
+}
 
-// Actualizar el estado de una orden (para administración)
-export const updateOrderStatus = async (req, res) => {
-    const { orderId, status } = req.body;
-    try {
-        const order = await Order.findById(orderId);
-        if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
-
-        order.status = status;
-        await order.save();
-        res.status(200).json(order);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar el estado de la orden' });
-    }
-};
-
-// Eliminar una orden (para administración)
+// Eliminar una orden (solo administradores)
 export const deleteOrder = async (req, res) => {
-    const { orderId } = req.params;
-    try {
-        const order = await Order.findByIdAndDelete(orderId);
-        if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
+    async (req, res) => {
+        try {
+            const { orderId } = req.params;
 
-        res.status(200).json({ message: 'Orden eliminada correctamente' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar la orden' });
+            // Verificar si el usuario es administrador
+            if (req.userRole !== 'Administrador') {
+                return res.status(403).json({
+                    message: 'No autorizado para eliminar órdenes',
+                    error: 'Acceso denegado'
+                });
+            }
+
+            // Buscar la orden
+            const order = await Order.findById(orderId);
+
+            // Verificar si la orden existe
+            if (!order) {
+                return res.status(404).json({
+                    message: 'Orden no encontrada',
+                    error: 'La orden no existe en el sistema'
+                });
+            }
+
+            // Validar si la orden puede ser eliminada (por ejemplo, si ya está entregada)
+            if (order.status === 'Entregado') {
+                return res.status(400).json({
+                    message: 'No se puede eliminar una orden entregada',
+                    error: 'Operación no permitida'
+                });
+            }
+
+            // Registrar la actividad antes de eliminar (opcional, si tienes un sistema de logs)
+            console.log(`Orden ${orderId} eliminada por admin ${req.userId} en ${new Date()}`);
+
+            // Eliminar la orden
+            await Order.findByIdAndDelete(orderId);
+
+            res.json({
+                message: 'Orden eliminada exitosamente',
+                deletedOrder: {
+                    orderNumber: order.orderNumber,
+                    customer: order.customer.name,
+                    date: order.createdAt
+                }
+            });
+
+        } catch (error) {
+            console.error('Error al eliminar orden:', error);
+            res.status(500).json({
+                message: 'Error al eliminar la orden',
+                error: error.message
+            });
+        }
     }
-};
+}

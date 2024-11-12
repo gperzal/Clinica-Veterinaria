@@ -8,7 +8,6 @@ import {
   Input,
   Stack,
   Divider,
-  useToast,
   Center
 } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc'
@@ -17,7 +16,7 @@ import { SiLinkedin, SiMessenger } from 'react-icons/si'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../auth/services/authService';
-
+import useToastNotification from '../../../hooks/useToastNotification';
 
 export default function RegisterForm() {
   const [name, setName] = useState('');
@@ -25,7 +24,7 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const toast = useToast();
+  const toast = useToastNotification();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,17 +36,15 @@ export default function RegisterForm() {
           title: 'Registro exitoso',
           description: `Bienvenido ${name}`,
           status: 'success',
-          duration: 5000,
-          isClosable: true,
         });
         setTimeout(() => {
           navigate('/login');
-        }, 3000); // Redirige después de 3 segundos
+        }, 3000); 
       } else {
         setErrorMessage('Error al registrar. Intente de nuevo.');
       }
     } catch (error) {
-      setErrorMessage('Error al registrar. Intente de nuevo.');
+      setErrorMessage( error.message || 'Error al registrar. Intente de nuevo.');
     }
   };
 

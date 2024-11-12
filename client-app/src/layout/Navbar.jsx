@@ -1,4 +1,5 @@
-import React, { useContext,useState  } from 'react';
+// client-app/src/layout/Navbar.jsx
+import React, { useContext } from 'react';
 import {
   Box,
   Flex,
@@ -20,20 +21,22 @@ import {
   useColorModeValue,
   Icon,
   Tooltip,
-  Badge
+  Badge,
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
   CloseIcon,
   MoonIcon,
   SunIcon,
-  QuestionIcon
+  QuestionIcon,
 } from '@chakra-ui/icons';
-import { FiBell, FiSettings, FiLogOut,FiShoppingCart  } from 'react-icons/fi';
+import { FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
+import { PiShoppingCart, PiShoppingCartFill } from 'react-icons/pi';
 import { RiCustomerService2Fill } from 'react-icons/ri';
 import { AuthContext } from '../modules/auth/context/AuthContext';
 import clinicLogo from '../assets/img/clinic-logo.png';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../modules/catalog/context/CartContext'; // Importa useCart
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
@@ -41,9 +44,15 @@ export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const navigate = useNavigate();
 
-  // Mockup de estado de carrito con productos para verificación
-  const [cartItems, setCartItems] = useState(3); // Usado solo para UI mockup
+  const { getCartCount } = useCart(); // Obtén getCartCount del contexto del carrito
+  const cartCount = getCartCount(); // Obtén el conteo actual de productos en el carrito
 
+  // Determina el icono a usar según si el carrito está vacío o no
+  const CartIcon = cartCount > 0 ? PiShoppingCartFill : PiShoppingCart;
+
+  // Aplica un tope de 99 al contador y muestra '∞' si es 100 o más
+  const displayCartCount =
+    cartCount >= 100 ? '∞' : cartCount > 0 ? (cartCount > 99 ? '99+' : cartCount) : null;
 
   return (
     <Box>
@@ -72,7 +81,7 @@ export default function Navbar() {
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Link href="/" _hover={{ textDecoration: 'none' }}>
-            <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px" /> 
+            <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px" />
           </Link>
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
@@ -84,88 +93,88 @@ export default function Navbar() {
           direction={'row'}
           spacing={3}
         >
-{/* Carrito de Compras */}
-<Tooltip label="Ver carrito de compras" aria-label="Carrito">
+          {/* Carrito de Compras */}
+          <Box position="relative">
+            <Tooltip label="Ver carrito de compras" aria-label="Carrito">
+              <IconButton
+                icon={<CartIcon />}
+                variant="ghost"
+                aria-label="Carrito"
+                onClick={() => navigate('/catalog/shopping-cart')}
+                display={{ base: 'inline-flex', md: 'inline-flex' }}
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+                borderRadius="full"
+                padding="8px"
+                bg={useColorModeValue('gray.100', 'gray.800')}
+                _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              />
+            </Tooltip>
+            {/* Badge de contador de productos */}
+            {displayCartCount && (
+              <Badge
+                colorScheme="red"
+                borderRadius="full"
+                position="absolute"
+                top="-1"
+                right="-1"
+                px={1}
+                py={0.5}
+                fontSize="0.7em"
+              >
+                {displayCartCount}
+              </Badge>
+            )}
+          </Box>
+
+          {/* Otros Iconos y Botones */}
+          <Tooltip label="Danos tu opinión o reporta un problema">
             <IconButton
-              icon={<FiShoppingCart />}
+              icon={<RiCustomerService2Fill />}
               variant="ghost"
-              aria-label="Carrito"
-              onClick={() => navigate('/catalog/shopping-cart')}
-              display={{ base: 'inline-flex', md: 'inline-flex' }}
+              aria-label="Feedback"
+              onClick={() => {
+                navigate('/feedback');
+              }}
+              display={{ base: 'none', md: 'inline-block' }}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
               borderRadius="full"
-              padding="8px"
+              padding="12px"
               bg={useColorModeValue('gray.100', 'gray.800')}
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
-              position="relative"
-            >
-              {cartItems > 0 && (
-                <Badge
-                  colorScheme="red"
-                  borderRadius="full"
-                  position="absolute"
-                  top="-1"
-                  right="-1"
-                  px={2}
-                  py={0.5}
-                  fontSize="xs"
-                >
-                  {cartItems}
-                </Badge>
-              )}
-            </IconButton>
+              _hover={{
+                bg: useColorModeValue('gray.200', 'gray.700'),
+              }}
+            />
           </Tooltip>
 
+          <Tooltip label="Preguntas Frecuentes" aria-label="FAQ">
+            <IconButton
+              icon={<QuestionIcon />}
+              variant="ghost"
+              aria-label="Mesa de Ayuda"
+              onClick={() => navigate('/faq')}
+              display={{ base: 'none', md: 'inline-block' }}
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+              borderRadius="full"
+              pb="3px"
+              bg={useColorModeValue('gray.100', 'gray.800')}
+              _hover={{
+                bg: useColorModeValue('gray.200', 'gray.700'),
+              }}
+            />
+          </Tooltip>
 
-         
-         <Tooltip label="Danos tu opinión o reporta un problema">
-    <IconButton
-      icon={<RiCustomerService2Fill />}
-      variant="ghost"
-      aria-label="Feedback"
-      onClick={() => {
-        navigate('/feedback');
-      }}
-      display={{ base: 'none', md: 'inline-block' }}
-      borderColor={useColorModeValue('gray.200', 'gray.700')} 
-      borderRadius="full" 
-      padding="12px"  
-      bg={useColorModeValue('gray.100', 'gray.800')} 
-      _hover={{
-        bg: useColorModeValue('gray.200', 'gray.700'),  
-      }}
-    />
-  </Tooltip>
-
-  <Tooltip label="Preguntas Frecuentes" aria-label="FAQ">
-    <IconButton
-      icon={<QuestionIcon />}
-      variant="ghost"
-      aria-label="Mesa de Ayuda"
-      onClick={() => navigate('/faq')}
-      display={{ base: 'none', md: 'inline-block' }}
-      borderColor={useColorModeValue('gray.200', 'gray.700')}  
-      borderRadius="full" 
-      pb="3px" 
-      bg={useColorModeValue('gray.100', 'gray.800')}  
-      _hover={{
-        bg: useColorModeValue('gray.200', 'gray.700'), 
-      }}
-    />
-  </Tooltip>
-
-  <Button 
-    onClick={toggleColorMode}
-    borderColor={useColorModeValue('gray.200', 'gray.700')}
-    borderRadius="full"
-    padding="6px"
-    bg={useColorModeValue('gray.100', 'gray.800')}
-    _hover={{
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-  >
-    {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-  </Button>
+          <Button
+            onClick={toggleColorMode}
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            borderRadius="full"
+            padding="6px"
+            bg={useColorModeValue('gray.100', 'gray.800')}
+            _hover={{
+              bg: useColorModeValue('gray.200', 'gray.700'),
+            }}
+          >
+            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+          </Button>
           {user ? (
             <Menu>
               <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
@@ -183,18 +192,20 @@ export default function Navbar() {
                 <br />
                 <MenuDivider />
                 <MenuItem onClick={() => navigate('/dashboard/notifications')}>
-                <Icon as={FiBell} mr={2} />
-                Notificaciones
-                <Box as="span" ml="2" color="red.500" fontWeight="bold">(3)</Box>
-              </MenuItem>
-              <MenuItem onClick={() => navigate('/dashboard')}>
-                <Icon as={FiSettings} mr={2} />
-                Panel de Control
-              </MenuItem>
-              <MenuItem onClick={logout}>
-                <Icon as={FiLogOut} mr={2} />
-                Cerrar Sesión
-               </MenuItem>
+                  <Icon as={FiBell} mr={2} />
+                  Notificaciones
+                  <Box as="span" ml="2" color="red.500" fontWeight="bold">
+                    (3)
+                  </Box>
+                </MenuItem>
+                <MenuItem onClick={() => navigate('/dashboard')}>
+                  <Icon as={FiSettings} mr={2} />
+                  Panel de Control
+                </MenuItem>
+                <MenuItem onClick={logout}>
+                  <Icon as={FiLogOut} mr={2} />
+                  Cerrar Sesión
+                </MenuItem>
               </MenuList>
             </Menu>
           ) : (
@@ -206,9 +217,8 @@ export default function Navbar() {
                 fontWeight={600}
                 color={'neutral.600'}
                 borderRadius={'full'}
-                _hover={{bg: 'blue.900', color: 'white'}}  
+                _hover={{ bg: 'blue.900', color: 'white' }}
                 href={'/login'}
-         
               >
                 Iniciar Sesión
               </Button>

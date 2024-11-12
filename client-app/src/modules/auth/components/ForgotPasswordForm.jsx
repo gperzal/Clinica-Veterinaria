@@ -7,41 +7,33 @@ import {
   Input,
   Stack,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { requestTokenPasswordReset } from '../services/authService';
+import useToastNotification from '../../../hooks/useToastNotification';
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const toast = useToast();
+  const toast = useToastNotification();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 1. Solicitar el token y enviar el correo desde el backend
       await requestTokenPasswordReset(email);
-
-      // 2. Mostrar un mensaje de éxito al usuario
       toast({
         title: 'Solicitud Exitosa',
         description: 'Revisa tu correo electrónico para continuar con el restablecimiento de tu contraseña. Busca en Spam si no lo encuentras.',
         status: 'success',
-        duration: 5000,
-        isClosable: true,
       });
     } catch (error) {
-      // 3. Manejo de errores
       toast({
         title: 'Error',
         description: error.message || 'Algo salió mal. Intenta nuevamente.',
         status: 'error',
-        duration: 5000,
-        isClosable: true,
       });
     } finally {
       setIsLoading(false);

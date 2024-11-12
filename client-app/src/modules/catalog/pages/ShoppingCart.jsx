@@ -1,7 +1,7 @@
 // client-app/src/modules/catalog/pages/ShoppingCart.jsx
 import React, { useState } from 'react';
 import { 
-  Box, Stack, Heading, Button, Flex, Text, 
+  Box, Stack, Heading, Button, Flex,  
   useColorModeValue, Alert, AlertIcon 
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -35,9 +35,10 @@ const ShoppingCart = () => {
     }
   };
 
-  const handlePaymentComplete = () => {
+  const handlePaymentComplete = async (newOrder) => {
+    console.log('Completando pago con orden:', newOrder);
     setCurrentStep('confirmation');
-    clearCart();
+    setOrderDetails(newOrder);
   };
 
   const handleBackToCart = () => {
@@ -52,15 +53,22 @@ const ShoppingCart = () => {
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem 
-                    key={`${item._id}-${item.variation}`}
-                    {...item}
-                    variations={item.product?.details?.variations || []}
-                    onRemove={() => removeFromCart(item._id, item.variation)} // Usando el _id del item
-                    onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity, item.variation)}
-                    onUpdateVariation={(newVariation) => {
-                        removeFromCart(item._id, item.variation);
-                        addToCart(item.product, item.quantity, newVariation);
-                    }}
+                  key={`${item._id}-${item.variation}`}
+                  product={item.product} // Pasa el objeto del producto aquí
+                  _id={item._id}
+                  name={item.name}
+                  priceAtAddition={item.priceAtAddition}
+                  quantity={item.quantity}
+                  imageUrl={item.imageUrl}
+                  variation={item.variation}
+                  variations={item.product?.details?.variations || []}
+                  sku={item.sku}
+                  onRemove={() => removeFromCart(item._id, item.variation)}
+                  onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity, item.variation)}
+                  onUpdateVariation={(newVariation) => {
+                    removeFromCart(item._id, item.variation);
+                    addToCart(item.product, item.quantity, newVariation);
+                  }}
                 />
               ))
             ) : (
@@ -82,7 +90,12 @@ const ShoppingCart = () => {
           />
         );
       case 'processing':
-        return <Payment onPaymentComplete={handlePaymentComplete} />;
+        return (
+          <Payment 
+            orderDetails={orderDetails} 
+            onPaymentComplete={handlePaymentComplete} 
+          />
+        );
       case 'confirmation':
         return <PaymentConfirmation orderDetails={orderDetails} />;
       default:

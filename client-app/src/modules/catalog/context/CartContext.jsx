@@ -1,109 +1,73 @@
 // client-app/src/modules/catalog/context/CartContext.jsx
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
-import {cartService} from '../../catalog/services/cartService';
+import useToastNotification from '../../../hooks/useToastNotification';
+import { cartService } from '../services/cartService';
+import { AuthContext } from '../../auth/context/AuthContext';
 
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const toast = useToast();
+  const showToast = useToastNotification();
+  const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Actualizar localStorage cuando el carrito cambie
   useEffect(() => {
     const fetchCart = async () => {
+      if (!user) {
+        setCartItems([]);
+        setLoading(false);
+        return;
+      }
       try {
-        const userData = JSON.parse(localStorage.getItem('userData')) || 
-                        JSON.parse(sessionStorage.getItem('userData'));
-        
-        if (!userData?.token) {
-          setCartItems([]);
-          setLoading(false);
-          return;
-        }
         const cart = await cartService.getCart();
         setCartItems(cart.items || []);
       } catch (error) {
-        if (error.message !== 'Usuario no autenticado') {
-          toast({
-            title: 'Error al cargar el carrito',
-            description: error.response?.data?.message || error.message,
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-          });
-        }
+        showToast({
+          title: 'Error al cargar el carrito',
+          description: error.response?.data?.message || error.message,
+          status: 'error',
+        });
         setCartItems([]);
       } finally {
         setLoading(false);
       }
     };
     fetchCart();
-  }, [toast]);
+  }, [user, showToast]);
 
-  
-
-  // Sincronizar precios al modificar el carrito
-  const syncCartIfNeeded = async () => {
-    try {
-      const { needsUpdate } = await cartService.checkCartUpdates();
-      if (needsUpdate) {
-        const { cart } = await cartService.syncCartPrices();
-        setCartItems(cart.items);
-        toast({
-          title: 'Precios actualizados',
-          description: 'Los precios han sido actualizados según el catálogo actual',
-          status: 'info',
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      console.error('Error al sincronizar precios:', error);
-    }
-  };
-  
   // Función para agregar al carrito
   const addToCart = async (product, quantity = 1, variation = '') => {
+    if (!user) {
+      showToast({
+        title: 'Debes iniciar sesión',
+        description: 'Por favor, inicia sesión para agregar productos al carrito',
+        status: 'warning',
+      });
+      return;
+    }
     try {
-      const userData = JSON.parse(localStorage.getItem('userData')) || 
-                      JSON.parse(sessionStorage.getItem('userData'));
-                      
-      if (!userData?.token) {
-        toast({
-          title: 'Error',
-          description: 'Debes iniciar sesión para agregar productos al carrito',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
-        return;
-      }
-
-      const updatedCart = await cartService.addProductToCart(product._id, quantity, variation);
+      const updatedCart = await cartService.addProductToCart(
+        product._id,
+        quantity,
+        variation
+      );
       setCartItems(updatedCart.items);
-      
-      toast({
+      getCartCount();
+      showToast({
         title: 'Producto agregado',
         description: `${product.name} ha sido agregado al carrito`,
         status: 'success',
-        duration: 3000,
-        isClosable: true,
       });
-
-      // Verificar actualizaciones después de modificar el carrito
-      await syncCartIfNeeded();
     } catch (error) {
-      console.error('Error al agregar al carrito:', error);
-      toast({
+      showToast({
         title: 'Error al agregar al carrito',
-        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        description:
+          error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
-        duration: 3000,
-        isClosable: true,
       });
     }
   };
@@ -111,25 +75,19 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (itemId, variation = '') => {
     try {
-      console.log('Removing from cart:', { itemId, variation }); 
       const updatedCart = await cartService.removeProductFromCart(itemId, variation);
       setCartItems(updatedCart.items);
-      
-      toast({
+      showToast({
         title: 'Producto eliminado',
         description: 'El producto ha sido eliminado del carrito',
         status: 'info',
-        duration: 3000,
-        isClosable: true,
       });
+      
     } catch (error) {
-      console.error('Error al eliminar del carrito:', error);
-      toast({
+      showToast({
         title: 'Error al eliminar del carrito',
         description: error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
-        duration: 3000,
-        isClosable: true,
       });
     }
   };
@@ -145,12 +103,10 @@ export const CartProvider = ({ children }) => {
       setCartItems(updatedCart.items);
     } catch (error) {
       console.error('Error al actualizar cantidad:', error);
-      toast({
+      showToast({
         title: 'Error al actualizar cantidad',
         description: error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
-        duration: 3000,
-        isClosable: true,
       });
     }
   };
@@ -159,22 +115,16 @@ export const CartProvider = ({ children }) => {
     try {
       await cartService.clearCartAPI();
       setCartItems([]);
-      
-      toast({
+      showToast({
         title: 'Carrito vaciado',
         description: 'Se han eliminado todos los productos del carrito',
         status: 'info',
-        duration: 3000,
-        isClosable: true,
       });
-    } catch (error) {
-      console.error('Error al vaciar el carrito:', error);
-      toast({
+    } catch (error) { 
+      showToast({
         title: 'Error al vaciar el carrito',
         description: error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
-        duration: 3000,
-        isClosable: true,
       });
     }
   };
@@ -184,7 +134,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const getCartCount = () => {
-    console.log('cartItems:', cartItems.reduce((total, item) => total + item.quantity, 0));
+  
     return cartItems.reduce((total, item) => total + item.quantity, 0);
 
   };

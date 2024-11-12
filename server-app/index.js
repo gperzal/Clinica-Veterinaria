@@ -61,7 +61,7 @@ app.use('/api/dashboard', profileRoutes);
 app.use('/api/dashboard', productRoutes);
 
 app.use('/api/cart', cartRoutes);
-app.use('/api/order', orderRoutes);
+app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

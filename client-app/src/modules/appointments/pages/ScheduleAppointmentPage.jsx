@@ -24,10 +24,9 @@ const ScheduleAppointmentPage = () => {
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { showErrorToast, showSuccessToast } = useToastNotification();
+  const { showToast } = useToastNotification();
 
   useEffect(() => {
-    console.log("User object:", user); // Esto te ayudará a verificar si `user._id` está disponible
   }, [user]);
 
   useEffect(() => {
@@ -37,24 +36,21 @@ const ScheduleAppointmentPage = () => {
       try {
         const response = await getPets();
         const activePets = (response.data?.pets || []).filter((pet) => pet.status === 'Activo');
-        
         setPets(activePets);
-
-        // Seleccionar automáticamente si solo hay una mascota activa
         if (activePets.length === 1) {
           setSelectedPet(activePets[0]);
         }
       } catch (error) {
-        console.error("Error fetching pets", error);
-        showErrorToast({
+        showToast({
           title: "Error al cargar mascotas",
-          error: { message: "No se pudieron cargar las mascotas del usuario." }
+          description: error.message || "No se pudieron cargar las mascotas del usuario.",
+          status: "error",
         });
       }
     };
 
     fetchPets();
-  }, [user, showErrorToast]);
+  }, [user, showToast]);
 
   const handleServiceSelection = (type) => {
     setServiceType(type);
@@ -108,15 +104,17 @@ const ScheduleAppointmentPage = () => {
       console.log("Creating appointment with data:", appointmentData); 
       const response = await createAppointment(appointmentData);
       console.log("Appointment created:", response.data);
-      showSuccessToast({
+      showToast({
         title: "Cita confirmada",
-        description: `Tu cita con ${selectedSpecialist.name} ha sido programada para el ${selectedDate} a las ${selectedTime}.`
+        description: `Tu cita con ${selectedSpecialist.name} ha sido programada para el ${selectedDate} a las ${selectedTime}.`,
+        status: "success",
       });
       setIsModalOpen(false);
     } catch (error) {
-      showErrorToast({
+      showToast({
         title: "Error al confirmar la cita",
-        error
+        description: error.message || "No se pudo confirmar la cita. Por favor, intenta nuevamente.",
+        status: "error"
       });
     }
   };

@@ -68,27 +68,36 @@ cartSchema.methods.syncPrices = async function () {
     const Product = mongoose.model('Product');
     let hasChanges = false;
 
-    for (let item of this.items) {
-        const currentProduct = await Product.findById(item.product);
-        if (!currentProduct) {
-            this.items = this.items.filter(i => i.product.toString() !== item.product.toString());
+    const itemProductIds = this.items.map(item => item.product);
+    const products = await Product.find({ _id: { $in: itemProductIds } });
+
+    const productMap = new Map();
+    products.forEach(product => {
+        productMap.set(product._id.toString(), product);
+    });
+
+    this.items = this.items.filter(item => {
+        const product = productMap.get(item.product.toString());
+        if (!product) {
             hasChanges = true;
-            continue;
+            return false; 
         }
 
-        const currentPrice = currentProduct.details?.discount
-            ? currentProduct.price * (1 - currentProduct.details.discount / 100)
-            : currentProduct.price;
+        const currentPrice = product.details?.discount
+            ? product.price * (1 - product.details.discount / 100)
+            : product.price;
 
         if (currentPrice !== item.priceAtAddition) {
             item.priceAtAddition = currentPrice;
             hasChanges = true;
         }
 
-        item.name = currentProduct.name;
-        item.imageUrl = currentProduct.imageURL || currentProduct.details.images[0];
-        item.sku = currentProduct.details.sku;
-    }
+        item.name = product.name;
+        item.imageUrl = product.imageURL || product.details.images[0];
+        item.sku = product.details.sku;
+
+        return true; // Mantener el item en el carrito
+    });
 
     if (hasChanges) {
         this.lastUpdated = new Date();
@@ -97,6 +106,7 @@ cartSchema.methods.syncPrices = async function () {
 
     return hasChanges;
 };
+
 
 // Índices
 cartSchema.index({ user: 1 }, { unique: true });

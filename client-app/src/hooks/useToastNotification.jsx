@@ -4,40 +4,17 @@ import { useToast } from '@chakra-ui/react';
 const useToastNotification = () => {
   const toast = useToast();
 
-  const showInfoToast = ({ title, description }) => {
+  const showToast = ({ title, description, status = 'info' }) => {
     toast({
       title,
       description,
-      status: 'info',
+      status,
       duration: 3000,
       isClosable: true,
     });
-  }
+  };
 
-  const showErrorToast = ({ title, error }) => {
-    toast({
-      title,
-      description: error.message,
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-  }
-
-  const showSuccessToast = ({ title, description }) => {
-    toast({
-      title,
-      description,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-  }
-
-
-  return { showInfoToast, showErrorToast, showSuccessToast };
-
-
+  return showToast;
 };
 
 export default useToastNotification;

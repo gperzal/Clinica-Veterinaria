@@ -1,5 +1,5 @@
-// AuthContext.js
-import React, { createContext, useState, useEffect } from 'react';
+// src/modules/auth/context/AuthContext.jsx
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
 export const AuthContext = createContext();
 
@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData, rememberMe) => {
     const { token, name, role, _id } = userData; 
-
     const user = { token, name, role, _id }; 
     setUser(user);
 
@@ -36,4 +35,13 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Hook personalizado para usar el contexto de autenticación
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  }
+  return context;
 };

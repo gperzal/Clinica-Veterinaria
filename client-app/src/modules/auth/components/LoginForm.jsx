@@ -9,7 +9,6 @@ import {
   Input,
   Stack,
   Divider,
-  useToast,
   Center
 } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc'
@@ -19,6 +18,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../auth/context/AuthContext';
 import { login } from '../../auth/services/authService';
+import useToastNotification from '../../../hooks/useToastNotification';
 
 
 export default function LoginForm() {
@@ -27,7 +27,7 @@ export default function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false); 
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const toast = useToast();
+  const toast = useToastNotification();
   const { login: loginContext } = useContext(AuthContext);
 
 
@@ -51,15 +51,15 @@ export default function LoginForm() {
           title: 'Inicio de sesión exitoso',
           description: `Bienvenido ${response.data.name}`,
           status: 'success',
-          duration: 5000,
-          isClosable: true,
         });
         navigate('/'); 
       } else {
         setErrorMessage('Credenciales incorrectas.');
+        
       }
     } catch (error) {
       setErrorMessage('Credenciales incorrectas.');
+     
     }
   };
 

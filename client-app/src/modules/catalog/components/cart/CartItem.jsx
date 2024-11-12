@@ -7,12 +7,13 @@ import {
   PopoverHeader, PopoverBody, PopoverArrow,
   PopoverCloseButton, Link
 } from '@chakra-ui/react';
-import { CloseIcon, EditIcon } from '@chakra-ui/icons';
+import { CloseIcon } from '@chakra-ui/icons';
 import { Link as RouterLink } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 
 const CartItem = ({ 
   _id,
+  product, 
   name, 
   price, 
   priceAtAddition,
@@ -30,7 +31,6 @@ const CartItem = ({
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textColor = useColorModeValue('gray.600', 'gray.300');
   const totalPrice = quantity * priceAtAddition;
-
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1) {
       onUpdateQuantity(newQuantity);
@@ -51,7 +51,7 @@ const CartItem = ({
       <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
         {/* Imagen y Link al Producto */}
         <Box position="relative" minW="150px">
-          <Link as={RouterLink} to={`/products/${_id}`}>
+          <Link as={RouterLink} to={`/products/${product?._id}`}>
             <Image 
               src={imageUrl} 
               alt={name} 
@@ -80,7 +80,7 @@ const CartItem = ({
             <VStack align="start" spacing={1}>
               <Link
                 as={RouterLink}
-                to={`/products/${_id}`}
+                to={`/products/${product?._id}`}
                 fontWeight="bold"
                 fontSize="lg"
                 _hover={{ color: 'teal.500' }}

@@ -7,18 +7,18 @@ import {
     Heading,
     Input,
     Stack,
-    useColorModeValue,
-    useToast,
+    useColorModeValue
   } from '@chakra-ui/react';
   import { useState } from 'react';
   import { useNavigate, useParams } from 'react-router-dom'; // Asegúrate de tener react-router-dom instalado
   import axios from 'axios';
-  
+  import useToastNotification from '../../../hooks/useToastNotification';
+
   export default function ResetPasswordForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
+    const toast = useToastNotification();
     const navigate = useNavigate();
     const { resetToken } = useParams();
   
@@ -38,8 +38,6 @@ import {
             title: 'Contraseña Restablecida',
             description: 'Tu contraseña ha sido actualizada exitosamente.',
             status: 'success',
-            duration: 5000,
-            isClosable: true,
           });
           navigate('/login'); // Redirigir a la página de inicio de sesión después de restablecer la contraseña
         }
@@ -48,8 +46,6 @@ import {
           title: 'Error',
           description: error.response?.data?.message || 'Algo salió mal. Intenta nuevamente.',
           status: 'error',
-          duration: 5000,
-          isClosable: true,
         });
       } finally {
         setIsLoading(false);

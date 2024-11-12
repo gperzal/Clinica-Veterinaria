@@ -9,39 +9,59 @@ import {
   Spinner,
   useColorModeValue
 } from '@chakra-ui/react';
+import { useOrder } from '../../context/OrderContext';
 
-const Payment = ({ onPaymentComplete }) => {
+const Payment = ({ orderDetails, onPaymentComplete }) => {
   const [step, setStep] = useState(1);
+  const { createNewOrder } = useOrder();
   const bgColor = useColorModeValue('white', 'gray.800');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    // Simulación de proceso de pago
-    const steps = [
-      { message: 'Conectando con el servidor de pago...', time: 1000 },
-      { message: 'Verificando información de tarjeta...', time: 1500 },
-      { message: 'Procesando el pago...', time: 1500 },
-      { message: 'Confirmando transacción...', time: 1000 },
-      { message: 'Pago completado con éxito!', time: 1000 }
-    ];
-
-    steps.forEach((stepInfo, index) => {
-      setTimeout(() => {
-        setStep(index + 1);
-        if (index === steps.length - 1) {
-          setTimeout(() => {
-            onPaymentComplete();
-          }, 1000);
+    const processPayment = async () => {
+      if (isProcessing) return; // Prevenir procesamiento múltiple
+      
+      try {
+        setIsProcessing(true);
+        const steps = [
+          { message: 'Conectando con el servidor de pago...', time: 1000 },
+          { message: 'Verificando información de tarjeta...', time: 1500 },
+          { message: 'Procesando el pago...', time: 1500 },
+          { message: 'Creando orden...', time: 1000 },
+          { message: '¡Pago completado con éxito!', time: 1000 }
+        ];
+  
+        for (let i = 0; i < steps.length; i++) {
+          await new Promise(resolve => setTimeout(resolve, steps[i].time));
+          setStep(i + 1);
         }
-      }, steps.slice(0, index).reduce((acc, curr) => acc + curr.time, 0));
-    });
-  }, [onPaymentComplete]);
+  
+        console.log('Creando orden con detalles:', orderDetails);
+        const newOrder = await createNewOrder(orderDetails);
+        console.log('Orden creada:', newOrder);
+        onPaymentComplete(newOrder);
+  
+      } catch (error) {
+        console.error('Error en el proceso de pago:', error);
+        // Aquí podrías agregar manejo de errores UI
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+  
+    if (orderDetails && !isProcessing) {
+      processPayment();
+    }
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderDetails]);
 
   const messages = [
     'Conectando con el servidor de pago...',
     'Verificando información de tarjeta...',
     'Procesando el pago...',
-    'Confirmando transacción...',
-    'Pago completado con éxito!'
+    'Creando orden...',
+    '¡Pago completado con éxito!'
   ];
 
   return (

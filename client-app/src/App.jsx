@@ -37,6 +37,7 @@ import { AppointmentsProvider } from './modules/appointments/context/Appointment
 // Modulo Catalogo
 import ProductsPage from './modules/catalog/pages/ProductsPage';
 import { CartProvider } from './modules/catalog/context/CartContext';
+import { OrderProvider } from './modules/catalog/context/OrderContext.jsx';
 import ProductDetailsPage from './modules/catalog/pages/ProductDetailsPage';
 import ShoppingCart from './modules/catalog/pages/ShoppingCart';
 // Modulo Contacto
@@ -53,6 +54,7 @@ function App() {
     <AuthProvider>  
       <AppointmentsProvider>  
       <CartProvider>
+      <OrderProvider>
       <Router>
         <Routes>
           {/* Rutas generales con Navbar y Footer */}
@@ -249,6 +251,7 @@ function App() {
           />
         </Routes>
       </Router>
+      </OrderProvider>
       </CartProvider>
       </AppointmentsProvider>
     </AuthProvider>
