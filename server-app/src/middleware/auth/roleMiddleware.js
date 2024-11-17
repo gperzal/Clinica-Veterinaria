@@ -1,11 +1,17 @@
 // Middleware para verificar roles
 const roleMiddleware = (requiredRoles) => {
     return (req, res, next) => {
-        // Verifica si el rol del usuario está incluido en los roles permitidos
-        if (!requiredRoles.includes(req.userRole)) {
-            return res.status(403).json({ message: 'Acceso denegado. Tu Rol no tiene permisos para realizar esta acción.' });
+        const userRole = req.userRole;
+
+        if (!userRole) {
+            return res.status(403).json({ message: 'Acceso denegado. No se pudo determinar el rol del usuario.' });
         }
-        next(); // Si el rol es válido, pasa al siguiente middleware o controlador
+
+        if (!requiredRoles.includes(userRole)) {
+            return res.status(403).json({ message: `Acceso denegado. Se requiere uno de los siguientes roles: ${requiredRoles.join(', ')}.` });
+        }
+
+        next();
     };
 };
 

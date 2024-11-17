@@ -1,15 +1,12 @@
-// src/modules/catalog/pages/ProductDetailsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
-  Flex,
   Image,
   Text,
   Heading,
   Badge,
   Button,
-  Stack,
   HStack,
   Select,
   Input,
@@ -18,7 +15,6 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  IconButton,
   Grid,
   VStack,
   Icon,
@@ -32,7 +28,7 @@ import {
   Spinner,
   useNumberInput,
 } from '@chakra-ui/react';
-import { FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaShoppingCart } from 'react-icons/fa';
 import { FaInfoCircle, FaClipboardList } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import useToastNotification from '../../../hooks/useToastNotification';
@@ -45,74 +41,70 @@ function ProductDetailsPage() {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const showToast = useToastNotification();
-  const [selectedVariation, setSelectedVariation] = useState('');
+
+  const [selectedVariation, setSelectedVariation] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const bgColor = useColorModeValue('gray.50', 'gray.700');
   const textColor = useColorModeValue('gray.800', 'white');
 
+  // Manejo de cantidad
   const {
     getInputProps,
     getIncrementButtonProps,
     getDecrementButtonProps,
-    value: quantity,
   } = useNumberInput({
     step: 1,
-    defaultValue: 1,
+    value: quantity,
+    onChange: (valueAsString, valueAsNumber) => setQuantity(valueAsNumber),
     min: 1,
-    max: product?.details.stock || 1,
+    max: selectedVariation ? selectedVariation.stock : product?.details?.stock || 1,
   });
 
   useEffect(() => {
-    if (product) {
-      setSelectedImage(product.details.images[0]);
+    if (product && product.details) {
+      // Inicialmente, no se selecciona ninguna variación (producto principal)
+      setSelectedVariation(null);
+      setSelectedImage(product.imageURL || '');
     }
   }, [product]);
 
+  useEffect(() => {
+    // Actualizar la cantidad a 1 y la imagen al cambiar la variación
+    setQuantity(1);
+    if (selectedVariation) {
+      if (selectedVariation.imageURL) {
+        setSelectedImage(selectedVariation.imageURL);
+      } else {
+        setSelectedImage(product?.imageURL || '');
+      }
+    } else {
+      // Si no hay variación seleccionada, usar la imagen del producto principal
+      setSelectedImage(product?.imageURL || '');
+    }
+  }, [selectedVariation, product]);
+
   const handleAddToCart = () => {
-    // Verificar si el usuario está autenticado
-    if (!user) {
+
+    // Verificar stock
+    const stockAvailable = selectedVariation
+      ? selectedVariation.stock
+      : product?.details?.stock || 0;
+    if (stockAvailable < quantity) {
       showToast({
-        title: 'Debes iniciar sesión',
-        description: 'Por favor, inicia sesión para agregar productos al carrito.',
-        status: 'warning',
+        title: 'Stock insuficiente',
+        description: `Solo hay ${stockAvailable} unidades disponibles.`,
+        status: 'error',
       });
       return;
     }
   
-    // Verificar si el producto tiene variaciones
-    const hasVariations = product && product.details && product.details.variations && product.details.variations.length > 0;
+    // Obtener el nombre de la variación seleccionada
+    const variationName = selectedVariation ? selectedVariation.name : '';
   
-    // Si el producto tiene variaciones, validar que se haya seleccionado una
-    if (hasVariations) {
-      if (selectedVariation === '') {
-        showToast({
-          title: 'Selecciona una variación',
-          description: 'Por favor, selecciona una variación antes de agregar al carrito.',
-          status: 'warning',
-        });
-        return;
-      }
-    }
-  
-    // Agregar el producto al carrito
-    addToCart(product, parseInt(quantity), hasVariations ? selectedVariation : undefined);
-    
-  };
-
-  const handlePrevImage = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : product.details.images.length - 1
-    );
-    setSelectedImage(product.details.images[currentIndex]);
-  };
-
-  const handleNextImage = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex < product.details.images.length - 1 ? prevIndex + 1 : 0
-    );
-    setSelectedImage(product.details.images[currentIndex]);
+    // Agregar al carrito
+    addToCart(product, quantity, variationName);
   };
 
   if (loading) {
@@ -140,159 +132,128 @@ function ProductDetailsPage() {
     );
   }
 
+  // Obtener precio y descuento según la variación seleccionada
+  const price = selectedVariation ? selectedVariation.price : product?.price || 0;
+
+  const discount = selectedVariation
+    ? selectedVariation.discount
+    : product?.details?.discount || 0;
+
+  const hasDiscount = discount > 0;
+  const discountedPrice = hasDiscount ? price * (1 - discount / 100) : price;
+
+  // Stock disponible
+  const stockAvailable = selectedVariation
+    ? selectedVariation.stock
+    : product?.details?.stock || 0;
+
+  // SKU
+  const sku = selectedVariation ? selectedVariation.sku : product?.details?.sku || '';
+
   return (
     <Box maxW="7xl" mx="auto" p={6}>
-      <Grid
-        templateColumns={{ base: '1fr', lg: '100px 1fr 1fr' }}
-        gap={6}
-      >
-        {/* Thumbnails */}
-        <Stack
-          direction={{ base: 'row', lg: 'column' }}
-          spacing={2}
-          overflowX={{ base: 'auto', lg: 'visible' }}
-          overflowY={{ base: 'visible', lg: 'auto' }}
-          maxHeight={{ lg: '400px' }}
-        >
-          {product.details.images.map((image, index) => (
-            <Image
-              key={index}
-              src={image}
-              alt={`Thumbnail ${index + 1}`}
-              onClick={() => {
-                setSelectedImage(image);
-                setCurrentIndex(index);
-              }}
-              cursor="pointer"
-              boxSize="75px"
-              objectFit="cover"
-              border={
-                selectedImage === image
-                  ? '2px solid teal'
-                  : '2px solid transparent'
-              }
-            />
-          ))}
-        </Stack>
-
-        {/* Main Image */}
-        <Box position="relative">
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
+        {/* Imagen Principal */}
+        <Box>
           <Image
             src={selectedImage}
-            alt={product.name}
+            alt={product?.name || 'Producto'}
             rounded="lg"
             objectFit="cover"
             w="100%"
-            h="400px"
+            h="auto"
           />
-          <Flex
-            position="absolute"
-            top="0"
-            bottom="0"
-            left="0"
-            right="0"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <IconButton
-              icon={<FaChevronLeft />}
-              aria-label="Previous Image"
-              onClick={handlePrevImage}
-              ml={2}
-              variant="solid"
-              bg="whiteAlpha.700"
-              color="gray.800"
-              _hover={{ bg: 'whiteAlpha.900' }}
-              size="lg"
-            />
-            <IconButton
-              icon={<FaChevronRight />}
-              aria-label="Next Image"
-              onClick={handleNextImage}
-              mr={2}
-              variant="solid"
-              bg="whiteAlpha.700"
-              color="gray.800"
-              _hover={{ bg: 'whiteAlpha.900' }}
-              size="lg"
-            />
-          </Flex>
         </Box>
 
-        {/* Product Info */}
+        {/* Información del Producto */}
         <Box>
           <Heading as="h2" fontSize="2xl" mb={4}>
-            {product.name}
+            {selectedVariation ? selectedVariation.name : product?.name || 'Producto'}
           </Heading>
           <Text fontSize="lg" color="gray.500" mb={4}>
-            SKU: {product.details.sku}
+            SKU: {sku}
           </Text>
-          {product.details.discount > 0 && (
-            <Badge colorScheme="red" fontSize="lg" mb={2}>
-              -{product.details.discount}%
-            </Badge>
-          )}
+
+          {/* Badges */}
+          <HStack spacing={2} mb={4}>
+            {hasDiscount && (
+              <Badge colorScheme="red" fontSize="md">
+                {discount}% OFF
+              </Badge>
+            )}
+            {stockAvailable > 0 ? (
+              <Badge colorScheme="green" fontSize="md">
+                En Stock
+              </Badge>
+            ) : (
+              <Badge colorScheme="red" fontSize="md">
+                Agotado
+              </Badge>
+            )}
+          </HStack>
+
+          {/* Precio */}
           <HStack spacing={4} mb={6}>
-            {product.details.discount ? (
+            {hasDiscount ? (
               <>
-                <Text
-                  as="s"
-                  fontSize="2xl"
-                  color="gray.600"
-                >
-                  $
-                  {(
-                    product.price *
-                    (1 - product.details.discount / 100)
-                  ).toLocaleString()}
+                <Text as="s" fontSize="2xl" color="gray.600">
+                  ${price.toLocaleString()}
                 </Text>
-                <Text
-                  fontSize="3xl"
-                  fontWeight="bold"
-                >
-                  ${product.price.toLocaleString()}
+                <Text fontSize="3xl" fontWeight="bold" color="teal.500">
+                  ${discountedPrice.toLocaleString()}
                 </Text>
               </>
             ) : (
-              <Text fontSize="3xl" fontWeight="bold">
-                ${product.price.toLocaleString()}
+              <Text fontSize="3xl" fontWeight="bold" color="teal.500">
+                ${price.toLocaleString()}
               </Text>
             )}
           </HStack>
-          <Text
-            fontSize="lg"
-            color={product.details.stock ? 'green.600' : 'red.600'}
-            mb={4}
-          >
-            {product.details.stock ? 'En Stock' : 'Agotado'}
-          </Text>
-          {product.details.variations.length > 0 && (
+
+          {/* Variaciones */}
+          {product?.details?.variations && product.details.variations.length > 0 && (
             <Box mb={4}>
               <Text mb={2}>Variación:</Text>
               <Select
-                placeholder="Selecciona una variación"
-                value={selectedVariation}
-                onChange={(e) =>
-                  setSelectedVariation(e.target.value)
-                }
+                value={selectedVariation ? selectedVariation.name : ''}
+                onChange={(e) => {
+                  const variationName = e.target.value;
+                  if (variationName === '') {
+                    // Producto principal seleccionado
+                    setSelectedVariation(null);
+                  } else {
+                    const variation = product.details.variations.find(
+                      (v) => v.name === variationName
+                    );
+                    setSelectedVariation(variation);
+                  }
+                  // Actualizar la cantidad a 1 al cambiar la variación
+                  setQuantity(1);
+                }}
                 mb={4}
               >
-                {product.details.variations.map((variation, index) => (
-                  <option key={index} value={variation}>
-                    {variation}
+                {/* Opción para el producto principal */}
+                <option value="">Producto principal</option>
+                {product.details.variations.map((variation) => (
+                  <option key={variation._id} value={variation.name}>
+                    {variation.name}
                   </option>
                 ))}
               </Select>
             </Box>
           )}
+
+          {/* Cantidad */}
           <Box mb={6}>
             <Text mb={2}>Cantidad:</Text>
-            <HStack maxW="320px">
+            <HStack maxW="200px">
               <Button {...getDecrementButtonProps()}>-</Button>
-              <Input {...getInputProps()} readOnly />
+              <Input {...getInputProps()} readOnly textAlign="center" />
               <Button {...getIncrementButtonProps()}>+</Button>
             </HStack>
           </Box>
+
+          {/* Botón Agregar al Carrito */}
           <Button
             leftIcon={<FaShoppingCart />}
             colorScheme="teal"
@@ -300,11 +261,7 @@ function ProductDetailsPage() {
             width="100%"
             mt={4}
             onClick={handleAddToCart}
-            disabled={
-              !product.details.stock ||
-              (product.details.variations.length > 0 &&
-                selectedVariation === '')
-            }
+            disabled={stockAvailable === 0}
           >
             Agregar al Carrito
           </Button>
@@ -338,16 +295,12 @@ function ProductDetailsPage() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  color={textColor}
-                >
+                <Text fontSize="xl" fontWeight="bold" color={textColor}>
                   Descripción del Producto
                 </Text>
                 <Box
                   dangerouslySetInnerHTML={{
-                    __html: product.details.descriptionFull,
+                    __html: product?.details?.descriptionFull || '',
                   }}
                 />
               </VStack>
@@ -361,37 +314,29 @@ function ProductDetailsPage() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  color={textColor}
-                >
+                <Text fontSize="xl" fontWeight="bold" color={textColor}>
                   Especificaciones Técnicas
                 </Text>
-                <Table
-                  variant="simple"
-                  size="md"
-                  mt={4}
-                >
-                  <Thead>
-                    <Tr>
-                      <Th>Característica</Th>
-                      <Th>Detalle</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {product.details.specificationsArray.map(
-                      (spec, index) => (
-                        <Tr
-                          key={`${spec.key}-${index}`}
-                        >
+                {product?.details?.specificationsArray ? (
+                  <Table variant="simple" size="md" mt={4}>
+                    <Thead>
+                      <Tr>
+                        <Th>Característica</Th>
+                        <Th>Detalle</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {product.details.specificationsArray.map((spec, index) => (
+                        <Tr key={`${spec.key}-${index}`}>
                           <Td>{spec.key}</Td>
                           <Td>{spec.value}</Td>
                         </Tr>
-                      )
-                    )}
-                  </Tbody>
-                </Table>
+                      ))}
+                    </Tbody>
+                  </Table>
+                ) : (
+                  <Text>No hay especificaciones disponibles.</Text>
+                )}
               </VStack>
             </TabPanel>
           </TabPanels>

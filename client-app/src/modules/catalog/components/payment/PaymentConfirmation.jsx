@@ -28,7 +28,6 @@ import {
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import { FaTruck, FaRegCreditCard, FaBoxOpen, FaReceipt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-
 const MotionBox = motion(Box);
 
 const PaymentConfirmation = ({ orderDetails }) => {
@@ -37,11 +36,11 @@ const PaymentConfirmation = ({ orderDetails }) => {
   const cardBgColor = useColorModeValue('gray.50', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const accentColor = useColorModeValue('teal.500', 'teal.300');
-
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   useEffect(() => {
-    console.log('OrderDetails recibidos:', orderDetails);
+    console.log('OrderDetails recibidos PaymentConfirmation:', orderDetails);
+    
   }, [orderDetails]);
 
   const orderData = {

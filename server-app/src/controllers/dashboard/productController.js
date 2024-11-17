@@ -38,6 +38,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
+
 // Actualizar un producto
 export const updateProduct = async (req, res) => {
   try {
@@ -52,6 +53,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
+
 // Eliminar un producto
 export const deleteProduct = async (req, res) => {
   try {
@@ -65,3 +67,4 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el producto' });
   }
 };
+

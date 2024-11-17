@@ -5,14 +5,27 @@ import Product from '../../models/Product.js';
 export const getCart = async (req, res) => {
     try {
         const userId = req.userId;
-        if (!userId) return res.status(401).json({ message: 'Usuario no autenticado o ID no válido' });
+        if (!userId) {
+            return res.status(401).json({
+                message: 'Usuario no autenticado o ID no válido',
+            });
+        }
 
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
-        if (!cart) return res.status(404).json({ message: 'Carrito no encontrado' });
+
+        if (!cart) {
+            return res.status(404).json({ message: 'Carrito no encontrado' });
+        }
+
+        // Sincronizar precios
+        const pricesUpdated = await cart.syncPrices();
 
         res.json(cart);
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener el carrito', error: error.message });
+        res.status(500).json({
+            message: 'Error al obtener el carrito',
+            error: error.message,
+        });
     }
 };
 
@@ -27,19 +40,44 @@ export const addToCart = async (req, res) => {
 
         const product = await Product.findById(productId);
         if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
-        if (product.details.stock < quantity) return res.status(400).json({ message: 'No hay suficiente stock disponible' });
+
+        // Inicializar variables
+        let currentPrice = product.price;
+        let sku = product.details.sku || '';
+        let imageUrl = product.imageURL || product.details.images[0] || '';
+        let stockAvailable = product.details.stock || 0;
+
+        if (variation) {
+            // Encontrar la variación seleccionada
+            const selectedVariation = product.details.variations.find(v => v.name === variation);
+            if (!selectedVariation) {
+                return res.status(400).json({ message: `Variación '${variation}' no encontrada para el producto` });
+            }
+            currentPrice = selectedVariation.price;
+            sku = selectedVariation.sku || '';
+            imageUrl = selectedVariation.imageURL || imageUrl;
+            stockAvailable = selectedVariation.stock || 0;
+        }
+
+        // Aplicar descuento si existe
+        if (product.details.discount) {
+            currentPrice = currentPrice * (1 - product.details.discount / 100);
+        }
+
+        // Verificar stock
+        if (stockAvailable < quantity) {
+            return res.status(400).json({ message: 'No hay suficiente stock disponible' });
+        }
 
         let cart = await Cart.findOne({ user: userId });
         if (!cart) {
             cart = new Cart({ user: userId, items: [] });
         }
 
-        const currentPrice = product.details?.discount ? product.price * (1 - product.details.discount / 100) : product.price;
-
         const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId && item.variation === variation);
         if (existingItemIndex > -1) {
             const newQuantity = cart.items[existingItemIndex].quantity + quantity;
-            if (product.details.stock < newQuantity) return res.status(400).json({ message: 'No hay suficiente stock disponible para la cantidad solicitada' });
+            if (stockAvailable < newQuantity) return res.status(400).json({ message: 'No hay suficiente stock disponible para la cantidad solicitada' });
 
             cart.items[existingItemIndex].quantity = newQuantity;
         } else {
@@ -49,8 +87,8 @@ export const addToCart = async (req, res) => {
                 variation,
                 priceAtAddition: currentPrice,
                 name: product.name,
-                imageUrl: product.imageURL || product.details.images[0],
-                sku: product.details.sku || ''
+                imageUrl: imageUrl,
+                sku: sku
             });
         }
 
@@ -138,17 +176,3 @@ export const clearCart = async (req, res) => {
     }
 };
 
-// Sincronizar precios del carrito
-export const syncPrices = async (req, res) => {
-    try {
-        const userId = req.userId;
-        const cart = await Cart.findOne({ user: userId });
-        if (!cart) return res.status(404).json({ message: 'Carrito no encontrado' });
-
-        const hasChanges = await cart.syncPrices();
-
-        res.json({ cart, updated: hasChanges, message: hasChanges ? 'Precios actualizados' : 'Precios ya están actualizados' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al sincronizar precios', error: error.message });
-    }
-};

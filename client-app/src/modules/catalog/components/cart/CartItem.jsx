@@ -1,36 +1,37 @@
 // client-app/src/modules/catalog/components/cart/CartItem.jsx
+
 import React, { useState } from 'react';
-import { 
-  Flex, Image, Box, Text, Button, IconButton, 
-  HStack, VStack, Badge, Select, useColorModeValue,
-  Popover, PopoverTrigger, PopoverContent, 
-  PopoverHeader, PopoverBody, PopoverArrow,
-  PopoverCloseButton, Link
+import {
+  Flex,
+  Image,
+  Box,
+  Text,
+  Button,
+  IconButton,
+  HStack,
+  VStack,
+  Badge,
+  useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton,
+  Link,
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { Link as RouterLink } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 
-const CartItem = ({ 
-  _id,
-  product, 
-  name, 
-  price, 
-  priceAtAddition,
-  quantity, 
-  imageUrl, 
-  variation,
-  variations = [],
-  sku,
-  onRemove, 
-  onUpdateQuantity,
-  onUpdateVariation 
-}) => {
+const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
   const [isEditing, setIsEditing] = useState(false);
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textColor = useColorModeValue('gray.600', 'gray.300');
-  const totalPrice = quantity * priceAtAddition;
+  const totalPrice = item.quantity * item.priceAtAddition;
+
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1) {
       onUpdateQuantity(newQuantity);
@@ -51,27 +52,27 @@ const CartItem = ({
       <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
         {/* Imagen y Link al Producto */}
         <Box position="relative" minW="150px">
-          <Link as={RouterLink} to={`/products/${product?._id}`}>
-            <Image 
-              src={imageUrl} 
-              alt={name} 
-              borderRadius="md" 
+          <Link as={RouterLink} to={`/products/${item.product._id}`}>
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              borderRadius="md"
               objectFit="cover"
               w="150px"
               h="150px"
             />
           </Link>
-          {variation && (
-            <Badge
-              position="absolute"
-              top="2"
-              right="2"
-              colorScheme="blue"
-              variant="solid"
-            >
-              {variation}
-            </Badge>
-          )}
+          {item.variation && (
+              <Badge
+                position="absolute"
+                top="2"
+                right="2"
+                colorScheme="blue"
+                variant="solid"
+              >
+                {item.variation}
+              </Badge>
+            )}
         </Box>
 
         {/* Información del Producto */}
@@ -80,14 +81,16 @@ const CartItem = ({
             <VStack align="start" spacing={1}>
               <Link
                 as={RouterLink}
-                to={`/products/${product?._id}`}
+                to={`/products/${item.product._id}`}
                 fontWeight="bold"
                 fontSize="lg"
                 _hover={{ color: 'teal.500' }}
               >
-                {name}
+                {item.name} {item.variation ? `(${item.variation})` : ''}
               </Link>
-              <Text color={textColor} fontSize="sm">SKU: {sku}</Text>
+              <Text color={textColor} fontSize="sm">
+                SKU: {item.sku}
+              </Text>
             </VStack>
             <IconButton
               icon={<CloseIcon />}
@@ -100,32 +103,25 @@ const CartItem = ({
           </Flex>
 
           {/* Precios */}
-          <Flex 
-            justify="space-between" 
-            align="center"
-            wrap="wrap"
-            gap={2}
-          >
+          <Flex justify="space-between" align="center" wrap="wrap" gap={2}>
             <VStack align="start" spacing={0}>
-              <Text fontSize="sm" color={textColor}>Precio unitario:</Text>
-              <Text fontWeight="bold">${priceAtAddition.toLocaleString()}</Text>
+              <Text fontSize="sm" color={textColor}>
+                Precio unitario:
+              </Text>
+              <Text fontWeight="bold">${item.priceAtAddition.toLocaleString()}</Text>
             </VStack>
             <VStack align="end" spacing={0}>
-              <Text fontSize="sm" color={textColor}>Total:</Text>
+              <Text fontSize="sm" color={textColor}>
+                Total:
+              </Text>
               <Text fontWeight="bold" color="teal.500">
                 ${totalPrice.toLocaleString()}
               </Text>
             </VStack>
           </Flex>
 
-          {/* Controles de Cantidad y Variación */}
-          <Flex 
-            justify="space-between" 
-            align="center"
-            mt={2}
-            wrap="wrap"
-            gap={4}
-          >
+          {/* Controles de Cantidad */}
+          <Flex justify="space-between" align="center" mt={2} wrap="wrap" gap={4}>
             <Popover
               isOpen={isEditing}
               onClose={() => setIsEditing(false)}
@@ -155,43 +151,27 @@ const CartItem = ({
                         <IconButton
                           size="xs"
                           icon={<Text>-</Text>}
-                          onClick={() => handleQuantityChange(quantity - 1)}
-                          isDisabled={quantity <= 1}
+                          onClick={() => handleQuantityChange(item.quantity - 1)}
+                          isDisabled={item.quantity <= 1}
                         />
-                        <Text fontWeight="medium">{quantity}</Text>
+                        <Text fontWeight="medium">{item.quantity}</Text>
                         <IconButton
                           size="xs"
                           icon={<Text>+</Text>}
-                          onClick={() => handleQuantityChange(quantity + 1)}
+                          onClick={() => handleQuantityChange(item.quantity + 1)}
                         />
                       </HStack>
                     </HStack>
-
-                    {/* Selector de variación si hay variaciones disponibles */}
-                    {variations.length > 0 && (
-                      <Box w="full">
-                        <Text fontSize="sm" mb={1}>Variación:</Text>
-                        <Select
-                          size="sm"
-                          value={variation}
-                          onChange={(e) => onUpdateVariation(e.target.value)}
-                        >
-                          {variations.map((v) => (
-                            <option key={v} value={v}>
-                              {v}
-                            </option>
-                          ))}
-                        </Select>
-                      </Box>
-                    )}
                   </VStack>
                 </PopoverBody>
               </PopoverContent>
             </Popover>
 
             <HStack spacing={1}>
-              <Text fontSize="sm" color={textColor}>Cantidad:</Text>
-              <Text fontWeight="medium">{quantity}</Text>
+              <Text fontSize="sm" color={textColor}>
+                Cantidad:
+              </Text>
+              <Text fontWeight="medium">{item.quantity}</Text>
             </HStack>
           </Flex>
         </VStack>

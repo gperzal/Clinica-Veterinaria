@@ -22,10 +22,10 @@ export const CartProvider = ({ children }) => {
     }
     try {
       const cart = await cartService.getCart();
-      setCartItems(cart?.items || []); 
+      setCartItems(cart?.items || []);
     } catch (error) {
       if (error.response?.status === 404) {
-        setCartItems([]); 
+        setCartItems([]);
       } else {
         showToast({
           title: 'Error al cargar el carrito',
@@ -41,7 +41,6 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     fetchCart();
   }, [user]);
-  
 
   const addToCart = async (product, quantity = 1, variation = '') => {
     if (!user) {
@@ -74,10 +73,10 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (itemId, variation = '') => {
+  const removeFromCart = async (itemId) => {
     try {
-      const updatedCart = await cartService.removeProductFromCart(itemId, variation);
-      setCartItems(updatedCart.items);
+      const updatedCart = await cartService.removeProductFromCart(itemId);
+      setCartItems(updatedCart.items || []);
       showToast({
         title: 'Producto eliminado',
         description: 'El producto ha sido eliminado del carrito',
@@ -86,26 +85,28 @@ export const CartProvider = ({ children }) => {
     } catch (error) {
       showToast({
         title: 'Error al eliminar del carrito',
-        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        description:
+          error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
       });
     }
   };
 
-  const updateQuantity = async (productId, quantity, variation = '') => {
+  const updateQuantity = async (itemId, quantity) => {
     try {
       if (quantity <= 0) {
-        await removeFromCart(productId, variation);
+        await removeFromCart(itemId);
         return;
       }
 
-      const updatedCart = await cartService.updateProductQuantity(productId, quantity, variation);
+      const updatedCart = await cartService.updateProductQuantity(itemId, quantity);
       setCartItems(updatedCart.items);
     } catch (error) {
       console.error('Error al actualizar cantidad:', error);
       showToast({
         title: 'Error al actualizar cantidad',
-        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        description:
+          error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
       });
     }
@@ -114,43 +115,47 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       await cartService.clearCartAPI();
-      setCartItems([]); 
+      setCartItems([]);
       showToast({
         title: 'Carrito vaciado',
         description: 'Se han eliminado todos los productos del carrito',
         status: 'info',
       });
-    } catch (error) { 
+    } catch (error) {
       showToast({
         title: 'Error al vaciar el carrito',
-        description: error.response?.data?.message || 'Error al conectar con el servidor',
+        description:
+          error.response?.data?.message || 'Error al conectar con el servidor',
         status: 'error',
       });
     }
   };
-  
-  
 
   const getCartTotal = () => {
-    return Array.isArray(cartItems) ? 
-      cartItems.reduce((total, item) => total + (item.priceAtAddition * item.quantity), 0) : 0;
+    return Array.isArray(cartItems)
+      ? cartItems.reduce((total, item) => total + item.priceAtAddition * item.quantity, 0)
+      : 0;
   };
-  
+
   const getCartCount = () => {
-    return Array.isArray(cartItems) ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
-  }
+    return Array.isArray(cartItems)
+      ? cartItems.reduce((total, item) => total + item.quantity, 0)
+      : 0;
+  };
 
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      loading,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      getCartTotal,
-      getCartCount
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        loading,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        getCartTotal,
+        getCartCount,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

@@ -7,7 +7,7 @@ import useToastNotification from '../../../../../src/hooks/useToastNotification'
 const useProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showInfoToast, showErrorToast, showSuccessToast } = useToastNotification();
+  const toast = useToastNotification();
 
   // Función para obtener productos
   const fetchProducts = async () => {
@@ -16,9 +16,10 @@ const useProducts = () => {
       const response = await catalogServices.getProducts();
       setProducts(response.data);
     } catch (error) {
-      showErrorToast({
+      toast({
         title: 'Error al cargar los productos.',
         error: error,
+        status: 'error',
       });
     } finally {
       setLoading(false);
@@ -29,15 +30,17 @@ const useProducts = () => {
   const createProduct = async (newProductData) => {
     try {
       await catalogServices.createProduct(newProductData);
-      showSuccessToast({
+      toast({
         title: 'Producto creado.',
         description: 'El producto ha sido creado exitosamente.',
+        status: 'success',
       });
       fetchProducts();
     } catch (error) {
-      showErrorToast({
+      toast({
         title: 'Error al cargar los productos.',
         error: error,
+        status: 'error',
       });
     }
   };
@@ -46,15 +49,18 @@ const useProducts = () => {
   const updateProduct = async (updatedProduct) => {
     try {
       await catalogServices.updateProduct(updatedProduct._id, updatedProduct);
-      showSuccessToast({
+      toast({
         title: 'Producto actualizado.',
         description: 'El producto ha sido actualizado exitosamente.',
+        status: 'success',
       });
       fetchProducts();
     } catch (error) {
-      showErrorToast({
+      toast({
         title: 'Error al actualizar los productos.',
         error: error,
+        status: 'error',
+
       });
     }
   };
@@ -63,15 +69,16 @@ const useProducts = () => {
   const deleteProduct = async (productId) => {
     try {
       await catalogServices.deleteProduct(productId);
-      showInfoToast({
+      toast({
         title: 'Producto eliminado.',
         description: 'El Producto ha sido eliminado exitosamente.',
       });
       fetchProducts();
     } catch (error) {
-      showErrorToast({
+      toast({
         title: 'Error al eliminar el producto.',
         error: error,
+        status: 'error',
       });
     }
   };

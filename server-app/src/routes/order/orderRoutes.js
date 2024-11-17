@@ -1,37 +1,29 @@
 // routes/orderRoutes.js
 
 import express from 'express';
+import authMiddleware from '../../middleware/auth/authMiddleware.js';
+import roleMiddleware from '../../middleware/auth/roleMiddleware.js';
 import {
     createOrder,
+    cancelOrder,
     getUserOrders,
     getOrderById,
-    cancelOrder,
     updateOrderStatus,
     getAllOrders,
     deleteOrder
 } from '../../controllers/order/orderController.js';
-import authMiddleware from '../../middleware/auth/authMiddleware.js';
 
 const router = express.Router();
 
-// Rutas de cliente
+// Rutas para usuarios autenticados (Clientes)
 router.post('/', authMiddleware, createOrder);
-// Ruta para obtener las órdenes del usuario
-router.get('/my-orders', authMiddleware, getUserOrders);
-// Ruta para obtener una orden por ID
-router.get('/my-orders/:orderId', authMiddleware, getOrderById);
+router.get('/', authMiddleware, getUserOrders);
+router.get('/:orderId', authMiddleware, getOrderById);
+router.put('/cancel/:orderId', authMiddleware, cancelOrder);
 
-// Ruta para cancelar una orden
-router.post('/cancel/:orderId', authMiddleware, cancelOrder);
-
-// Rutas de administrador
-// Obtener todas las órdenes (solo admin)
-router.get('/all-orders', authMiddleware, getAllOrders);
-
-// Actualizar estado de una orden (solo admin)
-router.put('/status/:orderId', authMiddleware, updateOrderStatus);
-
-// Eliminar una orden (solo admin)
-router.delete('/:orderId', authMiddleware, deleteOrder);
+// Rutas para administradores
+router.get('/admin/all', authMiddleware, roleMiddleware(['Administrador', 'Administrativo', 'Veterinario']), getAllOrders);
+router.put('/admin/status/:orderId', authMiddleware, roleMiddleware(['Administrador', 'Administrativo', 'Veterinario']), updateOrderStatus);
+router.delete('/admin/:orderId', authMiddleware, roleMiddleware(['Administrador', 'Administrativo', 'Veterinario']), deleteOrder);
 
 export default router;

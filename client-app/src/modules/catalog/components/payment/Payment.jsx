@@ -18,11 +18,13 @@ const Payment = ({ orderDetails, onPaymentComplete }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+  
     const processPayment = async () => {
-      if (isProcessing) return; // Prevenir procesamiento múltiple
-      
+      if (isProcessing) return; // Si ya se está procesando, no volver a ejecutarlo
+  
       try {
-        setIsProcessing(true);
+        setIsProcessing(true); // Indica que el proceso está en curso
         const steps = [
           { message: 'Conectando con el servidor de pago...', time: 1000 },
           { message: 'Verificando información de tarjeta...', time: 1500 },
@@ -33,28 +35,32 @@ const Payment = ({ orderDetails, onPaymentComplete }) => {
   
         for (let i = 0; i < steps.length; i++) {
           await new Promise(resolve => setTimeout(resolve, steps[i].time));
+          if (!isMounted) return; // Si el componente se desmonta, detén la ejecución
           setStep(i + 1);
         }
   
         console.log('Creando orden con detalles:', orderDetails);
         const newOrder = await createNewOrder(orderDetails);
         console.log('Orden creada:', newOrder);
-        onPaymentComplete(newOrder);
+  
+        if (isMounted) onPaymentComplete(newOrder); // Llama a la función solo si el componente está montado
   
       } catch (error) {
         console.error('Error en el proceso de pago:', error);
-        // Aquí podrías agregar manejo de errores UI
       } finally {
-        setIsProcessing(false);
+        setIsProcessing(false); // Resetea el estado de procesamiento
       }
     };
   
     if (orderDetails && !isProcessing) {
-      processPayment();
+      processPayment(); // Llama a la función si hay detalles y no se está procesando
     }
   
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderDetails]);
+    return () => {
+      isMounted = false; // Marca como desmontado cuando se desmonta el componente
+    };
+  }, [orderDetails]); // Escucha cambios en orderDetails
+  
 
   const messages = [
     'Conectando con el servidor de pago...',

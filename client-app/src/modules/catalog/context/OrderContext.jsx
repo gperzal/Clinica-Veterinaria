@@ -15,26 +15,26 @@ export const OrderProvider = ({ children }) => {
 
   const createNewOrder = async (orderDetails) => {
     try {
-      setLoading(true);
-      console.log('Iniciando creación de orden:', orderDetails);
-      const newOrder = await orderService.createOrder(orderDetails);
-      console.log('Orden creada exitosamente:', newOrder);
-      setCurrentOrder(newOrder);
-      return newOrder;
-    } catch (error) {
-      console.error('Error en createNewOrder:', error);
-      toast({
-        title: 'Error al crear la orden',
-        description: error.response?.data?.message || 'Error al procesar la orden',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+        setLoading(true);
+        const newOrder = await orderService.createOrder(orderDetails);
+        setCurrentOrder(newOrder);
+        toast({
+          title: 'Orden creada',
+          description: 'La orden ha sido creada exitosamente',
+          status: 'success',
+        })
+        return newOrder;
+      } catch (error) {
+        toast({
+          title: 'Error al crear la orden',
+          description: error.response?.data?.message || 'Error al procesar la orden',
+          status: 'error',
+        });
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const getUserOrderHistory = async () => {
     try {

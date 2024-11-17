@@ -45,7 +45,7 @@ const menuSections = [
       { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
       { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
       { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' },
-      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/coming-soon' },
+      { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/purchase-history' },
       { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
     ],
   },

@@ -5,8 +5,7 @@ import {
     addToCart,
     updateCartItem,
     removeFromCart,
-    clearCart,
-    syncPrices
+    clearCart
 } from '../../controllers/cart/cartController.js';
 import authMiddleware from '../../middleware/auth/authMiddleware.js';
 
@@ -26,9 +25,6 @@ router.delete('/remove', authMiddleware, removeFromCart);
 
 // Limpiar todos los productos del carrito del usuario
 router.delete('/clear', authMiddleware, clearCart);
-
-// Rutas de sincronización y actualización
-router.post('/sync-prices', authMiddleware, syncPrices);
 
 
 export default router;

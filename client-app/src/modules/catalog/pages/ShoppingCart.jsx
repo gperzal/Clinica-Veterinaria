@@ -1,8 +1,15 @@
 // client-app/src/modules/catalog/pages/ShoppingCart.jsx
+
 import React, { useState } from 'react';
-import { 
-  Box, Stack, Heading, Button, Flex,  
-  useColorModeValue, Alert, AlertIcon 
+import {
+  Box,
+  Stack,
+  Heading,
+  Button,
+  Flex,
+  useColorModeValue,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
@@ -18,13 +25,13 @@ const ShoppingCart = () => {
   const [shippingMethod, setShippingMethod] = useState('');
   const [orderDetails, setOrderDetails] = useState(null);
 
-  const { 
-    cartItems, 
-    removeFromCart, 
-    updateQuantity, 
+  const {
+    cartItems,
+    removeFromCart,
+    updateQuantity,
     addToCart,
     getCartTotal,
-    clearCart 
+    clearCart,
   } = useCart();
 
   const handlePaymentClick = () => {
@@ -48,26 +55,14 @@ const ShoppingCart = () => {
     switch (currentStep) {
       case 'cart':
         return (
-            <Stack spacing="6">
+          <Stack spacing="6">
             {Array.isArray(cartItems) && cartItems.length > 0 ? (
               cartItems.map((item) => (
-                <CartItem 
-                  key={`${item._id}-${item.variation}`}
-                  product={item.product} 
-                  _id={item._id}
-                  name={item.name}
-                  priceAtAddition={item.priceAtAddition}
-                  quantity={item.quantity}
-                  imageUrl={item.imageUrl}
-                  variation={item.variation}
-                  variations={item.product?.details?.variations || []}
-                  sku={item.sku}
-                  onRemove={() => removeFromCart(item._id, item.variation)}
-                  onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity, item.variation)}
-                  onUpdateVariation={(newVariation) => {
-                    removeFromCart(item._id, item.variation);
-                    addToCart(item.product, item.quantity, newVariation);
-                  }}
+                <CartItem
+                  key={item._id}
+                  item={item}
+                  onRemove={() => removeFromCart(item._id)}
+                  onUpdateQuantity={(quantity) => updateQuantity(item._id, quantity)}
                 />
               ))
             ) : (
@@ -80,20 +75,17 @@ const ShoppingCart = () => {
         );
       case 'checkout':
         return (
-          <Checkout 
-            cartTotal={getCartTotal()} 
-            cartItems={cartItems || []}  
-            setShippingCost={setShippingCost} 
-            setOrderDetails={setOrderDetails} 
-            setShippingMethod={setShippingMethod} 
+          <Checkout
+            cartTotal={getCartTotal()}
+            cartItems={cartItems || []}
+            setShippingCost={setShippingCost}
+            setOrderDetails={setOrderDetails}
+            setShippingMethod={setShippingMethod}
           />
         );
       case 'processing':
         return (
-          <Payment 
-            orderDetails={orderDetails} 
-            onPaymentComplete={handlePaymentComplete} 
-          />
+          <Payment orderDetails={orderDetails} onPaymentComplete={handlePaymentComplete} />
         );
       case 'confirmation':
         return <PaymentConfirmation orderDetails={orderDetails} />;
@@ -117,8 +109,8 @@ const ShoppingCart = () => {
     }
   };
 
-  const isPaymentDisabled = currentStep === 'cart' && (!Array.isArray(cartItems) || cartItems.length === 0);
-
+  const isPaymentDisabled =
+    currentStep === 'cart' && (!Array.isArray(cartItems) || cartItems.length === 0);
 
   return (
     <Box
@@ -141,10 +133,7 @@ const ShoppingCart = () => {
 
         {(currentStep === 'cart' || currentStep === 'checkout') && (
           <Flex direction="column" align="center" flex="1">
-            <CartOrderSummary 
-              subtotal={getCartTotal()}
-              shippingCost={shippingCost}
-            />
+            <CartOrderSummary subtotal={getCartTotal()} shippingCost={shippingCost} />
             <Button
               mt="6"
               colorScheme="teal"
@@ -169,13 +158,7 @@ const ShoppingCart = () => {
             )}
 
             {currentStep === 'cart' && (
-              <Button
-                as={RouterLink}
-                to="/products"
-                mt="4"
-                variant="link"
-                color="teal.500"
-              >
+              <Button as={RouterLink} to="/catalog" mt="4" variant="link" color="teal.500">
                 Seguir Comprando
               </Button>
             )}

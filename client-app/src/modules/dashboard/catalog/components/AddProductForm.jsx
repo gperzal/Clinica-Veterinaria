@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Box, Button, FormControl, FormLabel, Input,InputGroup, InputRightAddon, SimpleGrid, HStack, VStack, 
+  Box, Button, FormControl, FormLabel, Input, InputGroup, InputRightAddon, SimpleGrid, HStack, VStack,
   Stepper, Step, StepTitle, StepDescription, StepIndicator, StepSeparator, StepStatus,
   IconButton, Textarea, Text, Switch, useBreakpointValue, Image,
-   Menu, MenuButton, MenuList, MenuItem, Icon
+  Menu, MenuButton, MenuList, MenuItem, Icon
 } from '@chakra-ui/react';
-import { FaHeart, FaBone, FaPaw, FaShower, FaBed, FaCar, FaCouch, FaTshirt } from 'react-icons/fa'
+import { FaHeart, FaBone, FaPaw, FaShower, FaBed, FaCar, FaCouch, FaTshirt } from 'react-icons/fa';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
 const steps = [
@@ -31,14 +31,13 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
       stock: 0,
       sku: '',
       discount: 0,
-      originalPrice: 0,     
-      images: [],        
-      descriptionFull: '',  
-      specificationsArray: [],  
-      variations: []           
+      originalPrice: 0,
+      images: [],
+      descriptionFull: '',
+      specificationsArray: [],
+      variations: []
     }
   });
-
 
   // Manejador para cambiar el estado de inStock
   const handleInStockChange = (e) => {
@@ -47,10 +46,6 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
       status: e.target.checked
     });
   };
-
-  
-
-
 
   // Manejador para agregar al array de especificaciones
   const handleAddSpecification = () => {
@@ -87,29 +82,41 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
     });
   };
 
-  // Manejador para agregar al array de variaciones
+  // Manejador para agregar una variación
   const handleAddVariation = () => {
-    setProductData({
-      ...productData,
+    setProductData((prevState) => ({
+      ...prevState,
       details: {
-        ...productData.details,
-        variations: [...productData.details.variations, '']
-      }
-    });
+        ...prevState.details,
+        variations: [
+          ...prevState.details.variations,
+          {
+            name: '',
+            sku: '',
+            price: 0,
+            discount: 0,
+            stock: 0,
+            imageURL: '',
+          },
+        ],
+      },
+    }));
   };
 
-  const handleVariationChange = (index, value) => {
+  // Manejador para cambios en las variaciones
+  const handleVariationChange = (index, key, value) => {
     const updatedVariations = [...productData.details.variations];
-    updatedVariations[index] = value;
+    updatedVariations[index][key] = value;
     setProductData({
       ...productData,
       details: {
         ...productData.details,
-        variations: updatedVariations
-      }
+        variations: updatedVariations,
+      },
     });
   };
 
+  // Manejador para eliminar una variación
   const handleRemoveVariation = (index) => {
     const updatedVariations = [...productData.details.variations];
     updatedVariations.splice(index, 1);
@@ -117,8 +124,8 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
       ...productData,
       details: {
         ...productData.details,
-        variations: updatedVariations
-      }
+        variations: updatedVariations,
+      },
     });
   };
 
@@ -128,7 +135,7 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
       ...productData,
       details: {
         ...productData.details,
-        images: [...productData.details.images, ''] 
+        images: [...productData.details.images, '']
       }
     });
   };
@@ -168,27 +175,27 @@ const AddProductForm = ({ step, setStep, onProductCreate }) => {
     });
   };
 
- // Maneja los cambios en los campos básicos
- const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  // Si cambia el precio o el descuento, recalculamos el precio
-  if (name === 'price') {
-    const priceValue = parseFloat(value) || 0;
-    setProductData({
-      ...productData,
-      price: priceValue,
-      originalPrice: priceValue, 
-    });
-  }else {
-    setProductData({
-      ...productData,
-      [name]: value,
-    });
-  }
-};
+  // Maneja los cambios en los campos básicos
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    // Si cambia el precio o el descuento, recalculamos el precio
+    if (name === 'price') {
+      const priceValue = parseFloat(value) || 0;
+      setProductData({
+        ...productData,
+        price: priceValue,
+        originalPrice: priceValue,
+      });
+    } else {
+      setProductData({
+        ...productData,
+        [name]: value,
+      });
+    }
+  };
 
-// Maneja los cambios en los detalles (incluyendo el descuento)
-const handleDetailsChange = (e) => {
+  // Maneja los cambios en los detalles (incluyendo el descuento)
+  const handleDetailsChange = (e) => {
     const { name, value } = e.target;
     const discountValue = parseFloat(value) || 0;
 
@@ -198,10 +205,10 @@ const handleDetailsChange = (e) => {
 
       setProductData({
         ...productData,
-        price: newDiscountedPrice, 
+        price: newDiscountedPrice,
         details: {
           ...productData.details,
-          [name]: discountValue, 
+          [name]: discountValue,
         },
       });
     } else {
@@ -214,8 +221,6 @@ const handleDetailsChange = (e) => {
       });
     }
   };
-
-
 
   return (
     <Box>
@@ -302,9 +307,9 @@ const handleDetailsChange = (e) => {
           </SimpleGrid>
         )}
 
-          {step === 1 && (
+        {step === 1 && (
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
-            <HStack  spacing={1}>
+            <HStack spacing={1}>
               {/* Input de Precio */}
               <FormControl>
                 <FormLabel>Precio</FormLabel>
@@ -335,21 +340,21 @@ const handleDetailsChange = (e) => {
               <FormControl>
                 <FormLabel>Descuento</FormLabel>
                 <InputGroup>
-                <Input
-                  name="discount"
-                  value={productData.details.discount}
-                  onChange={handleDetailsChange}
-                  placeholder="Descuento (%)"
-                  type="number"
-                  w="40%"
-                />
-                <InputRightAddon>%</InputRightAddon>
+                  <Input
+                    name="discount"
+                    value={productData.details.discount}
+                    onChange={handleDetailsChange}
+                    placeholder="Descuento (%)"
+                    type="number"
+                    w="40%"
+                  />
+                  <InputRightAddon>%</InputRightAddon>
                 </InputGroup>
               </FormControl>
             </HStack>
 
-            <FormControl >
-              <FormLabel >Descripción</FormLabel>
+            <FormControl>
+              <FormLabel>Descripción</FormLabel>
               <Input
                 name="description"
                 value={productData.description}
@@ -359,7 +364,7 @@ const handleDetailsChange = (e) => {
             </FormControl>
 
             {/* Input de descripción completa que ocupe ambas columnas */}
-            <FormControl gridColumn="1 / 3" >
+            <FormControl gridColumn="1 / 3">
               <FormLabel>Descripción Completa</FormLabel>
               <Textarea
                 name="descriptionFull"
@@ -370,7 +375,6 @@ const handleDetailsChange = (e) => {
             </FormControl>
           </SimpleGrid>
         )}
-
 
         {step === 2 && (
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
@@ -386,62 +390,119 @@ const handleDetailsChange = (e) => {
               <FormLabel>Estado</FormLabel>
               <Switch isChecked={productData.status} onChange={handleInStockChange} />
             </FormControl>
-        
           </SimpleGrid>
         )}
 
         {step === 3 && (
           <>
             {/* Variaciones Dinámicas */}
-            <VStack w="full" align="start">
+            <FormControl>
               <FormLabel>Variaciones</FormLabel>
-              {productData.details.variations.map((variation, index) => (
-                <HStack key={index} w="full">
-                  <Input
-                    value={variation}
-                    onChange={(e) => handleVariationChange(index, e.target.value)}
-                    placeholder="Variación"
-                  />
+              <VStack spacing={2} align="stretch">
+                {productData.details?.variations?.map((variation, index) => (
+                  <Box key={index} p={4} borderWidth={1} borderRadius="md" w="full">
+                    <HStack w="full">
+                      <FormControl>
+                        <FormLabel>Nombre</FormLabel>
+                        <Input
+                          value={variation.name}
+                          onChange={(e) => handleVariationChange(index, 'name', e.target.value)}
+                          placeholder="Nombre de la Variación"
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>SKU</FormLabel>
+                        <Input
+                          value={variation.sku}
+                          onChange={(e) => handleVariationChange(index, 'sku', e.target.value)}
+                          placeholder="SKU de la Variación"
+                        />
+                      </FormControl>
+                    </HStack>
+                    <HStack w="full" mt={4}>
+                      <FormControl>
+                        <FormLabel>Precio</FormLabel>
+                        <Input
+                          type="number"
+                          value={variation.price}
+                          onChange={(e) => handleVariationChange(index, 'price', e.target.value)}
+                          placeholder="Precio de la Variación"
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>Descuento (%)</FormLabel>
+                        <Input
+                          type="number"
+                          value={variation.discount}
+                          onChange={(e) => handleVariationChange(index, 'discount', e.target.value)}
+                          placeholder="Descuento de la Variación"
+                        />
+                      </FormControl>
+                    </HStack>
+                    <HStack w="full" mt={4}>
+                      <FormControl>
+                        <FormLabel>Stock</FormLabel>
+                        <Input
+                          type="number"
+                          value={variation.stock}
+                          onChange={(e) => handleVariationChange(index, 'stock', e.target.value)}
+                          placeholder="Stock de la Variación"
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>Imagen URL</FormLabel>
+                        <Input
+                          value={variation.imageURL}
+                          onChange={(e) => handleVariationChange(index, 'imageURL', e.target.value)}
+                          placeholder="URL de la Imagen de la Variación"
+                        />
+                      </FormControl>
+                    </HStack>
+                    <IconButton
+                      mt={4}
+                      icon={<DeleteIcon />}
+                      colorScheme="red"
+                      onClick={() => handleRemoveVariation(index)}
+                      aria-label="Eliminar Variación"
+                    />
+                  </Box>
+                ))}
+                <Button onClick={handleAddVariation} leftIcon={<AddIcon />}>
+                  Agregar Variación
+                </Button>
+              </VStack>
+            </FormControl>
+
+            {/* Especificaciones Dinámicas */}
+            <VStack w="full" align="start" spacing={4}>
+              <FormLabel>Especificaciones</FormLabel>
+              {productData.details.specificationsArray.map((specification, index) => (
+                <HStack key={index} w="full" spacing={4}>
+                  <FormControl>
+                    <Input
+                      placeholder="Característica"
+                      value={specification.key}
+                      onChange={(e) => handleSpecificationChange(index, 'key', e.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      placeholder="Detalle"
+                      value={specification.value}
+                      onChange={(e) => handleSpecificationChange(index, 'value', e.target.value)}
+                    />
+                  </FormControl>
                   <IconButton
                     icon={<DeleteIcon />}
                     colorScheme="red"
-                    onClick={() => handleRemoveVariation(index)}
+                    onClick={() => handleRemoveSpecification(index)}
                   />
                 </HStack>
               ))}
-              <Button onClick={handleAddVariation} leftIcon={<AddIcon />}>Agregar Variación</Button>
+              <Button leftIcon={<AddIcon />} onClick={handleAddSpecification}>
+                Agregar Especificación
+              </Button>
             </VStack>
-
-            {/* Especificaciones Dinámicas */}
-                <VStack w="full" align="start" spacing={4}>
-          <FormLabel>Especificaciones</FormLabel>
-          {productData.details.specificationsArray.map((specification, index) => (
-            <HStack key={index} w="full" spacing={4}>
-              <FormControl>
-                <Input
-                  placeholder="Característica"
-                  value={specification.key}
-                  onChange={(e) => handleSpecificationChange(index, 'key', e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <Input
-                  placeholder="Detalle"
-                  value={specification.value}
-                  onChange={(e) => handleSpecificationChange(index, 'value', e.target.value)}
-                />
-              </FormControl>
-              <IconButton
-                icon={<DeleteIcon />}
-                colorScheme="red"
-                onClick={() => handleRemoveSpecification(index)}
-              />
-            </HStack>
-          ))}
-          <Button leftIcon={<AddIcon />} onClick={handleAddSpecification}>
-            Agregar Especificación
-          </Button>
-        </VStack>
 
             {/* Imágenes Dinámicas */}
             <VStack w="full" align="start" mt={4}>
@@ -493,3 +554,6 @@ const handleDetailsChange = (e) => {
 };
 
 export default AddProductForm;
+
+
+

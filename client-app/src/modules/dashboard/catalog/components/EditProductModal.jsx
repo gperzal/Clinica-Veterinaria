@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
   Button, FormControl, FormLabel, Input, Select, VStack, HStack, Textarea, Image, Box,
-  useColorModeValue, IconButton,  Text, NumberInput, NumberInputField, NumberInputStepper,
+  useColorModeValue, IconButton, Text, NumberInput, NumberInputField, NumberInputStepper,
   NumberIncrementStepper, NumberDecrementStepper, Tabs, TabList, TabPanels, Tab, TabPanel,
-   useToast,  SimpleGrid, Switch, AspectRatio,
-   useBreakpointValue
+   SimpleGrid, Switch, AspectRatio,  useBreakpointValue
 } from "@chakra-ui/react";
-import { AddIcon, DeleteIcon,  DragHandleIcon } from '@chakra-ui/icons';
-import { Reorder } from "framer-motion";
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import useToastNotification from '../../../../hooks/useToastNotification';
 
 const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
   const [editedProduct, setEditedProduct] = useState(product || {});
   const [activeTab, setActiveTab] = useState(0);
-  const toast = useToast();
+  const toast = useToastNotification();
 
   const bgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.800", "white");
@@ -27,13 +26,14 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
       setEditedProduct(product);
     }
   }, [product]);
-  
 
+  // Manejo de cambios en los campos básicos
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedProduct({ ...editedProduct, [name]: value });
   };
 
+  // Manejo de cambios en los detalles
   const handleDetailsChange = (e) => {
     const { name, value } = e.target;
     setEditedProduct({
@@ -45,23 +45,21 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     });
   };
 
+  // Manejo del cambio de precio
   const handlePriceChange = (value) => {
     const parsedValue = parseFloat(value);
     if (!isNaN(parsedValue)) {
       setEditedProduct({
         ...editedProduct,
         price: parsedValue,
-        details: {
-          ...editedProduct.details,
-          originalPrice: parsedValue,  // Asumimos que el precio original se actualiza también
-        }
       });
     }
   };
-  
+
+  // Manejo del cambio de descuento
   const handleDiscountChange = (value) => {
     const discountValue = parseFloat(value) || 0;
-  
+
     if (discountValue < 0 || discountValue > 100) {
       toast({
         title: 'Aviso',
@@ -72,19 +70,17 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
       });
       return;
     }
-  
-    const discountedPrice = editedProduct.details.originalPrice * (1 - discountValue / 100);
+
     setEditedProduct({
       ...editedProduct,
-      price: discountedPrice,
       details: {
         ...editedProduct.details,
         discount: discountValue,
-      }
+      },
     });
   };
-  
 
+  // Manejo de especificaciones
   const handleAddSpecification = () => {
     setEditedProduct({
       ...editedProduct,
@@ -113,19 +109,27 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     });
   };
 
+  // Manejo de variaciones
   const handleAddVariation = () => {
     setEditedProduct({
       ...editedProduct,
       details: {
         ...editedProduct.details,
-        variations: [...(editedProduct.details?.variations || []), '']
+        variations: [...(editedProduct.details?.variations || []), {
+          name: '',
+          sku: '',
+          price: 0,
+          discount: 0,
+          stock: 0,
+          imageURL: '',
+        }]
       }
     });
   };
 
-  const handleVariationChange = (index, value) => {
+  const handleVariationChange = (index, key, value) => {
     const updatedVariations = [...(editedProduct.details?.variations || [])];
-    updatedVariations[index] = value;
+    updatedVariations[index][key] = value;
     setEditedProduct({
       ...editedProduct,
       details: { ...editedProduct.details, variations: updatedVariations }
@@ -147,8 +151,6 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
         title: 'Error',
         description: 'No se puede actualizar un producto sin un ID válido.',
         status: 'error',
-        duration: 3000,
-        isClosable: true,
       });
       return;
     }
@@ -165,44 +167,6 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     }
   };
 
-  const handleReorderImages = (dragIndex, hoverIndex) => {
-    const updatedImages = [...(editedProduct.details?.images || [])];
-    const [removedImage] = updatedImages.splice(dragIndex, 1);
-    updatedImages.splice(hoverIndex, 0, removedImage);
-    setEditedProduct({
-      ...editedProduct,
-      details: { ...editedProduct.details, images: updatedImages }
-    });
-  };
-
-  const handleAddImage = () => {
-    setEditedProduct({
-      ...editedProduct,
-      details: {
-        ...editedProduct.details,
-        images: [...(editedProduct.details?.images || []), '']
-      }
-    });
-  };
-  
-  const handleImageChange = (index, value) => {
-    const updatedImages = [...(editedProduct.details?.images || [])];
-    updatedImages[index] = value;
-    setEditedProduct({
-      ...editedProduct,
-      details: { ...editedProduct.details, images: updatedImages }
-    });
-  };
-
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...(editedProduct.details?.images || [])];
-    updatedImages.splice(index, 1);
-    setEditedProduct({
-      ...editedProduct,
-      details: { ...editedProduct.details, images: updatedImages }
-    });
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={isMobile ? "full" : "4xl"}>
       <ModalOverlay />
@@ -216,7 +180,6 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
             <TabList overflowX="auto" overflowY="hidden" whiteSpace="nowrap" pb={2}>
               <Tab {...tabStyles}>Información Básica</Tab>
               <Tab {...tabStyles}>Detalles</Tab>
-              <Tab {...tabStyles}>Imágenes</Tab>
               <Tab {...tabStyles}>Inventario</Tab>
               <Tab {...tabStyles}>Especificaciones y Variaciones</Tab>
             </TabList>
@@ -245,6 +208,15 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                     <FormLabel>Descripción Corta</FormLabel>
                     <Input name="description" value={editedProduct.description || ''} onChange={handleInputChange} />
                   </FormControl>
+                  <FormControl>
+                    <FormLabel>Imagen Principal</FormLabel>
+                    <Input name="imageURL" value={editedProduct.imageURL || ''} onChange={handleInputChange} />
+                    {editedProduct.imageURL && (
+                      <AspectRatio ratio={16 / 9} maxW="300px" mt={2}>
+                        <Image src={editedProduct.imageURL} alt="Imagen Principal" objectFit="cover" borderRadius="md" />
+                      </AspectRatio>
+                    )}
+                  </FormControl>
                 </VStack>
               </TabPanel>
               {/* Detalles */}
@@ -252,9 +224,9 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                 <VStack spacing={4} align="stretch">
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl>
-                      <FormLabel>Precio Original</FormLabel>
+                      <FormLabel>Precio</FormLabel>
                       <NumberInput
-                        value={editedProduct.details?.price || editedProduct.price || 0}
+                        value={editedProduct.price || 0}
                         onChange={handlePriceChange}
                         min={0}
                         precision={2}
@@ -285,7 +257,9 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                   {editedProduct.details?.discount > 0 && (
                     <Box p={2} bg={hoverBgColor} borderRadius="md">
                       <Text as="s" color="gray.500">Precio original: ${editedProduct.price}</Text>
-                      <Text color="green.500" fontWeight="bold">Precio con descuento: ${editedProduct.price * (1 - editedProduct.details.discount / 100)}</Text>
+                      <Text color="green.500" fontWeight="bold">
+                        Precio con descuento: ${editedProduct.price * (1 - editedProduct.details.discount / 100)}
+                      </Text>
                     </Box>
                   )}
                   <FormControl>
@@ -299,52 +273,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                   </FormControl>
                 </VStack>
               </TabPanel>
-              {/* Imágenes */}
-              <TabPanel>
-                <VStack spacing={4} align="stretch">
-                  <FormControl>
-                    <FormLabel>Imagen Principal</FormLabel>
-                    <Input name="imageURL" value={editedProduct.imageURL || ''} onChange={handleInputChange} />
-                    {editedProduct.imageURL && (
-                      <AspectRatio ratio={16 / 9} maxW="300px" mt={2}>
-                        <Image src={editedProduct.imageURL} alt="Imagen Principal" objectFit="cover" borderRadius="md" />
-                      </AspectRatio>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Imágenes Adicionales</FormLabel>
-                    <Reorder.Group axis="y" values={editedProduct.details?.images || []} onReorder={handleReorderImages}>
-                      <VStack spacing={2} align="stretch">
-                        {editedProduct.details?.images?.map((image, index) => (
-                          <Reorder.Item key={image} value={image}>
-                            <HStack bg={hoverBgColor} p={2} borderRadius="md" flexWrap="wrap">
-                              <DragHandleIcon cursor="grab" />
-                              <Input
-                                value={image}
-                                onChange={(e) => handleImageChange(index, e.target.value)}
-                                placeholder="URL de la Imagen"
-                                flex="1"
-                                minW="150px"
-                              />
-                              <IconButton
-                                icon={<DeleteIcon />}
-                                colorScheme="red"
-                                onClick={() => handleRemoveImage(index)}
-                              />
-                              {image && (
-                                <Image src={image} alt={`Imagen ${index + 1}`} boxSize="50px" objectFit="cover" borderRadius="md" />
-                              )}
-                            </HStack>
-                          </Reorder.Item>
-                        ))}
-                      </VStack>
-                    </Reorder.Group>
-                    <Button onClick={handleAddImage} leftIcon={<AddIcon />} size="sm" mt={2}>
-                      Agregar Imagen
-                    </Button>
-                  </FormControl>
-                </VStack>
-              </TabPanel>
+    
               {/* Inventario */}
               <TabPanel>
                 <VStack spacing={4} align="stretch">
@@ -353,7 +282,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                       <FormLabel>Stock</FormLabel>
                       <NumberInput
                         value={editedProduct.details?.stock || 0}
-                        onChange={(value) => handleDetailsChange({ target: { name: 'stock', value } })}
+                        onChange={(valueString, valueNumber) => handleDetailsChange({ target: { name: 'stock', value: valueNumber } })}
                         min={0}
                       >
                         <NumberInputField />
@@ -384,6 +313,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
               {/* Especificaciones y Variaciones */}
               <TabPanel>
                 <VStack spacing={4} align="stretch">
+                  {/* Especificaciones */}
                   <FormControl>
                     <FormLabel>Especificaciones</FormLabel>
                     <VStack spacing={2} align="stretch">
@@ -411,22 +341,77 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                       </Button>
                     </VStack>
                   </FormControl>
+                  {/* Variaciones */}
                   <FormControl>
                     <FormLabel>Variaciones</FormLabel>
-                    <VStack spacing={2} align="stretch">
+                    <VStack spacing={4} align="stretch">
                       {editedProduct.details?.variations?.map((variation, index) => (
-                        <HStack key={index}>
-                          <Input
-                            value={variation}
-                            onChange={(e) => handleVariationChange(index, e.target.value)}
-                            placeholder="Variación"
-                          />
+                        <Box key={index} p={4} borderWidth={1} borderRadius="md" w="full">
+                          <HStack w="full">
+                            <FormControl>
+                              <FormLabel>Nombre</FormLabel>
+                              <Input
+                                value={variation.name}
+                                onChange={(e) => handleVariationChange(index, 'name', e.target.value)}
+                                placeholder="Nombre de la Variación"
+                              />
+                            </FormControl>
+                            <FormControl>
+                              <FormLabel>SKU</FormLabel>
+                              <Input
+                                value={variation.sku}
+                                onChange={(e) => handleVariationChange(index, 'sku', e.target.value)}
+                                placeholder="SKU de la Variación"
+                              />
+                            </FormControl>
+                          </HStack>
+                          <HStack w="full" mt={4}>
+                            <FormControl>
+                              <FormLabel>Precio</FormLabel>
+                              <Input
+                                type="number"
+                                value={variation.price}
+                                onChange={(e) => handleVariationChange(index, 'price', e.target.value)}
+                                placeholder="Precio de la Variación"
+                              />
+                            </FormControl>
+                            <FormControl>
+                              <FormLabel>Descuento (%)</FormLabel>
+                              <Input
+                                type="number"
+                                value={variation.discount}
+                                onChange={(e) => handleVariationChange(index, 'discount', e.target.value)}
+                                placeholder="Descuento de la Variación"
+                              />
+                            </FormControl>
+                          </HStack>
+                          <HStack w="full" mt={4}>
+                            <FormControl>
+                              <FormLabel>Stock</FormLabel>
+                              <Input
+                                type="number"
+                                value={variation.stock}
+                                onChange={(e) => handleVariationChange(index, 'stock', e.target.value)}
+                                placeholder="Stock de la Variación"
+                              />
+                            </FormControl>
+                            <FormControl>
+                              <FormLabel>Imagen URL</FormLabel>
+                              <Input
+                                value={variation.imageURL}
+                                onChange={(e) => handleVariationChange(index, 'imageURL', e.target.value)}
+                                placeholder="URL de la Imagen de la Variación"
+                              />
+                            </FormControl>
+                          </HStack>
                           <IconButton
+                            mt={4}
                             icon={<DeleteIcon />}
                             colorScheme="red"
                             onClick={() => handleRemoveVariation(index)}
+                            aria-label="Eliminar Variación"
                           />
-                        </HStack>
+                        </Box>
                       ))}
                       <Button onClick={handleAddVariation} leftIcon={<AddIcon />} size="sm">
                         Agregar Variación
