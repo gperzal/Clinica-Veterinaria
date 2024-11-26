@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// client-app/src/modules/dashboard/appointments/pages/AppointmentsPage.jsx
+import React, { useState, useEffect } from 'react';
 import {
   Tabs, TabList, TabPanels, Tab, TabPanel, Box, Text, Heading, Icon, useColorModeValue,
 } from "@chakra-ui/react";
@@ -14,37 +15,49 @@ import TreatmentHistory from '../components/TreatmentHistory';
 import HealthHistory from '../components/HealthHistory';
 import MedicalControls from '../components/MedicalControls';
 import { getOwnerById, getPetById } from '../../profile/services/profileService';
+import { attendAppointment } from '../services/medicalRecordService';
+
 
 const AppointmentsPage = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [ownerData, setOwnerData] = useState(null);
   const [petData, setPetData] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showTreatmentHistory, setShowTreatmentHistory] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
+  const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const selectedColor = useColorModeValue("blue.500", "blue.300");
 
   const isPatientSelected = selectedPatient && ownerData && petData;
 
-  const handleViewDetails = async (appointment) => {
+  const handleViewDetails = async (appointmentId) => {
     try {
-      const ownerResponse = await getOwnerById(appointment.ownerId);
-      const petResponse = await getPetById(appointment.petId);
-      
-      setSelectedPatient({ ownerId: appointment.ownerId, petId: appointment.petId });
-      setOwnerData(ownerResponse.data.owner);
-      setPetData(petResponse.data.pet);
+      const data = await attendAppointment(appointmentId);
+      const { appointment } = data;
+
+      setSelectedPatient({ ownerId: appointment.pet.owner._id, petId: appointment.pet._id });
+      setOwnerData(appointment.pet.owner);
+      setPetData(appointment.pet);
+      setSelectedAppointment(appointment);
       setTabIndex(1); // Cambia automáticamente a la pestaña de Ficha Médica
+      setAppointmentsRefreshKey(prevKey => prevKey + 1);
     } catch (error) {
-      console.error("Error al obtener los datos del paciente:", error);
+      console.error('Error al atender la cita:', error);
     }
   };
+
+  useEffect(() => {
+    if (tabIndex === 0) {
+      setAppointmentsRefreshKey(prevKey => prevKey + 1);
+    }
+  }, [tabIndex]);
 
   return (
     <Box p={4} bg={bgColor} borderRadius="lg" shadow="md" maxW="90vw" mx="auto">
       <Heading fontSize="2xl" fontWeight="bold" mb={6} textAlign="center">
-        Gestión de Citas Médicas
+        Gestión de Citas Programadas
       </Heading>
       <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="unstyled">
         <TabList
@@ -91,16 +104,20 @@ const AppointmentsPage = () => {
         
         <TabPanels>
           <TabPanel>
-            <MedicalAppointments onViewDetails={handleViewDetails} />
+          <MedicalAppointments
+              onViewDetails={handleViewDetails}
+              refreshKey={appointmentsRefreshKey}
+            />
           </TabPanel>
           <TabPanel>
             {isPatientSelected ? (
-              <MedicalFiche 
-                ownerData={ownerData} 
-                petData={petData}
-                selectedPatient={selectedPatient} 
-                onToggleTreatmentHistory={setShowTreatmentHistory}
-              />
+              <MedicalFiche
+              ownerData={ownerData}
+              petData={petData}
+              selectedAppointment={selectedAppointment}
+              onToggleTreatmentHistory={setShowTreatmentHistory}
+              onBack={() => setTabIndex(0)}
+            />
             ) : (
               <Text>Seleccione un paciente para ver la Ficha Médica.</Text>
             )}

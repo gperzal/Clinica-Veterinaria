@@ -6,9 +6,9 @@ const appointmentSchema = new mongoose.Schema({
     time: { type: String, required: true },
     serviceType: { type: String, enum: ['Servicios Médicos', 'Servicios de Estética'], required: true },
     specialist: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     pet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet', required: true },
-    status: { type: String, enum: ['Pendiente', 'Completada', 'Cancelada'], default: 'Pendiente' },
+    status: { type: String, enum: ['Pendiente', 'En Proceso', 'Completada', 'Cancelada'], default: 'Pendiente' },
 }, {
     timestamps: true,
 });

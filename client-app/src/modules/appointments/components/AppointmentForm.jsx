@@ -7,9 +7,7 @@ import {
   Heading,
   Input,
   Select,
-  Stack,
   VStack,
-  Text,
 } from '@chakra-ui/react';
 import { FaCalendarAlt } from 'react-icons/fa';
 

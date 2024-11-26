@@ -1,8 +1,30 @@
-import React from 'react';
+
+import React , { useState, useEffect  } from 'react';
 import { SimpleGrid, FormControl, FormLabel, Input, Select, Stack, Switch, Heading, useColorModeValue, Box } from '@chakra-ui/react';
 
 const PetInfoSection = ({ petData }) => {
   const labelColor = useColorModeValue("teal.600", "teal.300"); // Definimos el color adaptativo para los labels
+
+  const [healthStatus, setHealthStatus] = useState(petData?.healthStatus || '');
+  const [status, setStatus] = useState(petData?.status === 'Activo');
+  
+
+  // Efecto para actualizar el estado de la mascota
+  useEffect(() => { 
+    const updatePetInfo = async () => {
+      try {
+        await updatePet({
+          id: petData._id,
+          healthStatus: healthStatus,
+          status: status ? 'Activo' : 'Inactivo',
+          });
+        } catch (error) {
+        console.error("Error al actualizar la información de la mascota:", error);
+      }
+    };
+    updatePetInfo();
+  }, [healthStatus, status, petData._id]); 
+
 
   return (
     <Box as="section" w="full" p={4} borderWidth="1px" borderRadius="lg" bg={useColorModeValue("gray.50", "gray.800")}>
@@ -34,7 +56,11 @@ const PetInfoSection = ({ petData }) => {
         </FormControl>
         <FormControl>
           <FormLabel color={labelColor}>Estado de Salud General</FormLabel>
-          <Select value={petData?.healthStatus || ""} placeholder="Selecciona una opción">
+          <Select
+            value={healthStatus}
+            onChange={(e) => setHealthStatus(e.target.value)}
+            placeholder="Selecciona una opción"
+          >
             <option value="Sano">Sano</option>
             <option value="En tratamiento">En tratamiento</option>
             <option value="Enfermo">Enfermo</option>
@@ -48,7 +74,8 @@ const PetInfoSection = ({ petData }) => {
           <Switch 
             colorScheme="teal" 
             size="lg" 
-            isChecked={petData?.status === "Activo"}   
+            isChecked={status}
+            onChange={(e) => setStatus(e.target.checked)}
           />
         </Stack>
       </FormControl>

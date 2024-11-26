@@ -1,14 +1,23 @@
 // src/services/appointmentService.js
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_BACKEND_API; 
+import api from '../../../../services/api';
 
 export const getMedicalAppointments = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/appointments/user/${userId}`);
+    const response = await api.get(`/api/appointments/${userId}`);
     return response.data.appointments;
   } catch (error) {
     console.error('Error fetching medical appointments:', error);
     throw error;
   }
 };
+
+export const getAppointmentsBySpecialist = async () => {
+  try {
+    const response = await api.get('/api/appointments/specialist');
+    return response.data.appointments;
+  } catch (error) {
+    console.error('Error fetching specialist appointments:', error);
+    throw error;
+  }
+};
+

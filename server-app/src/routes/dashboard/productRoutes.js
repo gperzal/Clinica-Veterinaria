@@ -12,18 +12,18 @@ import authMiddleware from '../../middleware/auth/authMiddleware.js';
 const router = express.Router();
 
 // Crear producto
-router.post('/products', authMiddleware, createProduct);
+router.post('/', authMiddleware, createProduct);
 
 // Obtener todos los productos
-router.get('/products', getProducts);
+router.get('/', getProducts);
 
 // Obtener producto por ID
-router.get('/products/:id', getProductById);
+router.get('/:id', getProductById);
 
 // Actualizar producto               
-router.put('/products/:id', authMiddleware, updateProduct);
+router.put('/:id', authMiddleware, updateProduct);
 
 // Eliminar producto
-router.delete('/products/:id', authMiddleware, deleteProduct);
+router.delete('/:id', authMiddleware, deleteProduct);
 
 export default router;

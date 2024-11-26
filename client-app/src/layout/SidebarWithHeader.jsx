@@ -1,12 +1,9 @@
-// src/components/dashboard/SidebarWithHeader.jsx
-
 import React, { useState, useContext } from 'react';
 import {
   Box,
   CloseButton,
   Flex,
   Icon,
-  useColorModeValue,
   Text,
   Drawer,
   DrawerContent,
@@ -19,6 +16,8 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Tooltip,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -31,20 +30,20 @@ import {
   FiBell,
   FiFile,
   FiChevronDown,
+  FiChevronLeft,
+  FiChevronRight,
 } from 'react-icons/fi';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { AuthContext } from '../modules/auth/context/AuthContext';
 
-
-// Datos organizados por secciones con roles permitidos
 const menuSections = [
   {
     sectionName: 'Generales',
-    allowedRoles: ['Cliente', 'Administrativo', 'Veterinario', 'Administrador'],
+    allowedRoles: ['Cliente', 'Administrativo', 'Veterinario', 'Estilista', 'Administrador'],
     items: [
       { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
       { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
-      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' },
       { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/purchase-history' },
       { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
     ],
@@ -60,8 +59,8 @@ const menuSections = [
     ],
   },
   {
-    sectionName: 'Veterinario',
-    allowedRoles: ['Veterinario', 'Administrador'],
+    sectionName: 'Especialista',
+    allowedRoles: ['Veterinario', 'Estilista', 'Administrador'],
     items: [
       { name: 'Citas', icon: FiClipboard, path: '/dashboard/appointments' },
     ],
@@ -77,59 +76,89 @@ const menuSections = [
   },
 ];
 
-const SidebarContent = ({ onClose, userRole, ...rest }) => {
+const SidebarContent = ({ onClose, userRole, isCollapsed, toggleCollapse, ...rest }) => {
   return (
     <Box
       transition="0.3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: 60 }}
+      w={isCollapsed ? 16 : { base: 'full', md: 60 }}
       pos="fixed"
       h="full"
+      overflowY="auto"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Link to="/">
+      {/* Contenedor del título y botón de colapsar */}
+      <Flex
+        h="20"
+        alignItems="center"
+        mx="4"
+        justifyContent="space-between"
+        position="relative"
+      >
+        {/* Título del sidebar */}
+        {!isCollapsed && (
+          <Link to="/">
           <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
             Dashboard
           </Text>
-        </Link>
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+          </Link>
+        )}
+
+        {/* Botón de colapsar */}
+        <IconButton
+          position="absolute"
+          right={0} // Alineado al final del contenedor del título
+          aria-label="Toggle sidebar"
+          icon={isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
+          onClick={toggleCollapse}
+          variant="ghost"
+        />
       </Flex>
+
+      {/* Renderizado de los menús según roles */}
       {menuSections
         .filter((section) => section.allowedRoles.includes(userRole))
         .map((section) => (
-          <MenuSection key={section.sectionName} section={section} />
+          <MenuSection
+            key={section.sectionName}
+            section={section}
+            isCollapsed={isCollapsed}
+          />
         ))}
     </Box>
   );
 };
 
-const MenuSection = ({ section }) => {
+
+
+const MenuSection = ({ section, isCollapsed }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
     <Box mt={4}>
-      <Flex
-        align="center"
-        justifyContent="space-between"
-        px={4}
-        py={2}
-        bg={useColorModeValue('gray.100', 'gray.700')}
-        borderRadius="md"
-        cursor="pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Text fontSize="sm" fontWeight="bold" textTransform="uppercase">
-          {section.sectionName} 
-        </Text>
-        <Icon as={FiMenu} />
-      </Flex>
-      <Collapse in={isOpen} animateOpacity>
+      {!isCollapsed && (
+        <Flex
+          align="center"
+          justifyContent="space-between"
+          px={4}
+          py={2}
+          bg={useColorModeValue('gray.100', 'gray.700')}
+          borderRadius="md"
+          cursor="pointer"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Text fontSize="sm" fontWeight="bold" textTransform="uppercase">
+            {section.sectionName}
+          </Text>
+          <Icon as={FiMenu} />
+        </Flex>
+      )}
+      <Collapse in={isOpen || isCollapsed} animateOpacity>
         <VStack align="start" spacing={0} mt={2}>
           {section.items.map((link) => (
-            <NavItem key={link.name} icon={link.icon} path={link.path}>
+            <NavItem key={link.name} icon={link.icon} path={link.path} isCollapsed={isCollapsed}>
               {link.name}
             </NavItem>
           ))}
@@ -137,36 +166,39 @@ const MenuSection = ({ section }) => {
       </Collapse>
     </Box>
   );
-};;
+};
 
-const NavItem = ({ icon, children, path, ...rest }) => {
+const NavItem = ({ icon, children, path, isCollapsed, ...rest }) => {
   return (
     <Link to={path} style={{ textDecoration: 'none', width: '100%' }}>
-      <Flex
-        align="center"
-        p="4"
-        pl="6"
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        _hover={{
-          bg: 'cyan.400',
-          color: 'white',
-        }}
-        {...rest}
-      >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            _groupHover={{
-              color: 'white',
-            }}
-            as={icon}
-          />
-        )}
-        {children}
-      </Flex>
+      <Tooltip label={children} isDisabled={!isCollapsed} placement="right">
+        <Flex
+          align="center"
+          p="4"
+          pl={isCollapsed ? 0 : '6'}
+          justifyContent={isCollapsed ? 'center' : 'flex-start'}
+          borderRadius="lg"
+          role="group"
+          cursor="pointer"
+          _hover={{
+            bg: 'cyan.400',
+            color: 'white',
+          }}
+          {...rest}
+        >
+          {icon && (
+            <Icon
+              mr={!isCollapsed ? '4' : 0}
+              fontSize="16"
+              _groupHover={{
+                color: 'white',
+              }}
+              as={icon}
+            />
+          )}
+          {!isCollapsed && children}
+        </Flex>
+      </Tooltip>
     </Link>
   );
 };
@@ -236,12 +268,11 @@ const MobileNav = ({ onOpen, user, logout, ...rest }) => {
 
 const SidebarWithHeader = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Obtenemos el usuario desde el contexto
   const { user, logout } = useContext(AuthContext);
 
   if (!user) {
-    // Si no hay usuario, redireccionamos al login
     return <Navigate to="/" replace />;
   }
 
@@ -250,6 +281,8 @@ const SidebarWithHeader = ({ children }) => {
       <SidebarContent
         onClose={onClose}
         userRole={user.role}
+        isCollapsed={isCollapsed}
+        toggleCollapse={() => setIsCollapsed(!isCollapsed)}
         display={{ base: 'none', md: 'block' }}
       />
       <Drawer
@@ -261,14 +294,20 @@ const SidebarWithHeader = ({ children }) => {
         size="full"
       >
         <DrawerContent>
-          <SidebarContent onClose={onClose} userRole={user.role} />
+          <SidebarContent
+            onClose={onClose}
+            userRole={user.role}
+            isCollapsed={isCollapsed}
+            toggleCollapse={() => setIsCollapsed(!isCollapsed)}
+          />
         </DrawerContent>
       </Drawer>
       <MobileNav onOpen={onOpen} user={user} logout={logout} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      <Box ml={{ base: 0, md: isCollapsed ? 16 : 60 }} p="4">
         {children}
       </Box>
     </Box>
   );
 };
+
 export default SidebarWithHeader;

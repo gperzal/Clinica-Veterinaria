@@ -7,9 +7,9 @@ import {
 import { FaCheckCircle, FaCheck, FaExclamationTriangle,
     FaArrowLeft, FaArrowRight
    } from "react-icons/fa";
-import GeneralRestSection from './treatmen-thistory/GeneralRestSection';
-import TreatmentLogSection from './treatmen-thistory/TreatmentLogSection';
-import ContractSection from './treatmen-thistory/ContractSection';
+import GeneralRestSection from './treatmen-history/GeneralRestSection';
+import TreatmentLogSection from './treatmen-history/TreatmentLogSection';
+import ContractSection from './treatmen-history/ContractSection';
 
 const TreatmentHistory = ({ medicalFicheId, petData, ownerData }) => {
   
