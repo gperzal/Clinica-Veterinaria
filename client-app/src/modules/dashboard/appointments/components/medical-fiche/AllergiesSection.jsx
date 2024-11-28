@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { HStack, IconButton, Input, Tag, TagCloseButton, TagLabel, Heading, Box, useColorModeValue } from '@chakra-ui/react';
 import { FaPlus } from 'react-icons/fa';
 
-const AllergiesSection = () => {
+const AllergiesSection = ({ allergies = [], setAllergies }) => {
   // Definir estados para allergies y newAllergy
-  const [allergies, setAllergies] = useState([]);
   const [newAllergy, setNewAllergy] = useState("");
 
   const handleAddAllergy = () => {
@@ -30,7 +29,7 @@ const AllergiesSection = () => {
         <IconButton icon={<FaPlus />} colorScheme="teal" onClick={handleAddAllergy} />
       </HStack>
       <Box mt={4}>
-        {allergies.map((allergy, index) => (
+        {Array.isArray(allergies) && allergies.map((allergy, index) => (
           <Tag key={index} size="lg" colorScheme="red" m={1}>
             <TagLabel>{allergy}</TagLabel>
             <TagCloseButton onClick={() => handleRemoveAllergy(allergy)} />

@@ -10,9 +10,6 @@ export const attendAppointment = async (req, res) => {
     const { appointmentId } = req.params;
     const veterinarianId = req.userId;
 
-    console.log('Veterinario ID:', veterinarianId);
-    console.log('Cita ID:', appointmentId);
-
     // Obtener la cita y popular pet y owner
     const appointment = await Appointment.findById(appointmentId)
       .populate({
@@ -43,20 +40,29 @@ export const attendAppointment = async (req, res) => {
 
     // Obtener o crear el MedicalRecord de la mascota
     let medicalRecord = await MedicalRecord.findOne({ pet: appointment.pet._id });
+
     if (!medicalRecord) {
       medicalRecord = new MedicalRecord({ pet: appointment.pet._id });
       await medicalRecord.save();
     }
 
+    // Buscar la entrada médica de esta cita
+    const medicalEntry = medicalRecord.medicalEntries.find(
+      (entry) => entry.appointment.toString() === appointmentId
+    );
+
     res.status(200).json({
       message: 'Cita en proceso.',
       appointment,
       medicalRecord,
+      medicalEntry: medicalEntry || null, // Retorna la entrada médica si existe, o null si no hay.
     });
   } catch (error) {
+    console.error('Error al iniciar la atención de la cita:', error);
     res.status(500).json({ message: 'Error al iniciar la atención de la cita.', error });
   }
 };
+
 
 // Guardar la ficha médica y completar la cita
 export const saveMedicalRecord = async (req, res) => {
@@ -70,11 +76,22 @@ export const saveMedicalRecord = async (req, res) => {
       exams,
       treatmentHistory,
     } = req.body;
+
     const veterinarianId = req.userId;
+
+    console.log("Datos recibidos:", {
+      veterinarianId,
+      appointmentId,
+      petUpdates,
+      medicalEntry,
+      allergies,
+      vaccinations,
+      exams,
+      treatmentHistory,
+    });
 
     // Obtener la cita
     const appointment = await Appointment.findById(appointmentId).populate('pet');
-
     if (!appointment) {
       return res.status(404).json({ message: 'Cita no encontrada.' });
     }
@@ -84,46 +101,48 @@ export const saveMedicalRecord = async (req, res) => {
       return res.status(403).json({ message: 'No autorizado para guardar esta ficha médica.' });
     }
 
-    // Actualizar el estado de la cita a 'Completada'
-    appointment.status = 'Completada';
-    await appointment.save();
-
-    // Actualizar la mascota si es necesario
+    // Actualizar los datos de la mascota si es necesario
     if (petUpdates) {
       await Pet.findByIdAndUpdate(appointment.pet._id, petUpdates, { new: true });
     }
 
-    // Obtener el MedicalRecord
+    // Obtener o crear el registro médico
     let medicalRecord = await MedicalRecord.findOne({ pet: appointment.pet._id });
-
     if (!medicalRecord) {
-      return res.status(404).json({ message: 'Registro médico no encontrado.' });
+      medicalRecord = new MedicalRecord({
+        pet: appointment.pet._id,
+        allergies: [],
+        vaccinations: [],
+        exams: [],
+        medicalEntries: [],
+      });
     }
 
-    // Agregar la nueva entrada médica
-    const newMedicalEntry = {
-      date: new Date(),
-      appointment: appointment._id,
-      veterinarian: veterinarianId,
-      ...medicalEntry,
-    };
-    medicalRecord.medicalEntries.push(newMedicalEntry);
+    // Verificar si ya existe una entrada médica para esta cita
+    let existingEntry = medicalRecord.medicalEntries.find(
+      (entry) => entry.appointment.toString() === appointmentId
+    );
 
-    // Actualizar alergias, vacunas, exámenes
-    if (allergies) {
-      medicalRecord.allergies = allergies;
-    }
-    if (vaccinations) {
-      medicalRecord.vaccinations = vaccinations;
-    }
-    if (exams) {
-      medicalRecord.exams = exams;
+    if (existingEntry) {
+      // Actualizar la entrada médica existente
+      existingEntry.medicalInfo = medicalEntry;
+      existingEntry.updatedAt = new Date();
+    } else {
+      // Crear una nueva entrada médica
+      const newMedicalEntry = {
+        date: new Date(),
+        appointment: appointment._id,
+        veterinarian: veterinarianId,
+        medicalInfo: medicalEntry,
+      };
+      medicalRecord.medicalEntries.push(newMedicalEntry);
     }
 
-    // Agregar historial de tratamientos si es necesario
-    if (treatmentHistory) {
-      medicalRecord.treatmentHistory = treatmentHistory;
-    }
+    // Actualizar las alergias, vacunas, exámenes y tratamientos si se proporcionan
+    if (allergies) medicalRecord.allergies = allergies;
+    if (vaccinations) medicalRecord.vaccinations = vaccinations;
+    if (exams) medicalRecord.exams = exams;
+    if (treatmentHistory) medicalRecord.treatmentHistory = treatmentHistory;
 
     // Guardar el registro médico
     await medicalRecord.save();
@@ -133,9 +152,13 @@ export const saveMedicalRecord = async (req, res) => {
       medicalRecord,
     });
   } catch (error) {
+    console.error('Error al guardar la ficha médica:', error);
     res.status(500).json({ message: 'Error al guardar la ficha médica.', error });
   }
 };
+
+
+
 
 
 // Actualizar una entrada médica específica
@@ -174,9 +197,11 @@ export const updateMedicalEntry = async (req, res) => {
 
     res.status(200).json({ message: 'Entrada médica actualizada correctamente.', entry });
   } catch (error) {
+    console.error('Error al actualizar la entrada médica:', error);
     res.status(500).json({ message: 'Error al actualizar la entrada médica.', error });
   }
 };
+
 
 // Obtener el registro médico de una mascota
 export const getMedicalRecordByPet = async (req, res) => {
@@ -241,16 +266,15 @@ export const updatePet = async (req, res) => {
   }
 };
 
+// Actualizar el estado de una cita
 export const updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
     const userId = req.userId;
 
-
-
     // Validar que el estado proporcionado es válido
-    const validStatuses = ['Pendiente', 'En Proceso', 'Completada'];
+    const validStatuses = ['Pendiente', 'En Proceso', 'Finalizado'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Estado no válido.' });
     }

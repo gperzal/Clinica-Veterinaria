@@ -8,7 +8,7 @@ const appointmentSchema = new mongoose.Schema({
     specialist: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     pet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet', required: true },
-    status: { type: String, enum: ['Pendiente', 'En Proceso', 'Completada', 'Cancelada'], default: 'Pendiente' },
+    status: { type: String, enum: ['Pendiente', 'En Proceso', 'Finalizado', 'Cancelada'], default: 'Pendiente' },
 }, {
     timestamps: true,
 });

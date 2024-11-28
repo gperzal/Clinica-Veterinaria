@@ -25,7 +25,7 @@ export const createAppointment = async (req, res) => {
 // Obtener citas de un usuario
 export const getAppointmentsByUser = async (req, res) => {
     const { userId } = req.params;
-    // console.log("User ID:", req.params);
+  
     try {
         const appointments = await Appointment.find({ owner: userId }).populate('specialist pet');
         res.status(200).json({ appointments });

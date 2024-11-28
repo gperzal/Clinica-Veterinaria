@@ -2,28 +2,19 @@
 import React , { useState, useEffect  } from 'react';
 import { SimpleGrid, FormControl, FormLabel, Input, Select, Stack, Switch, Heading, useColorModeValue, Box } from '@chakra-ui/react';
 
-const PetInfoSection = ({ petData }) => {
-  const labelColor = useColorModeValue("teal.600", "teal.300"); // Definimos el color adaptativo para los labels
+const PetInfoSection = ({ petData, onPetDataChange }) => {
+  const labelColor = useColorModeValue("teal.600", "teal.300"); 
 
   const [healthStatus, setHealthStatus] = useState(petData?.healthStatus || '');
   const [status, setStatus] = useState(petData?.status === 'Activo');
   
 
-  // Efecto para actualizar el estado de la mascota
-  useEffect(() => { 
-    const updatePetInfo = async () => {
-      try {
-        await updatePet({
-          id: petData._id,
-          healthStatus: healthStatus,
-          status: status ? 'Activo' : 'Inactivo',
-          });
-        } catch (error) {
-        console.error("Error al actualizar la información de la mascota:", error);
-      }
-    };
-    updatePetInfo();
-  }, [healthStatus, status, petData._id]); 
+  useEffect(() => {
+    onPetDataChange({
+      healthStatus,
+      status: status ? 'Activo' : 'Inactivo',
+    });
+  }, [healthStatus, status, onPetDataChange]);
 
 
   return (

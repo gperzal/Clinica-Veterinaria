@@ -14,8 +14,9 @@ import Documents from '../components/Documents';
 import TreatmentHistory from '../components/TreatmentHistory';
 import HealthHistory from '../components/HealthHistory';
 import MedicalControls from '../components/MedicalControls';
-import { getOwnerById, getPetById } from '../../profile/services/profileService';
 import { attendAppointment } from '../services/medicalRecordService';
+import useToastNotification from '../../../../hooks/useToastNotification';
+import { getAppointmentsBySpecialist } from '../services/appointmentService';
 
 
 const AppointmentsPage = () => {
@@ -27,21 +28,47 @@ const AppointmentsPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
 
+  const toast = useToastNotification();
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const selectedColor = useColorModeValue("blue.500", "blue.300");
 
   const isPatientSelected = selectedPatient && ownerData && petData;
 
   const handleViewDetails = async (appointmentId) => {
+    const validateStatus = (appointments) => {
+      const inProcess = appointments.find((appt) => appt.status === "En Proceso");
+      console.log("Cita :", appointments);
+      if (inProcess) {
+       
+        if (inProcess._id !== appointmentId) {
+          toast({
+            title: "Cita en proceso",
+            description: `Ya hay una ficha abierta para ${inProcess.pet.name} a las ${inProcess.time}.`,
+            status: "warning",
+            duration: 5000,
+            isClosable: true,
+          });
+          return false; 
+        }
+      }
+      return true;
+    };
+    
     try {
+
+      const appointments = await getAppointmentsBySpecialist(); 
+      const canProceed = validateStatus(appointments);
+
+      if (!canProceed) return; // Detener el proceso si no es válido
+
       const data = await attendAppointment(appointmentId);
       const { appointment } = data;
-
+ 
       setSelectedPatient({ ownerId: appointment.pet.owner._id, petId: appointment.pet._id });
       setOwnerData(appointment.pet.owner);
       setPetData(appointment.pet);
       setSelectedAppointment(appointment);
-      setTabIndex(1); // Cambia automáticamente a la pestaña de Ficha Médica
+      setTabIndex(1); 
       setAppointmentsRefreshKey(prevKey => prevKey + 1);
     } catch (error) {
       console.error('Error al atender la cita:', error);

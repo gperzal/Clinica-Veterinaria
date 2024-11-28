@@ -33,8 +33,8 @@ router.delete('/pet/:petId', authMiddleware, roleMiddleware(['Veterinario', 'Adm
 // Actualizar información de la mascota
 router.put('/pet/:petId/update', authMiddleware, roleMiddleware(['Veterinario', 'Administrador']), updatePet);
 
-
-router.put('/:appointmentId/status', authMiddleware, roleMiddleware(['Veterinario', 'Administrador']), updateAppointmentStatus);
+// Actualizar el estado de una cita
+router.put('/status/:appointmentId', authMiddleware, roleMiddleware(['Veterinario', 'Administrador']), updateAppointmentStatus);
 
 
 export default router;

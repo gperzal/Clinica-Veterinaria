@@ -24,7 +24,7 @@ import { FaClock, FaEye, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaSearch 
 import { getAppointmentsBySpecialist } from '../services/appointmentService';
 import { AuthContext } from '../../../auth/context/AuthContext';
 
-const MedicalAppointments = ({ onViewDetails, refreshKey }) => {
+const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) => {
   const { user } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
@@ -121,7 +121,7 @@ const MedicalAppointments = ({ onViewDetails, refreshKey }) => {
           </Select>
           <Select
             maxW="200px"
-            placeholder="Estado"
+            placeholder="Filtrar por Estado"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             borderColor={borderColor}
@@ -188,10 +188,10 @@ const MedicalAppointments = ({ onViewDetails, refreshKey }) => {
                   <Tooltip label="Ver detalles" fontSize="sm">
                     <IconButton
                       icon={<FaEye />}
-                      colorScheme="teal"
+                      colorScheme={activeAppointment ? "gray" : "teal"}
                       variant="outline"
                       onClick={() => onViewDetails(appointment._id)}
-                      aria-label="Ver detalles"
+                      isDisabled={activeAppointment}
                     />
                   </Tooltip>
                 </Td>

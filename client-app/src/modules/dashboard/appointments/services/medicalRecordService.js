@@ -2,6 +2,7 @@
 import api from '../../../../services/api';
 
 
+// Atender una cita (Iniciar atención)
 export const attendAppointment = async (appointmentId) => {
   try {
     const response = await api.post(`/api/dashboard/medical-records/attend/${appointmentId}`);
@@ -12,7 +13,7 @@ export const attendAppointment = async (appointmentId) => {
   }
 };
 
-
+// Guardar la ficha médica y completar la cita
 export const saveMedicalRecord = async (appointmentId, data) => {
   try {
     const response = await api.post(`/api/dashboard/medical-records/save/${appointmentId}`, data);
@@ -24,27 +25,7 @@ export const saveMedicalRecord = async (appointmentId, data) => {
 };
 
 
-export const updateMedicalEntry = async (medicalRecordId, entryId, entryData) => {
-  try {
-    const response = await api.put(`/api/dashboard/medical-records/entry/${medicalRecordId}/${entryId}`, entryData);
-    return response.data.entry;
-  } catch (error) {
-    console.error('Error updating medical entry:', error);
-    throw error;
-  }
-};
-
-
-export const deleteMedicalEntry = async (medicalRecordId, entryId) => {
-  try {
-    const response = await api.delete(`/api/dashboard/medical-records/entry/${medicalRecordId}/${entryId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting medical entry:', error);
-    throw error;
-  }
-};
-
+// Obtener el registro médico de una mascota
 export const getMedicalRecordByPet = async (petId) => {
   try {
     const response = await api.get(`/api/dashboard/medical-records/pet/${petId}`);
@@ -55,6 +36,31 @@ export const getMedicalRecordByPet = async (petId) => {
   }
 };
 
+
+// Actualizar una entrada médica específica
+export const updateMedicalEntry = async (medicalRecordId, entryId, entryData) => {
+  try {
+    const response = await api.put(`/api/dashboard/medical-records/entry/${medicalRecordId}/${entryId}`, entryData);
+    return response.data.entry;
+  } catch (error) {
+    console.error('Error updating medical entry:', error);
+    throw error;
+  }
+};
+
+// Eliminar el registro médico de una mascota
+export const deleteMedicalEntry = async (medicalRecordId, entryId) => {
+  try {
+    const response = await api.delete(`/api/dashboard/medical-records/entry/${medicalRecordId}/${entryId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting medical entry:', error);
+    throw error;
+  }
+};
+
+
+// Actualizar información de la mascota
 export const updatePetInfo = async (petId, petData) => {
   try {
     const response = await api.put(`/api/dashboard/medical-records/pet/${petId}/update`, petData);
@@ -65,9 +71,10 @@ export const updatePetInfo = async (petId, petData) => {
   }
 };
 
+// Actualizar el estado de una cita
 export const setAppointmentStatus = async (appointmentId, status) => {
   try {
-    const response = await api.put(`/api/dashboard/medical-records/${appointmentId}/status`, { status });
+    const response = await api.put(`/api/dashboard/medical-records/status/${appointmentId}`, { status });
     return response.data;
   } catch (error) {
     console.error('Error al cambiar el estado de la cita:', error);
