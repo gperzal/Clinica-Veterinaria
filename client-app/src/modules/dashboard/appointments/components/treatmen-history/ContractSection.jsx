@@ -1,33 +1,45 @@
-import React, { useState } from 'react';
-import { Box, Heading, Text, Checkbox, Button, List, ListItem, ListIcon, useColorModeValue } from '@chakra-ui/react';
-import { FaCheckCircle } from 'react-icons/fa';
+// src/modules/dashboard/appointments/components/treatmen-history/ContractSection.jsx
+import React, { useState } from "react";
+import {
+  Box,
+  Heading,
+  Text,
+  Checkbox,
+  Button,
+  List,
+  ListItem,
+  ListIcon,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { FaCheckCircle } from "react-icons/fa";
 
-const ContractSection = () => {
+const ContractSection = ({ onSignContract }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const labelColor = useColorModeValue("teal.600", "teal.300");
 
   return (
     <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={useColorModeValue("white", "gray.700")}>
-      <Heading size="md" color={labelColor} mb={4}>Contrato de Responsabilidad</Heading>
+      <Heading size="md" color={labelColor} mb={4}>
+        Contrato de Responsabilidad
+      </Heading>
 
-      <Box 
-        borderWidth="1px" 
-        borderRadius="lg" 
-        p={4} 
+      <Box
+        borderWidth="1px"
+        borderRadius="lg"
+        p={4}
         bg={useColorModeValue("gray.100", "gray.600")}
-        maxHeight="400px" 
+        maxHeight="400px"
         overflowY="auto"
       >
         <Text fontSize="sm" fontWeight="bold" mb={4} color={labelColor}>
           Cláusulas Principales:
         </Text>
-
         <List spacing={3} fontSize="sm" color="gray.100">
+          {/* Lista de cláusulas */}
           <ListItem>
             <ListIcon as={FaCheckCircle} color="green.500" />
-            <Box as="span" fontWeight="bold">1. Objeto del Contrato:</Box> Este contrato establece las responsabilidades del propietario y de la clínica en relación con el cuidado clínico de la mascota, así como las consecuencias legales en caso de abandono.
+            Este contrato establece las responsabilidades del propietario y de la clínica...
           </ListItem>
-
           <ListItem>
             <ListIcon as={FaCheckCircle} color="green.500" />
             <Box as="span" fontWeight="bold">2. Responsabilidad del Propietario:</Box> El propietario se compromete a recoger a su mascota en la fecha y hora acordadas para su alta médica, salvo acuerdo en contrario o razones justificadas comunicadas por escrito.
@@ -67,8 +79,11 @@ const ContractSection = () => {
             <ListIcon as={FaCheckCircle} color="green.500" />
             <Box as="span" fontWeight="bold">9. Resolución de Conflictos:</Box> Cualquier conflicto se resolverá ante los tribunales competentes en la ciudad de _______________.
           </ListItem>
-        </List>
 
+        </List>
+       
+       
+       
         <Checkbox
           isChecked={termsAccepted}
           onChange={() => setTermsAccepted(!termsAccepted)}
@@ -77,12 +92,15 @@ const ContractSection = () => {
         >
           Acepto los términos y condiciones del contrato de responsabilidad.
         </Checkbox>
-
-        
       </Box>
-      <Button colorScheme="green" isDisabled={!termsAccepted} mt={4}>
-          Firmar Contrato
-        </Button>
+      <Button
+        colorScheme="green"
+        isDisabled={!termsAccepted}
+        mt={4}
+        onClick={onSignContract}
+      >
+        Firmar Contrato
+      </Button>
     </Box>
   );
 };

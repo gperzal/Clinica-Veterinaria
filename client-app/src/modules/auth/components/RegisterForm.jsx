@@ -8,7 +8,7 @@ import {
   Input,
   Stack,
   Divider,
-  Center
+  Center, Tooltip
 } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc'
 import { FaFacebook } from 'react-icons/fa'
@@ -77,30 +77,14 @@ export default function RegisterForm() {
           <Text textAlign={'center'} color={'gray.500'}>
             o regístrate con
           </Text>
-          <Stack>
-            <Button w={'full'} colorScheme={'facebook'} leftIcon={<FaFacebook />}>
-              <Center>
-                <Text>Registrarse con Facebook</Text>
-              </Center>
-            </Button>
-
+         <Stack spacing={4} align="center" justify="center">
+          <Tooltip label="Este servicio está temporalmente fuera de servicio" aria-label="A tooltip">
             <Button w={'full'} variant={'outline'} leftIcon={<FcGoogle />}>
               <Center>
                 <Text>Registrarse con Google</Text>
               </Center>
             </Button>
-
-            <Button w={'full'} colorScheme={'messenger'} leftIcon={<SiLinkedin />}>
-              <Center>
-                <Text>Registrarse con LinkedIn</Text>
-              </Center>
-            </Button>
-
-            <Button w={'full'} colorScheme={'messenger'} leftIcon={<SiMessenger />}>
-              <Center>
-                <Text>Registrarse con Messenger</Text>
-              </Center>
-            </Button>
+            </Tooltip>
           </Stack>
         </Stack>
       </Flex>

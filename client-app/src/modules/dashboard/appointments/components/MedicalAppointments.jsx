@@ -41,8 +41,8 @@ const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) 
 
   const statusColors = {
     Pendiente: 'yellow',
-    'En proceso': 'orange',
-    Completada: 'green',
+    'En Proceso': 'blue',
+    Finalizado: 'green',
   };
 
   const getStartOfPeriod = (period) => {

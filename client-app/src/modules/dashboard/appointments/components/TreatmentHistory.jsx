@@ -1,103 +1,110 @@
-import React, { useState } from 'react';
-import { 
-  Box, Heading, Text, Button, Textarea, Checkbox, VStack, Stack, useColorModeValue, 
-  Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon,Icon,
-  List, ListItem, ListIcon, Badge, SimpleGrid, HStack, Select, IconButton
-} from '@chakra-ui/react';
-import { FaCheckCircle, FaCheck, FaExclamationTriangle,
-    FaArrowLeft, FaArrowRight
-   } from "react-icons/fa";
-import GeneralRestSection from './treatmen-history/GeneralRestSection';
-import TreatmentLogSection from './treatmen-history/TreatmentLogSection';
-import ContractSection from './treatmen-history/ContractSection';
+import React, { useState, useEffect } from "react";
+import { Box, Heading, useColorModeValue } from "@chakra-ui/react";
+import GeneralRestSection from "./treatmen-history/GeneralRestSection";
+import TreatmentLogSection from "./treatmen-history/TreatmentLogSection";
+import ContractSection from "./treatmen-history/ContractSection";
+import Signature from "./treatmen-history/Signature";
+import useToastNotification from "../../../../hooks/useToastNotification";
+import { updateTreatmentLog, updateTreatments, getTreatmentLog } from "./../services/medicalRecordService";
 
-const TreatmentHistory = ({ medicalFicheId, petData, ownerData }) => {
-  
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const daysInClinic = 7;
-  const treatmentDays = 7;
+const TreatmentHistory = ({ petData, treatmentLogId }) => {
+  const [treatmentLogs, setTreatmentLogs] = useState([]); // Estado para los tratamientos
+  const [contractSigned, setContractSigned] = useState(false); // Estado para el contrato firmado
+  const [isSigning, setIsSigning] = useState(false); // Estado para animación de firma
+  const [treatmentLogData, setTreatmentLogData] = useState({}); // Almacenar startDate y endDate
   const bgColor = useColorModeValue("gray.50", "gray.800");
-  const labelColor = useColorModeValue("teal.600", "teal.300");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filter, setFilter] = useState("all"); // Estado de filtro: "all", "pending", "confirmed"
-  const treatmentsPerPage = 2;
+  const showToast = useToastNotification();
 
+  const handleStartRest = async ({ startDate, endDate }) => {
+    try {
+      if (!treatmentLogId) {
+        throw new Error("No se encontró un ID de registro de tratamiento.");
+      }
 
+      // Generar tratamientos dinámicamente según las fechas
+      const totalDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+      const logs = Array.from({ length: totalDays }, (_, i) => ({
+        date: new Date(new Date(startDate).getTime() + i * 86400000).toISOString().split("T")[0],
+        treatment: `Tratamiento día ${i + 1}`,
+        notes: "",
+        confirmed: false,
+      }));
 
-
-  // Generación automática de registros de tratamiento según los días de estancia
-  const [treatmentLogs, setTreatmentLogs] = useState(
-    Array.from({ length: daysInClinic }, (_, i) => ({
-      date: new Date(Date.now() + i * 86400000).toLocaleDateString(),
-      treatment: "Tratamiento general",
-      notes: "",
-      confirmed: false,
-    }))
-  );
-
-    // Filtrar tratamientos según el estado seleccionado
-    const filteredLogs = treatmentLogs.filter(log => {
-        if (filter === "all") return true;
-        return filter === "confirmed" ? log.confirmed : !log.confirmed;
+      // Llama al endpoint para actualizar el registro de tratamientos
+      const updatedLog = await updateTreatmentLog(treatmentLogId, {
+        startDate,
+        endDate,
+        treatments: logs,
+        contractSigned: true, // Marcar el contrato como firmado
       });
-    
-      // Paginación
-      const startIdx = (currentPage - 1) * treatmentsPerPage;
-      const paginatedLogs = filteredLogs.slice(startIdx, startIdx + treatmentsPerPage);
-    
-    
 
-  // Maneja la confirmación del tratamiento
-  const handleConfirmTreatment = (index) => {
-    setTreatmentLogs((prevLogs) =>
-      prevLogs.map((log, i) =>
-        i === index ? { ...log, confirmed: !log.confirmed } : log
-      )
-    );
+      // Actualiza el estado local basado en la respuesta del servidor
+      setTreatmentLogs(updatedLog.treatments || logs); // Usa `logs` por defecto si la respuesta está vacía
+      setContractSigned(updatedLog.contractSigned || true);
+      setTreatmentLogData({ startDate, endDate }); // Actualiza los datos del registro
+;
+    } catch (error) {
+      console.error("Error al iniciar el reposo clínico:", error);
+      showToast({
+        title: "Error",
+        description: "No se pudo guardar el reposo clínico. Inténtalo de nuevo.",
+        status: "error",
+      });
+    }
   };
 
-  // Maneja la edición de notas en línea
-  const handleNoteChange = (index, newNote) => {
-    setTreatmentLogs((prevLogs) =>
-      prevLogs.map((log, i) =>
-        i === index ? { ...log, notes: newNote } : log
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchTreatmentLog = async () => {
+      try {
+        const response = await getTreatmentLog(treatmentLogId); // Obtener datos del tratamiento
+        console.log("TreatmentLog Fetched: ", response);
 
+        setTreatmentLogs(response.treatments || []);
+        setContractSigned(response.contractSigned || false);
+        setTreatmentLogData({
+          startDate: response.startDate || new Date().toISOString().split("T")[0],
+          endDate: response.endDate || "",
+        });
+      } catch (error) {
+        console.error("Error al cargar TreatmentLog:", error);
+        showToast({
+          title: "Error",
+          description: "No se pudo cargar el registro de tratamientos.",
+          status: "error",
+        });
+      }
+    };
 
-   // Cambia estado de confirmación
-   const toggleConfirm = (index) => {
-    setTreatmentLogs((logs) =>
-      logs.map((log, i) => (i === index ? { ...log, confirmed: !log.confirmed } : log))
-    );
-  };
-
-  // Actualiza notas
-  const updateNotes = (index, newNote) => {
-    setTreatmentLogs((logs) =>
-      logs.map((log, i) => (i === index ? { ...log, notes: newNote } : log))
-    );
-  };
-
+    fetchTreatmentLog();
+  }, [treatmentLogId]);
 
   return (
     <Box p={6} bg={bgColor} borderRadius="lg" shadow="lg" maxWidth="90vw" mx="auto">
-        <Heading size="lg" textAlign="center" mb={6} color={labelColor}>
-          Reposo Clínico de {petData?.name}
-        </Heading>
+      <Heading size="lg" textAlign="center" mb={6} color="teal.500">
+        Reposo Clínico de {petData?.name || "Mascota"}
+      </Heading>
 
-        {/* Información General del Reposo */}
-        <GeneralRestSection />
-
-        {/* Registro Diario de Tratamientos */}
-        <TreatmentLogSection daysInClinic={daysInClinic} />
-
-        {/* Contrato de Responsabilidad */}
-        <ContractSection />
+      {isSigning ? (
+        <Signature />
+      ) : !contractSigned ? (
+        <ContractSection onSignContract={() => setContractSigned(true)} />
+      ) : (
+        <>
+          <GeneralRestSection onStartRest={handleStartRest} treatmentLogData={treatmentLogData} />
+          {treatmentLogs.length > 0 && (
+            <TreatmentLogSection
+              treatmentLogs={treatmentLogs}
+              setTreatmentLogs={setTreatmentLogs}
+              onUpdateTreatment={async (logs) => {
+                const updatedLog = await updateTreatments(treatmentLogId, logs);
+                setTreatmentLogs(updatedLog.treatments || []);
+              }}
+            />
+          )}
+        </>
+      )}
     </Box>
-  
   );
 };
 

@@ -4,9 +4,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Box, Flex } from '@chakra-ui/react';
 import { AuthProvider } from './modules/auth/context/AuthContext';
 
+import HomePage from './pages/HomePage';
+
+// Modulo de Layout
 import Navbar from './layout/Navbar';
 import Footer from './layout/Footer';
-import HomePage from './pages/HomePage';
+import Chatbot from './layout/Chatbot';
+
 // Modulo de Auth
 import LoginPage from './modules/auth/pages/LoginPage';
 import RegisterPage from './modules/auth/pages/RegisterPage';
@@ -44,6 +48,10 @@ import ShoppingCart from './modules/catalog/pages/ShoppingCart';
 import ContactPage from './modules/contact/pages/ContactPage';
 import FAQPage from './modules/contact/pages/FAQPage';
 import FeedbackPage from './modules/contact/pages/FeedbackPage';
+// Modulo Blog
+import BlogPage from './modules/blog/pages/BlogPage';
+
+
 // Modulo Dashboard
 import SidebarWithHeader from './layout/SidebarWithHeader'; 
 import AboutPage from './pages/AboutPage';
@@ -65,6 +73,7 @@ function App() {
                 <Navbar />
                 <Box flex="1">
                   <HomePage />
+                  <Chatbot />
                 </Box>
                 <Footer />
               </Flex>
@@ -200,6 +209,19 @@ function App() {
             } 
           />
           <Route 
+            path="/blog" 
+            element={
+              <Flex direction="column" minH="100vh">
+                <Navbar />
+                <Box flex="1">
+                  <BlogPage />
+                </Box>
+                <Footer />
+              </Flex>
+            } 
+          />
+
+          <Route 
             path="/coming-soon" 
             element={
               <Flex direction="column" minH="100vh">
@@ -224,6 +246,7 @@ function App() {
                 </Flex>
               } 
             />
+
 
 
           <Route path="*" element={<NotFoundPage />} />

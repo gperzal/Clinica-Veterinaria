@@ -1,0 +1,34 @@
+{
+    "productos": [
+      {
+        "id": 1,
+        "nombre": "Royal Canin Adult",
+        "categoria": "Alimento",
+        "tipo": "Perro",
+        "precio": 45000,
+        "descripcion": "Alimento premium para perros adultos",
+        "disponibilidad": true,
+        "detalles": "Contiene proteínas de alta calidad y nutrientes esenciales"
+      },
+      {
+        "id": 2,
+        "nombre": "Hills Science Diet",
+        "categoria": "Alimento",
+        "tipo": "Gato",
+        "precio": 15000,
+        "descripcion": "Alimento balanceado para gatos",
+        "disponibilidad": true,
+        "detalles": "Fórmula especial para el cuidado digestivo"
+      },
+      {
+        "id": 3,
+        "nombre": "Collar Antipulgas",
+        "categoria": "Accesorios",
+        "tipo": "Perro/Gato",
+        "precio": 5000,
+        "descripcion": "Protección contra pulgas y garrapatas",
+        "disponibilidad": true,
+        "detalles": "Duración de 6 meses, resistente al agua"
+      }
+    ]
+  }

@@ -80,35 +80,6 @@ const recommendedData = [
       
       const petAverages = calculateAverages(petDataHistory);
       
-        // Agrupaciones
-        const groupedData = {
-            "Indicadores Físicos": [
-            { name: "Peso", value: petAverages["Peso"] },
-            { name: "Índice de Condición Corporal", value: petAverages["Índice de Condición Corporal"] },
-            { name: "Nivel de Hidratación", value: petAverages["Nivel de Hidratación"] },
-            ],
-            "Indicadores Vitales": [
-            { name: "Frecuencia Cardíaca", value: petAverages["Frecuencia Cardíaca"] },
-            { name: "Frecuencia Respiratoria", value: petAverages["Frecuencia Respiratoria"] },
-            { name: "Temperatura", value: petAverages["Temperatura"] },
-            ],
-            "Indicadores de Presión": [
-            { name: "Presión Sistólica", value: petAverages["Presión Sistólica"] },
-            { name: "Presión Diastólica", value: petAverages["Presión Diastólica"] },
-            ],
-        };
-        const recommendedGroupedData = {
-            "Indicadores Físicos": recommendedData.filter((d) =>
-              ["Peso", "Índice de Condición Corporal", "Nivel de Hidratación"].includes(d.name)
-            ),
-            "Indicadores Vitales": recommendedData.filter((d) =>
-              ["Frecuencia Cardíaca", "Frecuencia Respiratoria", "Temperatura"].includes(d.name)
-            ),
-            "Indicadores de Presión": recommendedData.filter((d) =>
-              ["Presión Sistólica", "Presión Diastólica"].includes(d.name)
-            ),
-          };
-
       // Convertir promedios a formato para el gráfico
       const actualData = Object.keys(petAverages).map((key) => ({
         name: key,
@@ -154,9 +125,8 @@ const HealthMetricCard = ({ title, value, analysis, trend }) => {
   };
       
   const HealthHistory = () => {
-    const bgColor = useColorModeValue("gray.300", "gray.900");
-    const bgColorGraph = useColorModeValue("white", "gray.800");
-
+    const bgColor = useColorModeValue("gray.50", "gray.900");
+  
     return (
       <Box p={6} bg={bgColor} borderRadius="lg" shadow="lg" maxWidth="100%" mx="auto">
         <Heading size="lg" mb={6} textAlign="center" color="teal.500">
@@ -180,12 +150,12 @@ const HealthMetricCard = ({ title, value, analysis, trend }) => {
         </Slider>
   
         {/* Gráfico Radar */}
-        <Box p={4} borderRadius="lg" shadow="md" mt={8} bg={bgColorGraph}>
+        <Box bg="white" p={4} borderRadius="lg" shadow="md" mt={8}>
           <Heading size="sm" mb={4}>
             Comparación de Signos Vitales (Promedio vs Recomendado)
           </Heading>
-          <ResponsiveContainer width="100%" height={400} >
-            <RadarChart bg={bgColorGraph} data={recommendedData.map((item, idx) => ({ ...item, value2: actualData[idx]?.value.toFixed(1) }))}>
+          <ResponsiveContainer width="100%" height={400}>
+            <RadarChart data={recommendedData.map((item, idx) => ({ ...item, value2: actualData[idx]?.value }))}>
               <PolarGrid />
               <PolarAngleAxis dataKey="name" />
               <PolarRadiusAxis />

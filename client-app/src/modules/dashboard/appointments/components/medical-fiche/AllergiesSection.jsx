@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HStack, IconButton, Input, Tag, TagCloseButton, TagLabel, Heading, Box, useColorModeValue } from '@chakra-ui/react';
 import { FaPlus } from 'react-icons/fa';
+import { AllergiesProps } from '../../utils/validateProps';
 
 const AllergiesSection = ({ allergies = [], setAllergies }) => {
   // Definir estados para allergies y newAllergy
@@ -39,5 +40,7 @@ const AllergiesSection = ({ allergies = [], setAllergies }) => {
     </Box>
   );
 };
+
+AllergiesSection.propTypes = AllergiesProps;
 
 export default AllergiesSection;

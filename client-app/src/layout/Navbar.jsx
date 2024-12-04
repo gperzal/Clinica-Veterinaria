@@ -314,6 +314,6 @@ const NAV_ITEMS = [
   { label: 'Home', href: '/' },
   { label: 'Agendar', href: '/appointments' },
   { label: 'Catálogo', href: '/catalog' },
-  { label: 'Blogs', href: '/coming-soon' },
+  { label: 'Blogs', href: '/blog' },
   { label: 'Contacto', href: '/contact' },
 ];

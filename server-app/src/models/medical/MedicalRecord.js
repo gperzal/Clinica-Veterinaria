@@ -23,11 +23,10 @@ const MedicalEntrySchema = new mongoose.Schema({
     diet: String,
     appetiteDigestion: String,
   },
-  notes: String,         // Notas internas del veterinario
-  publicNotes: String,   // Notas compartidas con el cliente
-  isClinicalRest: Boolean, // Indica si requiere reposo clínico
+  notes: { type: String },
   prescriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prescription' }],
   documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
+  treatmentLog: { type: mongoose.Schema.Types.ObjectId, ref: "TreatmentLog" },
 }, {
   timestamps: true,
 });
@@ -35,18 +34,17 @@ const MedicalEntrySchema = new mongoose.Schema({
 // Esquema principal de la ficha médica
 const MedicalRecordSchema = new mongoose.Schema({
   pet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet', required: true, unique: true },
-  allergies: [{ type: String }],  // Lista de alergias
+  allergies: [{ type: String }],
   vaccinations: [{
-    type: String,
-    date: Date,
-    nextDate: Date,
-    status: String, // 'Vacunar' o 'Al día'
+    type: { type: String, required: true },
+    date: { type: Date, required: true },
+    nextDate: { type: Date, default: null },
+    status: { type: String, default: 'Vacunar' },
   }],
   exams: [{
-    type: String,
-    date: Date,
-    result: String,
-    documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
+    type: { type: String, required: true },
+    date: { type: Date, required: true },
+    result: { type: String, required: true },
   }],
   medicalEntries: [MedicalEntrySchema], // Historial de atenciones médicas
 }, {

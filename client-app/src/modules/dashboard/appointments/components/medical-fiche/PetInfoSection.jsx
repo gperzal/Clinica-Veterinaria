@@ -1,6 +1,7 @@
 
 import React , { useState, useEffect  } from 'react';
 import { SimpleGrid, FormControl, FormLabel, Input, Select, Stack, Switch, Heading, useColorModeValue, Box } from '@chakra-ui/react';
+import {PetInfoProps}  from '../../utils/validateProps.js';
 
 const PetInfoSection = ({ petData, onPetDataChange }) => {
   const labelColor = useColorModeValue("teal.600", "teal.300"); 
@@ -75,5 +76,8 @@ const PetInfoSection = ({ petData, onPetDataChange }) => {
     </Box>
   );
 };
+
+
+PetInfoSection.propTypes = PetInfoProps;
 
 export default PetInfoSection;

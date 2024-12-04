@@ -24,6 +24,50 @@ export const saveMedicalRecord = async (appointmentId, data) => {
   }
 };
 
+// Actualizar el registro de tratamiento médico (startDate, endDate, contractSigned)
+export const updateTreatmentLog = async (treatmentId, treatmentLog) => {
+  try {
+    const response = await api.patch(`/api/dashboard/medical-records/treatment/${treatmentId}`, treatmentLog);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating treatment log:", error);
+    throw error;
+  }
+};
+
+
+
+// Actualizar la lista de tratamientos en el historial
+export const updateTreatments = async (treatmentId, treatments) => {
+  try {
+    const response = await api.patch(`/api/dashboard/medical-records/treatment/${treatmentId}/treatments`, { treatments });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating treatments:", error);
+    throw error;
+  }
+};
+
+
+export const getTreatmentLogByAppointment = async (appointmentId) => {
+  try {
+    const response = await api.get(`/api/dashboard/medical-records/by-appointment/${appointmentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener el TreatmentLog por AppointmentId:", error);
+    throw error;
+  }
+};
+
+export const getTreatmentLog = async (treatmentId) => {
+  try {
+    const response = await api.get(`/api/dashboard/medical-records/by-treatment/${treatmentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener el TreatmentLog:", error);
+    throw error;
+  }
+};
 
 // Obtener el registro médico de una mascota
 export const getMedicalRecordByPet = async (petId) => {

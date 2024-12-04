@@ -1,0 +1,278 @@
+[
+    {
+        "id": 1,
+        "title": "¿Por qué evitar la automedicación en mascotas?",
+        "excerpt": "Conoce los riesgos de automedicar a tu mascota y cómo puede afectar su salud.",
+        "image": "https://scontent.fscl35-1.fna.fbcdn.net/v/t1.6435-9/93794219_2900358446726117_598297585806999552_n.jpg?stp=dst-jpg_p526x296_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeH4whxZpy_jjDNjL4z6ZYHk8AWdeqUM-xfwBZ16pQz7F_OnriFa9B15du9lUgqPfZU&_nc_ohc=Vt_OyTwSpSEQ7kNvgH49oSd&_nc_zt=23&_nc_ht=scontent.fscl35-1.fna&_nc_gid=Az0dohnYjRCG34jMEgeizpR&oh=00_AYA3C4MZusRKHzn0AfNwhd6tcJQ2YOmcfPjUwmH2TEry1Q&oe=677294B0",
+        "date": "28 Nov 2024",
+        "likes": 25,
+        "comments": 5,
+        "author": "Dr. Ricardo Vargas",
+        "content": "La automedicación es un problema frecuente que puede poner en peligro la vida de nuestras mascotas. Medicamentos comunes como el paracetamol o el ibuprofeno, usados en humanos, pueden ser tóxicos para perros y gatos. Ante cualquier síntoma, consulta siempre a un veterinario especializado.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Rosa",
+                "content": "Le di ibuprofeno a mi perro por error, ¿qué debo hacer?",
+                "date": "28 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dr. Ricardo Vargas",
+                        "content": "Es fundamental acudir al veterinario de inmediato. El ibuprofeno es tóxico para perros.",
+                        "date": "28 Nov 2024"
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "author": "Carlos",
+                "content": "Gracias por la información, muy útil.",
+                "date": "29 Nov 2024"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "Alimentos de baja calidad: ¿Qué riesgos implican?",
+        "excerpt": "Descubre cómo los alimentos de baja calidad afectan la salud de tu mascota.",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2fMODQZ9XUAjWF_V9j3JUKey3RYz-_gt7TQ&s",
+        "date": "27 Nov 2024",
+        "likes": 30,
+        "comments": 8,
+        "author": "Dra. Sofía Martínez",
+        "content": "Alimentos de baja calidad, ricos en subproductos y conservantes, pueden causar problemas como alergias, obesidad, y enfermedades crónicas en nuestras mascotas. Opta siempre por alimentos de calidad recomendados por tu veterinario para garantizar una vida saludable.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Rosa",
+                "content": "¿Es bueno darle comida casera a mi mascota?",
+                "date": "27 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dra. Sofía Martínez",
+                        "content": "¡Hola Rosa! La comida casera puede ser buena si es balanceada. Evita alimentos procesados y condimentos. Pollo hervido es una opción excelente.",
+                        "date": "28 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "Cuidados esenciales para una mascota feliz y saludable",
+        "excerpt": "Consejos prácticos para cuidar a tu mascota de forma efectiva.",
+        "image": "https://cdn.colombia.com/sdi/2023/02/10/buscaran-la-creacion-de-un-hospital-publico-para-mascotas-en-bogota-1117312.jpg",
+        "date": "26 Nov 2024",
+        "likes": 40,
+        "comments": 12,
+        "author": "Clínica VetPet",
+        "content": "Cuidar a tu mascota implica más que brindarle alimento y agua. Es fundamental ofrecerle atención veterinaria regular, ejercicio, y amor. Conoce los aspectos clave para mantener a tu compañero peludo feliz y saludable.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Jorge",
+                "content": "¿Cada cuánto tiempo debo llevar a mi perro al veterinario?",
+                "date": "26 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Clínica VetPet",
+                        "content": "Recomendamos al menos una vez al año para revisiones generales, o cada 6 meses si tiene más de 7 años.",
+                        "date": "27 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "title": "Vacunación en cachorros: Todo lo que debes saber",
+        "excerpt": "Guía completa sobre el calendario de vacunación para cachorros.",
+        "image": "/api/placeholder/400/300",
+        "date": "25 Nov 2024",
+        "likes": 55,
+        "comments": 15,
+        "author": "Dr. Manuel López",
+        "content": "La vacunación es crucial para proteger a tu cachorro contra enfermedades graves. El esquema debe comenzar a las 6-8 semanas de edad y continuar hasta las 16 semanas. Incluye vacunas contra el parvovirus, distemper y otras enfermedades importantes.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Ana María",
+                "content": "¿Qué pasa si me salto una fecha de vacunación?",
+                "date": "25 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dr. Manuel López",
+                        "content": "Es importante mantener el calendario. Si te saltaste una fecha, consulta con tu veterinario para reprogramar y ajustar el esquema.",
+                        "date": "26 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "title": "Signos de emergencia veterinaria",
+        "excerpt": "Aprende a reconocer cuándo tu mascota necesita atención médica urgente.",
+        "image": "/api/placeholder/400/300",
+        "date": "24 Nov 2024",
+        "likes": 65,
+        "comments": 20,
+        "author": "Dra. Carmen Ruiz",
+        "content": "Algunos signos de emergencia incluyen: dificultad para respirar, sangrado abundante, trauma por accidente, convulsiones, abdomen hinchado y duro, o incapacidad para orinar. Ante estos síntomas, acude inmediatamente al veterinario.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Pedro",
+                "content": "Mi gato no ha comido en 24 horas, ¿es una emergencia?",
+                "date": "24 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dra. Carmen Ruiz",
+                        "content": "En gatos, 24 horas sin comer puede ser grave. Necesita revisión veterinaria pronto para descartar problemas serios.",
+                        "date": "25 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "title": "Cuidados dentales en mascotas",
+        "excerpt": "La importancia de la higiene dental en perros y gatos.",
+        "image": "/api/placeholder/400/300",
+        "date": "23 Nov 2024",
+        "likes": 45,
+        "comments": 10,
+        "author": "Dr. Alberto Sánchez",
+        "content": "La enfermedad periodontal afecta al 80% de las mascotas mayores de 3 años. Es importante cepillar los dientes regularmente y realizar limpiezas dentales profesionales. Los problemas dentales no tratados pueden causar problemas cardíacos y renales.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "María",
+                "content": "¿Qué pasta dental debo usar para mi perro?",
+                "date": "23 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dr. Alberto Sánchez",
+                        "content": "Usa solo pasta dental específica para perros. La pasta dental humana puede ser tóxica para ellos.",
+                        "date": "24 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "title": "Esterilización: Mitos y realidades",
+        "excerpt": "Información vital sobre la esterilización de mascotas.",
+        "image": "/api/placeholder/400/300",
+        "date": "22 Nov 2024",
+        "likes": 70,
+        "comments": 25,
+        "author": "Dra. Patricia Núñez",
+        "content": "La esterilización no solo previene embarazos no deseados, sino que también reduce el riesgo de cáncer y mejora el comportamiento. Es un procedimiento seguro que beneficia la salud a largo plazo de tu mascota.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Luis",
+                "content": "¿A qué edad es mejor esterilizar?",
+                "date": "22 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dra. Patricia Núñez",
+                        "content": "Generalmente recomendamos entre los 4-6 meses, pero puede variar según la raza y especie. Consulta con tu veterinario para el momento óptimo.",
+                        "date": "23 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "title": "Parásitos internos: Prevención y tratamiento",
+        "excerpt": "Guía completa sobre desparasitación en mascotas.",
+        "image": "/api/placeholder/400/300",
+        "date": "21 Nov 2024",
+        "likes": 35,
+        "comments": 8,
+        "author": "Dr. Fernando Quiroz",
+        "content": "Los parásitos internos son comunes en mascotas y pueden transmitirse a humanos. Es esencial mantener un programa regular de desparasitación desde las 2 semanas de edad. Consulta con tu veterinario para establecer el protocolo adecuado.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Diana",
+                "content": "¿Cada cuánto debo desparasitar a mi gato adulto?",
+                "date": "21 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dr. Fernando Quiroz",
+                        "content": "Para gatos adultos, recomendamos desparasitar cada 3-4 meses, pero puede variar según su estilo de vida y riesgos de exposición.",
+                        "date": "22 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "title": "Enriquecimiento ambiental para gatos",
+        "excerpt": "Cómo mantener a tu gato mentalmente estimulado y feliz.",
+        "image": "/api/placeholder/400/300",
+        "date": "20 Nov 2024",
+        "likes": 50,
+        "comments": 15,
+        "author": "Dra. Laura Mendoza",
+        "content": "Los gatos necesitan estimulación mental y física para mantenerse saludables. Proporciona áreas elevadas, rascadores, juguetes interactivos y tiempo de juego diario. El enriquecimiento ambiental previene problemas de comportamiento y obesidad.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Carolina",
+                "content": "Mi gato solo duerme, ¿es normal?",
+                "date": "20 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dra. Laura Mendoza",
+                        "content": "Los gatos duermen entre 12-16 horas al día, pero deberían tener períodos de actividad. Intenta establecer rutinas de juego en la mañana y tarde.",
+                        "date": "21 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "title": "Cuidados especiales para mascotas senior",
+        "excerpt": "Guía para el cuidado de perros y gatos mayores de 7 años.",
+        "image": "/api/placeholder/400/300",
+        "date": "19 Nov 2024",
+        "likes": 60,
+        "comments": 18,
+        "author": "Dr. Javier Torres",
+        "content": "Las mascotas senior requieren atención especial: chequeos más frecuentes, dieta adaptada, ejercicio moderado y monitoreo de cambios de comportamiento. La detección temprana de problemas es clave para mantener su calidad de vida.",
+        "commentsList": [
+            {
+                "id": 1,
+                "author": "Roberto",
+                "content": "¿Qué suplementos son buenos para perros mayores?",
+                "date": "19 Nov 2024",
+                "replies": [
+                    {
+                        "id": 1,
+                        "author": "Dr. Javier Torres",
+                        "content": "Los suplementos deben ser prescritos según las necesidades específicas. Comúnmente se usan condroprotectores para articulaciones, pero siempre consulta antes de dar cualquier suplemento.",
+                        "date": "20 Nov 2024"
+                    }
+                ]
+            }
+        ]
+    }
+]

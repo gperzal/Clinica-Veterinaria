@@ -10,6 +10,7 @@ import ExamsSection from './medical-fiche/ExamsSection';
 import NotesSection from './medical-fiche/NotesSection';
 import { attendAppointment, setAppointmentStatus, saveMedicalRecord, updatePetInfo  } from '../services/medicalRecordService';
 import useToastNotification from '../../../../hooks/useToastNotification';
+import { MedicalInfoProps, SelectedAppointmentProps  } from '../utils/validateProps';
 
 const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatmentHistory, onBack }) => {
   const bgColor = useColorModeValue("white", "gray.800");
@@ -21,8 +22,11 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
   const [updatedPetData, setUpdatedPetData] = useState({});
   const [medicalInfo, setMedicalInfo] = useState({});
   const [allergies, setAllergies] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [vaccinations, setVaccinations] = useState([]);
+  const [notes, setNotes] = useState(""); 
+  const [treatmentLog, setTreatmentLog] = useState({});
 
-  
 
   const handleToggleClinicalRest = () => {
     const newState = !isClinicalRest;
@@ -42,12 +46,9 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
   
   const handleSaveMedicalRecord = async () => {
     try {
-      
-
+      const formattedExams = exams.map(({ id, ...rest }) => rest); // Excluir el campo `id`
       // Guardar cambios de la mascota
       await updatePetInfo(selectedAppointment.pet._id, updatedPetData);
-
-
       // Guardar la ficha clínica con los datos ingresados
       const medicalRecordData = {
         appointmentId: selectedAppointment._id,
@@ -70,13 +71,13 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
           appetiteDigestion: medicalInfo.appetiteDigestion,
         },
         allergies: allergies, 
-        vaccinations:  [], // vaccinationsData Otra sección agrupada
-        exams: [], // examsData Otra sección agrupada
-        treatmentHistory:  [], // treatmentHistoryData Otra sección agrupada
+        vaccinations:  vaccinations, 
+        exams: formattedExams,
+        notes: notes, 
+        treatmentLog: treatmentLog ,
       };
 
       console.log("Medical Record Data:", medicalRecordData);
-      console.log("Medical Info:", medicalInfo);
       await saveMedicalRecord(selectedAppointment._id, medicalRecordData);
       showToast({ title: 'Ficha Clínica Guardada', description: 'Los datos de la ficha clínica se han guardado correctamente.', status: 'success' });
   
@@ -90,45 +91,63 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
   
       // Volver al menú principal o realizar otras acciones
       onBack();
-    } catch (error) {
+    } catch {
       showToast({ title: 'Error', description: 'Error al guardar la ficha clínica.', status: 'error' });
     }
   };
+
 
 
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       try {
         const response = await attendAppointment(selectedAppointment._id);
-        const { medicalRecord } = response;
-        console.log("Medical Record:", medicalRecord);
+        const { medicalRecord, medicalEntry } = response; 
+        console.log("Medical Entry Fetched:", medicalEntry);
   
         if (medicalRecord) {
-          // Cargar datos históricos (alergias, vacunas, exámenes)
           setAllergies(medicalRecord.allergies || []);
-  
-          // Buscar una entrada médica específica para la cita actual
-          const currentMedicalEntry = medicalRecord.medicalEntries.find(
-            (entry) => entry.appointment === selectedAppointment._id
-          );
-  
-          if (currentMedicalEntry?.medicalInfo) {
-            // Llenar los campos con los datos de la entrada médica actual
-            setMedicalInfo((prev) => ({
-              ...prev,
-              ...Object.keys(currentMedicalEntry.medicalInfo).reduce((acc, key) => {
-                acc[key] = currentMedicalEntry.medicalInfo[key] || '';
-                return acc;
-              }, {}),
-            }));
+          setExams(medicalRecord.exams || []);
+          setVaccinations(medicalRecord.vaccinations || []);
+        } else {
+          setAllergies([]);
+          setExams([]);
+          setVaccinations([]);
+        }
+        if (medicalEntry) {
+          setMedicalInfo((prev) => ({
+            ...prev,
+            ...Object.keys(medicalEntry.medicalInfo).reduce((acc, key) => {
+              acc[key] = medicalEntry.medicalInfo[key] || '';
+              return acc;
+            }, {}),
+          }));
+          setNotes(medicalEntry.notes || ''); 
+       
+          if (medicalEntry.treatmentLog) {
+            setTreatmentLog(medicalEntry.treatmentLog);
+            // Verificar si tiene tratamientos
+            setIsClinicalRest(medicalEntry.treatmentLog.treatments.length > 0);
           } else {
-            // No hay entrada médica específica para esta cita
-            setMedicalInfo({});
+            setTreatmentLog({
+              startDate: null,
+              endDate: null,
+              treatments: [],
+              contractSigned: false,
+            });
+            setIsClinicalRest(false);
           }
         } else {
-          // Si no hay registro médico, limpiar todo
+       
           setMedicalInfo({});
-          setAllergies([]);
+          setNotes('');
+          setTreatmentLog({
+            startDate: null,
+            endDate: null,
+            treatments: [],
+            contractSigned: false,
+          });
+          setIsClinicalRest(false);
         }
       } catch (error) {
         console.error('Error al obtener los detalles de la cita:', error);
@@ -138,7 +157,6 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
     fetchAppointmentDetails();
   }, [selectedAppointment]);
   
-    
   
   return (
     <Box p={6} bg={bgColor} borderRadius="lg" shadow="lg" maxWidth="100%" mx="auto">
@@ -154,12 +172,16 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
         <Divider />
         <AllergiesSection allergies={allergies} setAllergies={setAllergies} />
         <Divider />
-        <VaccinationHistorySection />
+        <VaccinationHistorySection  vaccinations={vaccinations} setVaccinations={setVaccinations} />
         <Divider />
-        <ExamsSection />
+        <ExamsSection exams={exams} setExams={setExams} />
         <Divider />
-        <NotesSection isClinicalRest={isClinicalRest} onToggleClinicalRest={handleToggleClinicalRest} /> 
-        
+        <NotesSection 
+          isClinicalRest={isClinicalRest} 
+          onToggleClinicalRest={handleToggleClinicalRest} 
+          notes={notes} 
+          setNotes={setNotes} 
+        />
         <Stack direction="row" justify="center" mt={6}>
           <Button
             leftIcon={<FaSave />}
@@ -181,5 +203,8 @@ const MedicalFiche = ({ ownerData, petData, selectedAppointment, onToggleTreatme
     </Box>
   );
 };
+
+MedicalInfoSection.propTypes = MedicalInfoProps;
+MedicalFiche.propTypes = {...SelectedAppointmentProps};
 
 export default MedicalFiche;

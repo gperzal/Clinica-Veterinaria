@@ -10,7 +10,7 @@ const PrescriptionSchema = new mongoose.Schema({
   prescription: String,
   dosage: String,
   duration: String,
-  signature: String, // Firma electrónica si aplica
+  signature: String, 
 }, {
   timestamps: true,
 });

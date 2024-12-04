@@ -17,6 +17,7 @@ import MedicalControls from '../components/MedicalControls';
 import { attendAppointment } from '../services/medicalRecordService';
 import useToastNotification from '../../../../hooks/useToastNotification';
 import { getAppointmentsBySpecialist } from '../services/appointmentService';
+import { getTreatmentLogByAppointment } from "../services/medicalRecordService"; 
 
 
 const AppointmentsPage = () => {
@@ -27,6 +28,7 @@ const AppointmentsPage = () => {
   const [showTreatmentHistory, setShowTreatmentHistory] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
+  const [treatmentLogId, setTreatmentLogId] = useState(null); 
 
   const toast = useToastNotification();
   const bgColor = useColorModeValue("gray.50", "gray.900");
@@ -39,39 +41,62 @@ const AppointmentsPage = () => {
       const inProcess = appointments.find((appt) => appt.status === "En Proceso");
       console.log("Cita :", appointments);
       if (inProcess) {
-       
         if (inProcess._id !== appointmentId) {
           toast({
             title: "Cita en proceso",
             description: `Ya hay una ficha abierta para ${inProcess.pet.name} a las ${inProcess.time}.`,
             status: "warning",
-            duration: 5000,
-            isClosable: true,
           });
-          return false; 
+          return false;
         }
       }
       return true;
     };
-    
+  
     try {
-
-      const appointments = await getAppointmentsBySpecialist(); 
+      // Validar que no hay otra cita "En Proceso"
+      const appointments = await getAppointmentsBySpecialist();
       const canProceed = validateStatus(appointments);
-
-      if (!canProceed) return; // Detener el proceso si no es válido
-
+      if (!canProceed) return;
+  
+      // Obtener los detalles de la cita
       const data = await attendAppointment(appointmentId);
       const { appointment } = data;
- 
+  
+      // Actualizar los estados relacionados con el paciente, dueño, etc.
       setSelectedPatient({ ownerId: appointment.pet.owner._id, petId: appointment.pet._id });
       setOwnerData(appointment.pet.owner);
       setPetData(appointment.pet);
       setSelectedAppointment(appointment);
-      setTabIndex(1); 
-      setAppointmentsRefreshKey(prevKey => prevKey + 1);
+  
+      // Obtener el treatmentLogId asociado a esta cita
+      try {
+        const treatmentLogData = await getTreatmentLogByAppointment(appointmentId);
+    
+        if (treatmentLogData && treatmentLogData._id) {
+          setTreatmentLogId(treatmentLogData._id); // Guardar el treatmentLogId
+        } else {
+          setTreatmentLogId(null);
+        }
+      } catch (error) {
+        console.error("Error al obtener el TreatmentLog:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo obtener el historial de tratamientos.",
+          status: "error",
+        });
+      }
+  
+      // Cambiar al tab de Ficha Médica
+      setTabIndex(1);
+      setAppointmentsRefreshKey((prevKey) => prevKey + 1);
     } catch (error) {
-      console.error('Error al atender la cita:', error);
+      console.error("Error al atender la cita:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo atender la cita. Inténtalo de nuevo.",
+        status: "error",
+      });
     }
   };
 
@@ -142,6 +167,7 @@ const AppointmentsPage = () => {
               ownerData={ownerData}
               petData={petData}
               selectedAppointment={selectedAppointment}
+              treatmentLogId={treatmentLogId} // Pasar treatmentLogId
               onToggleTreatmentHistory={setShowTreatmentHistory}
               onBack={() => setTabIndex(0)}
             />
@@ -150,7 +176,13 @@ const AppointmentsPage = () => {
             )}
           </TabPanel>
           <TabPanel>
-            {showTreatmentHistory ? <TreatmentHistory selectedPatient={selectedPatient} /> : null}
+            {showTreatmentHistory ? (
+              <TreatmentHistory
+                petData={petData}
+                medicalEntryId={selectedAppointment?._id}
+                treatmentLogId={treatmentLogId} // Pasar treatmentLogId
+              />
+            ) : null}
           </TabPanel>
           <TabPanel>
             {isPatientSelected ? <Recipes /> : <Text>Seleccione un paciente para ver el Recetario.</Text>}

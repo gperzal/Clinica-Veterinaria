@@ -27,6 +27,9 @@ import {
 } from 'react-icons/fa';
 import { SiComicfury } from "react-icons/si";
 import { MdOutlinePets } from "react-icons/md";
+import {MedicalInfoProps} from '../../utils/validateProps';
+
+
 const MedicalInfoSection = ({ medicalInfo, setMedicalInfo }) => {
   const labelColor = useColorModeValue('teal.600', 'teal.300'); // Define el color dinámico para el label
 
@@ -302,8 +305,8 @@ const MedicalInfoSection = ({ medicalInfo, setMedicalInfo }) => {
           <Input
             placeholder="Cambios en apetito o digestión"
             type="text"
-            value={medicalInfo.digestion || ''}
-            onChange={(e) => handleChange('digestion', e.target.value)}
+            value={medicalInfo.appetiteDigestion || ''}
+            onChange={(e) => handleChange('appetiteDigestion', e.target.value)}
           />
             </InputGroup>
         </FormControl>
@@ -311,5 +314,7 @@ const MedicalInfoSection = ({ medicalInfo, setMedicalInfo }) => {
     </Box>
   );
 };
+
+MedicalInfoSection.propTypes = MedicalInfoProps;
 
 export default MedicalInfoSection;

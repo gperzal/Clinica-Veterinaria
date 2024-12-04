@@ -1,8 +1,10 @@
 // controllers/dashboard/medicalRecordController.js
 
 import MedicalRecord from '../../models/medical/MedicalRecord.js';
+import TreatmentLog from '../../models/medical/TreatmentLog.js';
 import Pet from '../../models/Pet.js';
 import Appointment from '../../models/Appointment.js';
+
 
 // Iniciar la atención de una cita médica y preparar el registro médico
 export const attendAppointment = async (req, res) => {
@@ -47,15 +49,61 @@ export const attendAppointment = async (req, res) => {
     }
 
     // Buscar la entrada médica de esta cita
-    const medicalEntry = medicalRecord.medicalEntries.find(
+    let medicalEntry = medicalRecord.medicalEntries.find(
       (entry) => entry.appointment.toString() === appointmentId
     );
 
+    if (!medicalEntry) {
+      // Crear nueva entrada médica si no existe
+      medicalEntry = {
+        appointment: appointmentId,
+        veterinarian: veterinarianId,
+        medicalInfo: {},
+        notes: '',
+        prescriptions: [],
+        documents: [],
+      };
+
+      medicalRecord.medicalEntries.push(medicalEntry);
+      await medicalRecord.save();
+    }
+
+    // Verificar si ya existe un TreatmentLog asociado a esta entrada médica
+    let treatmentLog = await TreatmentLog.findOne({ medicalEntry: medicalEntry._id });
+
+    if (!treatmentLog) {
+      // Crear un nuevo registro de tratamiento vacío
+      treatmentLog = new TreatmentLog({
+        medicalEntry: medicalEntry._id,
+        startDate: null,
+        endDate: null,
+        treatments: [], // Inicialmente vacío
+        contractSigned: false,
+      });
+      await treatmentLog.save();
+
+      // Asociar el `treatmentLog` al `MedicalEntry`
+      medicalEntry.treatmentLog = treatmentLog._id;
+      await medicalRecord.save();
+    }
+
+    // Responder con datos estructurados
     res.status(200).json({
       message: 'Cita en proceso.',
-      appointment,
-      medicalRecord,
-      medicalEntry: medicalEntry || null, // Retorna la entrada médica si existe, o null si no hay.
+      appointment, // Información de la cita
+      medicalEntry: {
+        ...medicalEntry.toObject(),
+        treatmentLog, // Asociar directamente el registro de tratamiento en lugar de repetirlo
+      },
+      medicalRecord: {
+        allergies: medicalRecord.allergies,
+        vaccinations: medicalRecord.vaccinations,
+        exams: medicalRecord.exams,
+        medicalEntries: medicalRecord.medicalEntries.map((entry) => ({
+          ...entry.toObject(),
+          treatmentLog: entry._id.toString() === medicalEntry._id.toString() ? treatmentLog : undefined,
+        })),
+      },
     });
   } catch (error) {
     console.error('Error al iniciar la atención de la cita:', error);
@@ -64,7 +112,10 @@ export const attendAppointment = async (req, res) => {
 };
 
 
-// Guardar la ficha médica y completar la cita
+
+
+
+// Guardar la ficha médica y completar la citala cita
 export const saveMedicalRecord = async (req, res) => {
   try {
     const { appointmentId } = req.params;
@@ -74,7 +125,7 @@ export const saveMedicalRecord = async (req, res) => {
       allergies,
       vaccinations,
       exams,
-      treatmentHistory,
+      notes, // Notas de la cita
     } = req.body;
 
     const veterinarianId = req.userId;
@@ -87,7 +138,7 @@ export const saveMedicalRecord = async (req, res) => {
       allergies,
       vaccinations,
       exams,
-      treatmentHistory,
+      notes,
     });
 
     // Obtener la cita
@@ -126,6 +177,7 @@ export const saveMedicalRecord = async (req, res) => {
     if (existingEntry) {
       // Actualizar la entrada médica existente
       existingEntry.medicalInfo = medicalEntry;
+      existingEntry.notes = notes; // Asignar la nota a la entrada médica
       existingEntry.updatedAt = new Date();
     } else {
       // Crear una nueva entrada médica
@@ -134,14 +186,19 @@ export const saveMedicalRecord = async (req, res) => {
         appointment: appointment._id,
         veterinarian: veterinarianId,
         medicalInfo: medicalEntry,
+        notes: notes,
       };
       medicalRecord.medicalEntries.push(newMedicalEntry);
     }
 
-    // Actualizar las alergias, vacunas, exámenes y tratamientos si se proporcionan
+    // Actualizar otros campos si se proporcionan
     if (allergies) medicalRecord.allergies = allergies;
     if (vaccinations) medicalRecord.vaccinations = vaccinations;
-    if (exams) medicalRecord.exams = exams;
+    if (exams) medicalRecord.exams = exams.map((exam) => ({
+      type: String(exam.type),
+      date: new Date(exam.date),
+      result: String(exam.result),
+    }));
     if (treatmentHistory) medicalRecord.treatmentHistory = treatmentHistory;
 
     // Guardar el registro médico
@@ -157,9 +214,124 @@ export const saveMedicalRecord = async (req, res) => {
   }
 };
 
+// Actualizar un sector de tratamiento
+export const updateTreatmentLog = async (req, res) => {
+  try {
+    const { treatmentId } = req.params;
+    const { startDate, endDate, contractSigned } = req.body;
+
+    const treatmentLog = await TreatmentLog.findByIdAndUpdate(
+      treatmentId,
+      { startDate, endDate, contractSigned },
+      { new: true }
+    );
+
+    if (!treatmentLog) {
+      return res.status(404).json({ message: "TreatmentLog no encontrado." });
+    }
+
+    res.status(200).json({ message: "TreatmentLog actualizado.", treatmentLog });
+  } catch (error) {
+    console.error("Error al actualizar TreatmentLog:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+
+// Actualizar tratamientos de una entrada de tratamiento
+export const updateTreatments = async (req, res) => {
+  try {
+    const { treatmentId } = req.params;
+    const { treatments } = req.body;
+    console.log("Datos recibidos1:", req.params);
+    console.log("Datos recibidos2:", {
+      treatmentId,
+      treatments,
+    });
+
+    const treatmentLog = await TreatmentLog.findByIdAndUpdate(
+      treatmentId,
+      { treatments },
+      { new: true }
+    );
+
+    if (!treatmentLog) {
+      return res.status(404).json({ message: "TreatmentLog no encontrado." });
+    }
+
+    res.status(200).json({ message: "Tratamientos actualizados.", treatmentLog });
+  } catch (error) {
+    console.error("Error al actualizar tratamientos:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
 
 
+// oBTENER LA ID DE TRATAMIENTO 
+export const getTreatmentLogByAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
 
+  try {
+    // Buscar el registro médico (MedicalRecord) asociado a la cita
+    const medicalRecord = await MedicalRecord.findOne({ "medicalEntries.appointment": appointmentId });
+
+    if (!medicalRecord) {
+      return res.status(404).json({ message: "No se encontró un registro médico para esta cita." });
+    }
+
+    // Buscar la entrada médica correspondiente a la cita
+    const medicalEntry = medicalRecord.medicalEntries.find(
+      (entry) => entry.appointment.toString() === appointmentId
+    );
+
+    if (!medicalEntry) {
+      return res.status(404).json({ message: "No se encontró la entrada médica para esta cita." });
+    }
+
+    // Buscar el TreatmentLog asociado a la entrada médica
+    const treatmentLog = await TreatmentLog.findOne({ _id: medicalEntry.treatmentLog });
+
+    if (!treatmentLog) {
+      return res.status(404).json({ message: "No se encontró un registro de tratamiento para esta cita." });
+    }
+
+    // Devolver el tratamiento encontrado
+    res.status(200).json(treatmentLog);
+  } catch (error) {
+    console.error("Error al buscar el registro de tratamiento:", error);
+    res.status(500).json({ message: "Error al buscar el registro de tratamiento.", error: error.message });
+  }
+};
+
+
+export const getTreatmentLog = async (req, res) => {
+  const { treatmentId } = req.params; // Obtener el ID de los parámetros de la solicitud
+  console.log("ID recibido:", treatmentId);
+  // Validación inicial para asegurar que el ID no esté vacío o sea inválido
+  if (!treatmentId) {
+    return res.status(400).json({ message: "El ID del registro de tratamiento es obligatorio." });
+  }
+
+  console.log("ID del tratamiento recibido:", treatmentId);
+
+  try {
+    // Buscar el registro de tratamiento por su ID
+    const treatmentLog = await TreatmentLog.findById(treatmentId)
+
+    // Verificar si el registro de tratamiento existe
+    if (!treatmentLog) {
+      console.warn(`Registro de tratamiento con ID ${treatmentId} no encontrado.`);
+      return res.status(404).json({ message: "Registro de tratamiento no encontrado." });
+    }
+
+    // Devolver el registro de tratamiento en la respuesta
+    return res.status(200).json(treatmentLog);
+
+  } catch (error) {
+    // Capturar errores en la búsqueda o conexión a la base de datos
+    console.error(`Error al obtener el registro de tratamiento con ID ${treatmentId}:`, error);
+    return res.status(500).json({ message: "Error interno al obtener el registro de tratamiento." });
+  }
+};
 
 // Actualizar una entrada médica específica
 export const updateMedicalEntry = async (req, res) => {

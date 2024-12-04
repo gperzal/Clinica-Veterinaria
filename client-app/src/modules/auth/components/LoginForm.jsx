@@ -9,11 +9,10 @@ import {
   Input,
   Stack,
   Divider,
-  Center
+  Center, Tooltip
 } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc'
-import { FaFacebook } from 'react-icons/fa'
-import { SiLinkedin, SiMessenger } from 'react-icons/si'
+
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../auth/context/AuthContext';
@@ -100,28 +99,15 @@ export default function LoginForm() {
           <Text textAlign={'center'} color={'gray.500'}>
             o inicia sesión con
           </Text>
-          <Stack >
-                <Button w={'full'} variant={'outline'} leftIcon={<FcGoogle />}>
-              <Center>
-                <Text>Iniciar sesión con Google</Text>
-              </Center>
-            </Button>
-            <Button w={'full'} colorScheme={'facebook'} leftIcon={<FaFacebook />} >
-              <Center>
-                <Text>Iniciar sesión con Facebook</Text>
-              </Center>
-            </Button>
-            <Button w={'full'} colorScheme={'messenger'} leftIcon={<SiLinkedin />}>
-              <Center>
-                <Text>Iniciar sesión con LinkedIn</Text>
-              </Center>
-            </Button>
-            <Button w={'full'} colorScheme={'messenger'} leftIcon={<SiMessenger />}>
-              <Center>
-                <Text>Iniciar sesión con Messenger</Text>
-              </Center>
-            </Button>
-          </Stack>
+          <Stack spacing={4} align="center" justify="center" >
+            <Tooltip label="Este servicio está temporalmente fuera de servicio" aria-label="A tooltip">
+              <Button w={'full'} variant={'outline'} leftIcon={<FcGoogle />}>
+                <Center>
+                  <Text>Iniciar sesión con Google</Text>
+                </Center>
+              </Button>
+            </Tooltip>
+        </Stack>
         </Stack>
       </Flex>
     </Stack>

@@ -1,25 +1,26 @@
-// models/medical/TreatmentLog.js
-
 import mongoose from 'mongoose';
 
+// Subesquema para las entradas individuales de tratamientos
 const TreatmentEntrySchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
-  treatment: String,
-  notes: String,
+  treatment: { type: String, required: true },
+  notes: { type: String, default: "" },
   confirmed: { type: Boolean, default: false },
 });
 
+// Esquema principal para el historial de tratamientos
 const TreatmentLogSchema = new mongoose.Schema({
-  pet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet', required: true },
-  medicalEntry: { type: mongoose.Schema.Types.ObjectId, ref: 'MedicalEntry', required: true },
-  startDate: Date,
-  endDate: Date,
-  extendedDays: { type: Boolean, default: false },
+  medicalEntry: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MedicalEntry',
+    required: true,
+  },
+  startDate: { type: Date},
+  endDate: { type: Date },
   treatments: [TreatmentEntrySchema],
   contractSigned: { type: Boolean, default: false },
-  contractDocument: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' }, // Referencia al contrato firmado
 }, {
-  timestamps: true,
+  timestamps: true, // Agrega campos createdAt y updatedAt
 });
 
 export default mongoose.model('TreatmentLog', TreatmentLogSchema);

@@ -1,0 +1,42 @@
+{
+    "horarios": {
+      "lunes_viernes": "9:00 - 18:00",
+      "sabado": "10:00 - 14:00",
+      "domingo": "Cerrado"
+    },
+    "servicios": [
+      {
+        "id": 1,
+        "nombre": "Consulta General",
+        "duracion": "30 minutos",
+        "precio": 5000,
+        "descripcion": "Revisión general de salud"
+      },
+      {
+        "id": 2,
+        "nombre": "Vacunación",
+        "duracion": "15 minutos",
+        "precio": 3500,
+        "descripcion": "Aplicación de vacunas programadas"
+      },
+      {
+        "id": 3,
+        "nombre": "Control Dental",
+        "duracion": "45 minutos",
+        "precio": 7500,
+        "descripcion": "Limpieza dental completa"
+      }
+    ],
+    "veterinarios": [
+      {
+        "id": 1,
+        "nombre": "Dr. Sarah Johnson",
+        "especialidad": "Medicina General"
+      },
+      {
+        "id": 2,
+        "nombre": "Dr. Michael Chen",
+        "especialidad": "Cirugía"
+      }
+    ]
+  }
