@@ -1,5 +1,4 @@
-// client-app/src/layout/Navbar.jsx
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -22,6 +21,7 @@ import {
   Icon,
   Tooltip,
   Badge,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
@@ -30,29 +30,54 @@ import {
   SunIcon,
   QuestionIcon,
 } from '@chakra-ui/icons';
+import {
+  FaHome,
+  FaCalendarAlt,
+  FaShoppingCart,
+  FaBlog,
+  FaEnvelope,
+  FaSignInAlt,
+  FaUserPlus,
+} from 'react-icons/fa';
+import { PiShoppingCart,PiShoppingCartFill  } from "react-icons/pi";
 import { FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
-import { PiShoppingCart, PiShoppingCartFill } from 'react-icons/pi';
 import { RiCustomerService2Fill } from 'react-icons/ri';
 import { AuthContext } from '../modules/auth/context/AuthContext';
 import clinicLogo from '../assets/img/clinic-logo.png';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../modules/catalog/context/CartContext'; // Importa useCart
+import { useCart } from '../modules/catalog/context/CartContext';
 
 export default function Navbar() {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle, onClose } = useDisclosure(); 
   const { user, logout } = useContext(AuthContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const navigate = useNavigate();
+  const menuRef = useRef(null); 
 
-  const { getCartCount } = useCart(); // Obtén getCartCount del contexto del carrito
-  const cartCount = getCartCount(); // Obtén el conteo actual de productos en el carrito
+  const { getCartCount } = useCart();
+  const cartCount = getCartCount();
 
-  // Determina el icono a usar según si el carrito está vacío o no
   const CartIcon = cartCount > 0 ? PiShoppingCartFill : PiShoppingCart;
 
-  // Aplica un tope de 99 al contador y muestra '∞' si es 100 o más
   const displayCartCount =
     cartCount >= 100 ? '∞' : cartCount > 0 ? (cartCount > 99 ? '99+' : cartCount) : null;
+
+  const linkHoverBg = useColorModeValue('red.100', 'gray.700');
+  const linkHoverColor = useColorModeValue('red.500', 'red.300');
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
 
   return (
     <Box>
@@ -79,102 +104,91 @@ export default function Navbar() {
             aria-label={'Toggle Navigation'}
           />
         </Flex>
+      
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Link href="/" _hover={{ textDecoration: 'none' }}>
             <Image src={clinicLogo} alt="Clinica de Mascotas Logo" height="30px" />
           </Link>
+       
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav />
+            <DesktopNav linkHoverBg={linkHoverBg} linkHoverColor={linkHoverColor} />
           </Flex>
         </Flex>
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={'flex-end'}
-          direction={'row'}
-          spacing={3}
-        >
-          {/* Carrito de Compras */}
-          <Box position="relative">
-            <Tooltip label="Ver carrito de compras" aria-label="Carrito">
-              <IconButton
-                icon={<CartIcon />}
-                variant="ghost"
-                aria-label="Carrito"
-                onClick={() => navigate('/catalog/shopping-cart')}
-                display={{ base: 'inline-flex', md: 'inline-flex' }}
-                borderColor={useColorModeValue('gray.200', 'gray.700')}
-                borderRadius="full"
-                padding="8px"
-                bg={useColorModeValue('gray.100', 'gray.800')}
-                _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
-              />
-            </Tooltip>
-            {/* Badge de contador de productos */}
-            {displayCartCount && (
-              <Badge
-                colorScheme="red"
-                borderRadius="full"
-                position="absolute"
-                top="-1"
-                right="-1"
-                px={1}
-                py={0.5}
-                fontSize="0.7em"
-              >
-                {displayCartCount}
-              </Badge>
-            )}
-          </Box>
+   
+        <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} >
+          
+            <Box position="relative">
+              <Tooltip label="Ver carrito de compras">
+                <IconButton
+                  icon={<CartIcon />}
+                  variant="ghost"
+                  aria-label="Carrito"
+                  onClick={() => navigate('/catalog/shopping-cart')}
+                  borderRadius="full"
+                  bg={useColorModeValue('gray.100', 'gray.800')}
+                  _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+                />
+              </Tooltip>
+              {displayCartCount && (
+                <Badge
+                  colorScheme="red"
+                  borderRadius="full"
+                  position="absolute"
+                  top="-1.5"
+                  right="-1.5" 
+                  px={1}
+                  py={0.5}
+                  fontSize="0.7em"
+                  zIndex={1} 
+                >
+                  {displayCartCount}
+                </Badge>
+              )}
+       
+            </Box>
+  
+          <Tooltip label="Modo Claro/Oscuro">
+            <IconButton
+              onClick={toggleColorMode}
+              icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+              variant="ghost"
+              aria-label="Toggle Color Mode"
+              borderRadius="full"
+              bg={useColorModeValue('gray.100', 'gray.800')}
+              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+            />
+          </Tooltip>
+    
+          <Box display={useBreakpointValue({ base: 'none', md: 'flex' })}>
 
-          {/* Otros Iconos y Botones */}
-          <Tooltip label="Danos tu opinión o reporta un problema">
+          <Tooltip label="Soporte Técnico" display={{ base: 'none', md: 'inline-flex' }}>
             <IconButton
               icon={<RiCustomerService2Fill />}
               variant="ghost"
-              aria-label="Feedback"
-              onClick={() => {
-                navigate('/feedback');
-              }}
-              display={{ base: 'none', md: 'inline-block' }}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
+              aria-label="Soporte Técnico"
+              onClick={() => navigate('/feedback')}
               borderRadius="full"
-              padding="12px"
               bg={useColorModeValue('gray.100', 'gray.800')}
-              _hover={{
-                bg: useColorModeValue('gray.200', 'gray.700'),
-              }}
+              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+           
             />
           </Tooltip>
 
-          <Tooltip label="Preguntas Frecuentes" aria-label="FAQ">
+          <Tooltip label="Preguntas Frecuentes (FAQ)" display={{ base: 'none', md: 'inline-flex' }}>
             <IconButton
               icon={<QuestionIcon />}
               variant="ghost"
-              aria-label="Mesa de Ayuda"
+              aria-label="FAQ"
               onClick={() => navigate('/faq')}
-              display={{ base: 'none', md: 'inline-block' }}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
               borderRadius="full"
-              pb="3px"
               bg={useColorModeValue('gray.100', 'gray.800')}
-              _hover={{
-                bg: useColorModeValue('gray.200', 'gray.700'),
-              }}
+              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              mx={2}
             />
           </Tooltip>
 
-          <Button
-            onClick={toggleColorMode}
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            borderRadius="full"
-            padding="6px"
-            bg={useColorModeValue('gray.100', 'gray.800')}
-            _hover={{
-              bg: useColorModeValue('gray.200', 'gray.700'),
-            }}
-          >
-            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          </Button>
+          </Box>
+
           {user ? (
             <Menu>
               <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
@@ -211,109 +225,116 @@ export default function Navbar() {
           ) : (
             <>
               <Button
+                display={{ base: 'none', md: 'inline-flex' }}
                 as={Link}
                 fontSize={'sm'}
-                display={{ base: 'none', md: 'inline-flex' }}
                 fontWeight={600}
-                color={'neutral.600'}
-                borderRadius={'full'}
-                _hover={{ bg: 'blue.900', color: 'white' }}
+                color={useColorModeValue('gray.700', 'white')}
+                variant="outline"
                 href={'/login'}
               >
+                <Icon as={FaSignInAlt} mr={2} />
                 Iniciar Sesión
               </Button>
               <Button
+                display={{ base: 'none', md: 'inline-flex' }}
                 as={Link}
                 fontSize={'sm'}
-                display={{ base: 'none', md: 'inline-flex' }}
                 fontWeight={600}
                 color={'white'}
-                bg={'pink.200'}
-                borderRadius={'full'}
-                _hover={{ bg: 'pink.700', color: 'white' }}
+                bg={'pink.500'}
+                _hover={{ bg: 'pink.700' }}
                 href={'/register'}
               >
+                <Icon as={FaUserPlus} mr={2} />
                 Registrarse
               </Button>
             </>
           )}
         </Stack>
       </Flex>
-
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav user={user} logout={logout} />
+      <Box ref={menuRef} bg={useColorModeValue('white', 'gray.800')} p={4}>
+        <MobileNav
+          user={user}
+          linkHoverBg={linkHoverBg}
+          linkHoverColor={linkHoverColor}
+        />
+      </Box>
       </Collapse>
     </Box>
   );
 }
 
-const DesktopNav = () => {
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+const DesktopNav = ({ linkHoverBg, linkHoverColor }) => (
+  <Stack direction={'row'} spacing={4}>
+    {NAV_ITEMS.map((navItem) => (
+      <Link
+        key={navItem.label}
+        p={2}
+        href={navItem.href ?? '#'}
+        fontSize={'sm'}
+        fontWeight={500}
+        rounded={'md'}
+        _hover={{ bg: linkHoverBg, color: linkHoverColor }}
+        display="flex"
+        alignItems="center"
+      >
+        <Icon as={navItem.icon} mr={2} />
+        {navItem.label}
+      </Link>
+    ))}
+  </Stack>
+);
 
-  return (
-    <Stack direction={'row'} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Link
-            p={2}
-            href={navItem.href ?? '#'}
-            fontSize={'sm'}
-            fontWeight={500}
-            color={linkColor}
-            _hover={{
-              textDecoration: 'none',
-              color: linkHoverColor,
-            }}
-          >
-            {navItem.label}
-          </Link>
-        </Box>
-      ))}
-    </Stack>
-  );
-};
-
-const MobileNav = ({ user, logout }) => {
-  return (
-    <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-      {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
-      ))}
+const MobileNav = ({ user, linkHoverBg, linkHoverColor }) => (
+  <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
+    {NAV_ITEMS.map((navItem) => (
+      <Link
+        key={navItem.label}
+        py={2}
+        href={navItem.href}
+        fontSize={'md'}
+        fontWeight={500}
+        rounded={'md'}
+        display="flex"
+        alignItems="center"
+        _hover={{
+          textDecoration: 'none',
+          bg: linkHoverBg,
+          color: linkHoverColor,
+        }}
+      >
+        <Icon as={navItem.icon} mr={2} />
+        {navItem.label}
+      </Link>
+    ))}
+    <Stack mt={4}>
       {!user && (
         <>
-          <Button as={Link} href={'/login'} w="full" mt={4} colorScheme="teal">
+          <Button as={Link} href={'/login'} w="full" colorScheme="teal" leftIcon={<FaSignInAlt />}>
             Iniciar Sesión
           </Button>
-          <Button as={Link} href={'/register'} w="full" mt={4} colorScheme="teal" variant="outline">
+          <Button
+            as={Link}
+            href={'/register'}
+            w="full"
+            colorScheme="teal"
+            variant="outline"
+            leftIcon={<FaUserPlus />}
+          >
             Registrarse
           </Button>
         </>
       )}
     </Stack>
-  );
-};
-
-const MobileNavItem = ({ label, href }) => {
-  return (
-    <Link
-      py={2}
-      href={href}
-      display={'block'}
-      _hover={{ textDecoration: 'none' }}
-      fontWeight={600}
-      color={useColorModeValue('gray.600', 'gray.200')}
-    >
-      {label}
-    </Link>
-  );
-};
+  </Stack>
+);
 
 const NAV_ITEMS = [
-  { label: 'Home', href: '/' },
-  { label: 'Agendar', href: '/appointments' },
-  { label: 'Catálogo', href: '/catalog' },
-  { label: 'Blogs', href: '/blog' },
-  { label: 'Contacto', href: '/contact' },
+  { label: 'Home', href: '/', icon: FaHome },
+  { label: 'Agendar', href: '/appointments', icon: FaCalendarAlt },
+  { label: 'Catálogo', href: '/catalog', icon: FaShoppingCart },
+  { label: 'Blogs', href: '/blog', icon: FaBlog },
+  { label: 'Contacto', href: '/contact', icon: FaEnvelope },
 ];
