@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Box,
   Container,
@@ -10,10 +10,13 @@ import {
   Button,
   SimpleGrid,
   Icon,
-  useColorModeValue
+  useColorModeValue, 
+  useBreakpointValue
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaDog, FaSyringe, FaShoppingCart, FaBlog, FaRobot, FaQuoteLeft } from 'react-icons/fa';
+import { FaDog, FaSyringe, FaShoppingCart, FaBlog, FaRobot, FaQuoteLeft,
+  FaExclamationTriangle, FaPaw, FaAppleAlt, FaHeartbeat, FaArrowUp 
+ } from 'react-icons/fa';
 import { FaScissors } from "react-icons/fa6";
 import { Heart, Wallet, Laptop } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -22,41 +25,60 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 
+
 const MotionBox = motion(Box);
 
 export default function HomePage() {
+  const overflowXValue = useBreakpointValue({ base: 'hidden', md: 'visible' });
+
+  const heroRef = useRef(null);
+
+  const scrollToTop = () => {
+    heroRef.current.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <Container maxW={'7xl'} py={10}>
-      {/* Hero Section */}
-      <HeroSection />
-      {/* Servicios */}
+    <Container maxW={'6xl'} px={{ base: 4, md: 8 }} overflowX={overflowXValue}>
+      <HeroSection ref={heroRef} />
       <ServicesSection />
-      {/* Beneficios */}
       <BenefitsSection />
-      {/* Testimonios */}
       <TestimonialsSection />
-      {/* Blogs */}
       <BlogSection />
-      {/* Chatbot */}
       <ChatbotSection />
+      
+
+      <Box textAlign="center" mt={12} position="relative">
+        <Button
+          onClick={scrollToTop}
+          colorScheme="red"
+          variant="solid"
+          rounded="full"
+          p={4}
+          size="lg"
+          shadow="md"
+          _hover={{ bg: 'blue.500' }}
+        >
+          <Icon as={FaArrowUp} w={6} h={6} />
+        </Button>
+      </Box>
     </Container>
   );
 }
 
+const HeroSection = React.forwardRef((props, ref) => {
+  const darkModeImage =
+    'https://img.freepik.com/fotos-premium/medicina-cuidado-salud-tiro-medio-veterinario-mano-clinica-veterinaria_255667-24890.jpg';
+  const lightModeImage =
+    'https://img.freepik.com/foto-gratis/perro-control-veterinario-tiro-medio_23-2149143871.jpg';
 
-function HeroSection() {
-  // URLs de las imágenes para cada modo
-  const darkModeImage = 'https://img.freepik.com/fotos-premium/medicina-cuidado-salud-tiro-medio-veterinario-mano-clinica-veterinaria_255667-24890.jpg';
-  const lightModeImage = 'https://img.freepik.com/foto-gratis/perro-control-veterinario-tiro-medio_23-2149143871.jpg';
-  
   return (
     <Stack
       direction={{ base: 'column', md: 'row' }}
       spacing={10}
       align={'center'}
       py={10}
+      ref={ref} // Asigna la referencia
     >
-      {/* Texto del Hero */}
       <Stack flex={1} spacing={8}>
         <Heading lineHeight={1.1} fontWeight={600}>
           <Text
@@ -96,15 +118,7 @@ function HeroSection() {
           </Link>
         </Stack>
       </Stack>
-
-      {/* Imagen y Blob */}
-      <Flex
-        flex={1}
-        justify={'center'}
-        align={'center'}
-        position={'relative'}
-        w={'full'}
-      >
+      <Flex flex={1} justify={'center'} align={'center'} position={'relative'} w={'full'}>
         <Blob
           w={'150%'}
           h={'150%'}
@@ -134,9 +148,11 @@ function HeroSection() {
       </Flex>
     </Stack>
   );
-}
+});
 
-// Componente Blob permanece igual
+HeroSection.displayName = 'HeroSection';
+
+
 const Blob = (props) => {
   return (
     <Icon
@@ -168,7 +184,7 @@ function ServicesSection() {
   ];
 
   return (
-    <Box py={10}>
+    <Box py={10} mt={12}>
       <Heading textAlign="center" mb={6}>
         Nuestros Servicios
       </Heading>
@@ -198,7 +214,7 @@ function ServicesSection() {
 
 function BenefitsSection() {
   return (
-    <Box py={10} bg={useColorModeValue('gray.50', 'gray.800')} rounded="lg">
+    <Box py={10} mt={12} bg={useColorModeValue('gray.50', 'gray.800')} rounded="lg">
       <Heading
         textAlign="center"
         mb={6}
@@ -336,7 +352,7 @@ function TestimonialsSection() {
   };
 
   return (
-    <Box py={10}>
+    <Box py={10} mt={12}>
       <Heading textAlign="center" mb={6}>
         Opiniones de Nuestros Clientes
       </Heading>
@@ -369,6 +385,7 @@ function TestimonialCard({ name, feedback }) {
       rounded="lg"
       shadow="md"
       mx={3}
+      
       textAlign="center"
       position="relative"
       borderWidth={1}
@@ -421,52 +438,60 @@ function TestimonialCard({ name, feedback }) {
 
 
 function BlogSection() {
-  const blogPosts = [
+  const categories = [
     {
-      title: 'Cómo cuidar a tu perro durante el verano',
-      description: 'Descubre tips esenciales para mantener a tu perro fresco e hidratado.',
-      image:
-        'https://img.freepik.com/foto-gratis/perro-piscina-feliz_23-2148880985.jpg?size=626&ext=jpg',
-      link: '/blog/verano-perros',
+      title: 'Cuidado de Mascotas',
+      description: 'Guías prácticas para el cuidado y bienestar de tus mascotas.',
+      icon: FaPaw,
+      color: 'teal.400',
     },
     {
-      title: 'Vacunas esenciales para gatos',
-      description: 'Asegúrate de proteger a tu gato con esta guía completa de vacunación.',
-      image:
-        'https://veterinariaelabrazo.cl/cdn/shop/files/Diseno_sin_titulo_3.jpg?v=1630951535&width=1200',
-      link: '/blog/vacunas-gatos',
+      title: 'Nutrición',
+      description: 'Descubre cómo proporcionar una dieta balanceada y saludable.',
+      icon: FaAppleAlt,
+      color: 'orange.400'
+    },
+    {
+      title: 'Prevención y Salud',
+      description: 'Información sobre vacunas, controles y prevención de enfermedades.',
+      icon: FaHeartbeat,
+      color: 'red.400'
+    },
+    {
+      title: 'Advertencias y Peligros',
+      description: 'Aprende a proteger a tus mascotas de los peligros comunes.',
+      icon: FaExclamationTriangle,
+      color: 'yellow.400'
     },
   ];
 
   return (
-    <Box py={10}>
-      <Heading textAlign="center" mb={6}>
-        Blog Educativo
+    <Box py={10} mt={12} bg={useColorModeValue('gray.100', 'gray.800')} rounded="lg">
+      <Heading textAlign="center" mb={6} fontSize={{ base: '2xl', md: '4xl' }}>
+       Blog Educativo
       </Heading>
-      <Text textAlign="center" color="gray.500" mb={6}>
-        Aprende más sobre el cuidado y bienestar de tus mascotas con nuestros artículos.
+      <Text textAlign="center" color="gray.500" mb={10}>
+        Encuentra material con información valiosa para cuidar y proteger a tus mascotas.
       </Text>
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-        {blogPosts.map((post, index) => (
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
+        {categories.map((category, index) => (
           <Box
             key={index}
-            bg={useColorModeValue('white', 'gray.800')}
-            shadow="md"
+            p={6}
+            bg={useColorModeValue('white', 'gray.7000')}
             rounded="lg"
-            overflow="hidden"
+            shadow="md"
+            textAlign="center"
+            transition="transform 0.2s"
+            _hover={{ transform: 'scale(1.05)' }}
           >
-            <Image src={post.image} alt={post.title} w="100%" h="200px" objectFit="cover" />
-            <Box p={4}>
-              <Heading size="md" mb={2}>
-                {post.title}
-              </Heading>
-              <Text color="gray.500" mb={4}>
-                {post.description}
-              </Text>
-              <Button as={Link} to={post.link} colorScheme="red" size="sm">
-                Leer más
-              </Button>
-            </Box>
+            <Icon as={category.icon} w={10} h={10} color={category.color} mb={4} />
+            <Heading size="md" mb={2} color={useColorModeValue('gray.700', 'white')}>
+              {category.title}
+            </Heading>
+            <Text color="gray.500" mb={4}>
+              {category.description}
+            </Text>
           </Box>
         ))}
       </SimpleGrid>
@@ -475,9 +500,10 @@ function BlogSection() {
 }
 
 
+
 function ChatbotSection() {
   return (
-    <Box py={10} bg={useColorModeValue('gray.50', 'gray.800')} rounded="lg">
+    <Box py={10} mt={12} my={12} bg={useColorModeValue('gray.50', 'gray.800')} rounded="lg">
       <Stack direction={{ base: 'column', md: 'row' }} spacing={10} align="center">
         <Box flex={1} textAlign={{ base: 'center', md: 'left' }}>
           <Heading mb={4}>
@@ -486,9 +512,7 @@ function ChatbotSection() {
           <Text color="gray.500" mb={6}>
             Obtén asistencia inmediata para resolver tus dudas y recibir recomendaciones personalizadas para el cuidado de tu mascota.
           </Text>
-          <Button colorScheme="red" size="lg">
-            Probar Chatbot
-          </Button>
+
         </Box>
         <Box flex={1} display="flex" justifyContent="center" alignItems="center">
           <Image
