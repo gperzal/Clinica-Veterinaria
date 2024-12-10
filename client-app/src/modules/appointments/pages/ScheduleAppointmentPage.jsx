@@ -1,64 +1,45 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { 
-  Box, Container, Flex, Heading, 
-  useColorModeValue, Text,
-} from '@chakra-ui/react';
+import {  Box,  Container,  Flex,  Heading,  useColorModeValue,  Text,} from '@chakra-ui/react';
 import ServiceSelection from '../components/ServiceSelection';
 import PetSelection from '../components/PetSelection';
 import WeeklyCalendar from '../components/WeeklyCalendar';
 import AvailableTimes from '../components/AvailableTimes';
 import SpecialistSelection from '../components/SpecialistSelection';
-import ConfirmationModal from '../components/ConfirmationModal';  
-import { getPets } from '../../dashboard/profile/services/profileService';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { AuthContext } from '../../auth/context/AuthContext';
-import useToastNotification from '../../../hooks/useToastNotification';
-import { createAppointment } from '../services/appointmentService';
+import { AppointmentsContext } from '../context/AppointmentsContext';
 
 const ScheduleAppointmentPage = () => {
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
+  const { pets, loadPets, confirmAppointment } = useContext(AppointmentsContext);
+
   const [serviceType, setServiceType] = useState(null);
   const [selectedPet, setSelectedPet] = useState(null);
-  const [pets, setPets] = useState([]);  
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { showToast } = useToastNotification();
-
-  useEffect(() => {
-  }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchPets = async () => {
       try {
-        const response = await getPets();
-        const activePets = (response.data?.pets || []).filter((pet) => pet.status === 'Activo');
-        setPets(activePets);
+        const activePets = await loadPets(user);
         if (activePets.length === 1) {
           setSelectedPet(activePets[0]);
         }
-      } catch (error) {
-        showToast({
-          title: "Error al cargar mascotas",
-          description: error.message || "No se pudieron cargar las mascotas del usuario.",
-          status: "error",
-        });
+      } catch {
+        // Manejo de errores ya realizado en el contexto
       }
     };
 
     fetchPets();
-  }, [user, showToast]);
+  }, [user, loadPets]);
 
   const handleServiceSelection = (type) => {
     setServiceType(type);
-    if (pets.length === 1) {
-      setSelectedPet(pets[0]);
-    } else {
-      setSelectedPet(null);
-    }
+    setSelectedPet(pets.length === 1 ? pets[0] : null);
     setSelectedDate(null);
     setSelectedTime(null);
     setSelectedSpecialist(null);
@@ -85,39 +66,28 @@ const ScheduleAppointmentPage = () => {
 
   const formatDateToISO = (dateString) => {
     const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`; // Convierte a "YYYY-MM-DD"
+    return `${year}-${month}-${day}`;
   };
 
   const handleConfirmAppointment = async () => {
-    const formattedDate = formatDateToISO(selectedDate); 
+    const formattedDate = formatDateToISO(selectedDate);
     const appointmentData = {
       date: formattedDate,
       time: selectedTime,
       serviceType,
       specialistId: selectedSpecialist._id,
-      customerId: user._id,
-      petId: selectedPet._id
+      ownerId: user._id,
+      petId: selectedPet._id,
     };
-    console.log("Creating appointment with data:", appointmentData); // Agrega este log para verificar los datos
-
+  
     try {
-      console.log("Creating appointment with data:", appointmentData); 
-      const response = await createAppointment(appointmentData);
-      console.log("Appointment created:", response.data);
-      showToast({
-        title: "Cita confirmada",
-        description: `Tu cita con ${selectedSpecialist.name} ha sido programada para el ${selectedDate} a las ${selectedTime}.`,
-        status: "success",
-      });
+      await confirmAppointment(appointmentData, selectedSpecialist.name);
       setIsModalOpen(false);
-    } catch (error) {
-      showToast({
-        title: "Error al confirmar la cita",
-        description: error.message || "No se pudo confirmar la cita. Por favor, intenta nuevamente.",
-        status: "error"
-      });
+    } catch {
+      console.error('Error al confirmar la cita');
     }
   };
+  
 
   if (!user) {
     return (
