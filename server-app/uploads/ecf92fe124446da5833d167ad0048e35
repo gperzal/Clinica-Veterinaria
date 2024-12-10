@@ -1,0 +1,3 @@
+﻿name,email,password,role,phone,altPhone,birthdate,address
+Carlos Pérez,carlos.perez@example.com,123456,Cliente,1234567890,0987654321,1990-01-01,Calle Falsa 123
+María López,maria.lopez@example.com,abcdef,Administrativo,9876543210,1234567890,1985-05-10,Calle Verdadera 456

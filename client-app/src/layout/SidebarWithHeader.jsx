@@ -1,15 +1,10 @@
 import React, { useState, useContext } from 'react';
 import {
   Box,
-  CloseButton,
   Flex,
   Icon,
   Text,
-  Drawer,
-  DrawerContent,
-  useDisclosure,
   Collapse,
-  IconButton,
   VStack,
   HStack,
   Menu,
@@ -18,7 +13,15 @@ import {
   MenuList,
   Tooltip,
   useColorModeValue,
+  Drawer,
+  DrawerBody,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  IconButton,
+  useDisclosure
 } from '@chakra-ui/react';
+import { useSwipeable } from 'react-swipeable'; // Importa react-swipeable
 import {
   FiHome,
   FiUser,
@@ -26,13 +29,14 @@ import {
   FiClipboard,
   FiShoppingCart,
   FiSettings,
-  FiMenu,
   FiBell,
   FiFile,
   FiChevronDown,
   FiChevronLeft,
   FiChevronRight,
+  FiLogOut
 } from 'react-icons/fi';
+import { SiPetsathome } from "react-icons/si";
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { AuthContext } from '../modules/auth/context/AuthContext';
 
@@ -76,20 +80,19 @@ const menuSections = [
   },
 ];
 
-const SidebarContent = ({ onClose, userRole, isCollapsed, toggleCollapse, ...rest }) => {
+const SidebarContent = ({ userRole, isCollapsed, toggleCollapse, ...rest }) => {
   return (
     <Box
       transition="0.3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={isCollapsed ? 16 : { base: 'full', md: 60 }}
+      w={isCollapsed ? 16 : { base: 16, md: 60 }}
       pos="fixed"
       h="full"
       overflowY="auto"
       {...rest}
     >
-      {/* Contenedor del título y botón de colapsar */}
       <Flex
         h="20"
         alignItems="center"
@@ -97,27 +100,21 @@ const SidebarContent = ({ onClose, userRole, isCollapsed, toggleCollapse, ...res
         justifyContent="space-between"
         position="relative"
       >
-        {/* Título del sidebar */}
         {!isCollapsed && (
-          <Link to="/">
-          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-            Dashboard
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" ml="10">
+             Menú
           </Text>
-          </Link>
         )}
-
-        {/* Botón de colapsar */}
         <IconButton
           position="absolute"
-          right={0} // Alineado al final del contenedor del título
+          right={0}
           aria-label="Toggle sidebar"
           icon={isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
           onClick={toggleCollapse}
           variant="ghost"
+          display={{ base: 'none', md: 'flex' }}
         />
       </Flex>
-
-      {/* Renderizado de los menús según roles */}
       {menuSections
         .filter((section) => section.allowedRoles.includes(userRole))
         .map((section) => (
@@ -130,8 +127,6 @@ const SidebarContent = ({ onClose, userRole, isCollapsed, toggleCollapse, ...res
     </Box>
   );
 };
-
-
 
 const MenuSection = ({ section, isCollapsed }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -152,7 +147,7 @@ const MenuSection = ({ section, isCollapsed }) => {
           <Text fontSize="sm" fontWeight="bold" textTransform="uppercase">
             {section.sectionName}
           </Text>
-          <Icon as={FiMenu} />
+          <Icon as={FiChevronDown} />
         </Flex>
       )}
       <Collapse in={isOpen || isCollapsed} animateOpacity>
@@ -203,111 +198,134 @@ const NavItem = ({ icon, children, path, isCollapsed, ...rest }) => {
   );
 };
 
-const MobileNav = ({ onOpen, user, logout, ...rest }) => {
+
+const MobileNav = ({ user, logout, isCollapsed, ...rest }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Redirige al inicio o a la página de login
+    navigate('/');
+  };
+
+  const navigateToHome = () => {
+    navigate('/');
   };
 
   return (
     <Flex
-      ml={{ base: 0, md: 60 }}
+      ml={{ base: 0, md: isCollapsed ? 16 : 60 }} // Ajusta el margen según el estado del sidebar
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
       bg={useColorModeValue('white', 'gray.900')}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-      justifyContent={{ base: 'space-between', md: 'flex-end' }}
+      justifyContent="flex-end" 
+      position="fixed"
+      top="0"
+      left="0"
+      right="0"
+      zIndex="1000" 
       {...rest}
     >
+      {/* Icono de notificaciones */}
       <IconButton
-        display={{ base: 'flex', md: 'none' }}
-        onClick={onOpen}
-        variant="outline"
-        aria-label="open menu"
-        icon={<FiMenu />}
+        size="lg"
+        variant="ghost"
+        aria-label="Notificaciones"
+        icon={<FiBell />}
+        mr="4"
       />
-
-      <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
-        <Flex alignItems={'center'}>
-          <Menu>
-            <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
-              <HStack>
-                <VStack
-                  display={{ md: 'flex' }}
-                  alignItems="flex-start"
-                  spacing="1px"
-                  ml="2"
-                >
-                  <Text fontSize="sm" fontWeight="bold">{user.name}</Text>
-                  <Text fontSize="xs" color="gray.600" fontWeight="bold">
-                    {user.role}
-                  </Text>
-                </VStack>
-                <Box display={{ md: 'flex' }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            <MenuList
-              bg={useColorModeValue('white', 'gray.900')}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
-            >
-              <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </HStack>
+      {/* Menú del usuario */}
+      <Flex alignItems="center">
+        <Menu>
+          <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
+            <HStack>
+              <VStack alignItems="flex-start" spacing="1px" ml="2">
+                <Text fontSize="sm" fontWeight="bold">{user.name}</Text>
+                <Text fontSize="xs" color="gray.600" fontWeight="bold">{user.role}</Text>
+              </VStack>
+              <Box>
+                <FiChevronDown />
+              </Box>
+            </HStack>
+          </MenuButton>
+          <MenuList
+            bg={useColorModeValue('white', 'gray.900')}
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+          >
+            {/* Botón para ir al inicio */}
+            <MenuItem icon={<SiPetsathome />} onClick={navigateToHome}>
+              Volver a Inicio
+            </MenuItem>
+            {/* Botón para cerrar sesión */}
+            <MenuItem icon={<FiLogOut />} onClick={handleLogout}>
+              Cerrar Sesión
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Flex>
     </Flex>
   );
 };
 
+
+
+
 const SidebarWithHeader = ({ children }) => {
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
   const { user, logout } = useContext(AuthContext);
-
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: onClose,
+    onSwipedRight: onOpen,
+    preventDefaultTouchmoveEvent: true,
+  });
   if (!user) {
     return <Navigate to="/" replace />;
   }
-
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+    <Box {...swipeHandlers} minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
       <SidebarContent
-        onClose={onClose}
         userRole={user.role}
         isCollapsed={isCollapsed}
         toggleCollapse={() => setIsCollapsed(!isCollapsed)}
         display={{ base: 'none', md: 'block' }}
       />
-      <Drawer
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full"
-      >
-        <DrawerContent>
-          <SidebarContent
-            onClose={onClose}
-            userRole={user.role}
-            isCollapsed={isCollapsed}
-            toggleCollapse={() => setIsCollapsed(!isCollapsed)}
-          />
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent
+          maxW="4rem" 
+          bg={useColorModeValue('gray.900', 'gray.800')}
+        >
+          <DrawerCloseButton mt="4" />
+          <DrawerBody p={0}>
+            <SidebarContent
+              userRole={user.role}
+              isCollapsed={true}
+              toggleCollapse={() => {}}
+            />
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} user={user} logout={logout} />
-      <Box ml={{ base: 0, md: isCollapsed ? 16 : 60 }} p="4">
-        {children}
+      <MobileNav user={user} logout={logout} isCollapsed={isCollapsed} />
+      <Box
+        ml={{ base: 0, md: isCollapsed ? 16 : 60 }} 
+        transition="margin 0.3s ease"
+      >
+        <Box
+          pt="20"
+          p="4"
+        >
+          <Box mt={20}>    {children}</Box>
+      
+        </Box>
       </Box>
     </Box>
   );
 };
+
+
+
 
 export default SidebarWithHeader;

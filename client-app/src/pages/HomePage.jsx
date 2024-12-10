@@ -14,8 +14,8 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaDog, FaSyringe, FaShoppingCart, FaBlog, FaRobot, FaQuoteLeft,
-  FaExclamationTriangle, FaPaw, FaAppleAlt, FaHeartbeat, FaArrowUp 
+import { FaDog, FaSyringe, FaShoppingCart, FaBlog, FaRobot, FaQuoteLeft,FaQuoteRight,
+  FaExclamationTriangle, FaPaw, FaAppleAlt, FaHeartbeat, FaArrowUp
  } from 'react-icons/fa';
 import { FaScissors } from "react-icons/fa6";
 import { Heart, Wallet, Laptop } from 'lucide-react';
@@ -196,21 +196,29 @@ function ServicesSection() {
             p={6}
             rounded="lg"
             shadow="md"
+            borderWidth={1} // Contorno sutil
+            borderColor={useColorModeValue('gray.200', 'gray.600')} // Color del borde adaptable
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            _hover={{
+              transform: 'scale(1.05)', // Efecto hover
+              borderColor: useColorModeValue('red.300', 'red.500'), // Borde cambia en hover
+              shadow: 'lg',
+            }}
           >
             <Icon as={service.icon} w={10} h={10} mb={4} color="red.400" />
-            <Heading size="md" mb={2}>
+            <Heading size="md" mb={2} color={useColorModeValue('gray.800', 'white')}>
               {service.title}
             </Heading>
-            <Text color={'gray.500'}>{service.description}</Text>
+            <Text color={useColorModeValue('gray.600', 'gray.300')}>{service.description}</Text>
           </MotionBox>
         ))}
       </SimpleGrid>
     </Box>
   );
 }
+
 
 function BenefitsSection() {
   return (
@@ -258,33 +266,32 @@ function BenefitsSection() {
 function BenefitCard({ title, description, Icon, iconColor }) {
   return (
     <Box
-      bg={useColorModeValue('white', 'gray.700')}
+      bg={useColorModeValue('gray.50', 'gray.800')} 
       p={6}
       rounded="lg"
       shadow="md"
+      borderWidth={1}
+      borderColor={useColorModeValue('gray.200', 'gray.600')}
       textAlign="center"
       transition="transform 0.3s ease"
       _hover={{
         transform: 'scale(1.05)',
-        shadow: 'xl',
+        shadow: 'lg',
+        borderColor: useColorModeValue('green.300', 'green.800'),
       }}
     >
       <Box mb={4}>
-        <Icon 
-          size={48} 
-          color={iconColor}
-          style={{ margin: 'auto' }}
-        />
+        <Icon size={48} color={iconColor} style={{ margin: 'auto' }} />
       </Box>
       <Heading fontSize="lg" mb={2} color={useColorModeValue('gray.800', 'white')}>
         {title}
       </Heading>
-      <Text color={useColorModeValue('gray.600', 'gray.300')} fontSize="md">
-        {description}
-      </Text>
+      <Text color={useColorModeValue('gray.600', 'gray.300')}>{description}</Text>
     </Box>
   );
 }
+
+
 
 
 // 4. Testimonios Section
@@ -377,46 +384,54 @@ function TestimonialsSection() {
 function TestimonialCard({ name, feedback }) {
   return (
     <Box
-      bg={useColorModeValue(
-        'linear-gradient(135deg, #fff 0%, #f7f7f7 100%)',
-        'linear-gradient(135deg, #2D3748 0%, #4A5568 100%)'
-      )}
+      bg={useColorModeValue('white', 'gray.800')}
       p={6}
       rounded="lg"
       shadow="md"
-      mx={3}
-      
-      textAlign="center"
-      position="relative"
       borderWidth={1}
       borderColor={useColorModeValue('gray.200', 'gray.600')}
       transition="transform 0.3s ease, box-shadow 0.3s ease"
       _hover={{
         transform: 'scale(1.05)',
-        boxShadow: useColorModeValue('lg', '2xl'),
+        borderColor: useColorModeValue('blue.300', 'blue.500'),
+        boxShadow: 'lg',
       }}
+      mx={3}
       my={4}
+      textAlign="center"
+      position="relative"
     >
-      {/* Icono de cita */}
-      <Icon
-        as={FaQuoteLeft}
-        w={8}
-        h={8}
-        color={useColorModeValue('red.400', 'red.300')}
-        position="absolute"
-        top={-3}
-        left={-3}
-      />
-      {/* Feedback */}
-      <Text
-        color={useColorModeValue('gray.600', 'gray.300')}
-        mb={4}
-        fontSize="lg"
-        fontStyle="italic"
-      >
-        {feedback}
-      </Text>
-      {/* Separador decorativo */}
+   
+  
+   <Text
+  fontSize="lg"
+  fontStyle="italic"
+  color={useColorModeValue('gray.600', 'gray.300')}
+  px={4} 
+>
+  <Icon
+    as={FaQuoteLeft}
+    w={4}
+    h={4}
+    color="red.400"
+    mr={2} 
+    verticalAlign="middle"
+    mb={2}
+  />
+  {feedback}
+  <Icon
+    as={FaQuoteRight}
+    w={4}
+    h={4}
+    color="red.400"
+    ml={2}
+    mb={2}
+    verticalAlign="middle"
+  />
+</Text>
+
+      
+
       <Box
         h="1px"
         w="50%"
@@ -424,17 +439,20 @@ function TestimonialCard({ name, feedback }) {
         bg={useColorModeValue('gray.300', 'gray.600')}
         my={2}
       ></Box>
-      {/* Nombre */}
       <Text
         fontWeight="bold"
         fontSize="xl"
-        color={useColorModeValue('gray.700', 'white')}
+        color={useColorModeValue('gray.800', 'white')}
       >
         {name}
       </Text>
+
+  
+    
     </Box>
   );
 }
+
 
 
 function BlogSection() {
@@ -449,28 +467,38 @@ function BlogSection() {
       title: 'Nutrición',
       description: 'Descubre cómo proporcionar una dieta balanceada y saludable.',
       icon: FaAppleAlt,
-      color: 'orange.400'
+      color: 'orange.400',
     },
     {
       title: 'Prevención y Salud',
       description: 'Información sobre vacunas, controles y prevención de enfermedades.',
       icon: FaHeartbeat,
-      color: 'red.400'
+      color: 'red.400',
     },
     {
       title: 'Advertencias y Peligros',
       description: 'Aprende a proteger a tus mascotas de los peligros comunes.',
       icon: FaExclamationTriangle,
-      color: 'yellow.400'
+      color: 'yellow.400',
     },
   ];
 
   return (
     <Box py={10} mt={12} bg={useColorModeValue('gray.100', 'gray.800')} rounded="lg">
-      <Heading textAlign="center" mb={6} fontSize={{ base: '2xl', md: '4xl' }}>
-       Blog Educativo
+      <Heading
+        textAlign="center"
+        mb={6}
+        fontSize={{ base: '2xl', md: '4xl' }}
+        color={useColorModeValue('gray.800', 'white')}
+      >
+        Blog Educativo
       </Heading>
-      <Text textAlign="center" color="gray.500" mb={10}>
+      <Text
+        textAlign="center"
+        color={useColorModeValue('gray.600', 'gray.300')}
+        mb={10}
+        fontSize={{ base: 'md', md: 'lg' }}
+      >
         Encuentra material con información valiosa para cuidar y proteger a tus mascotas.
       </Text>
       <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
@@ -478,18 +506,24 @@ function BlogSection() {
           <Box
             key={index}
             p={6}
-            bg={useColorModeValue('white', 'gray.7000')}
+            bg={useColorModeValue('white', 'gray.700')}
             rounded="lg"
             shadow="md"
+            borderWidth={1}
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
             textAlign="center"
-            transition="transform 0.2s"
-            _hover={{ transform: 'scale(1.05)' }}
+            transition="transform 0.3s ease, box-shadow 0.3s ease"
+            _hover={{
+              transform: 'scale(1.05)',
+              borderColor: useColorModeValue('blue.300', 'blue.500'),
+              boxShadow: 'lg',
+            }}
           >
             <Icon as={category.icon} w={10} h={10} color={category.color} mb={4} />
-            <Heading size="md" mb={2} color={useColorModeValue('gray.700', 'white')}>
+            <Heading size="md" mb={2} color={useColorModeValue('gray.800', 'white')}>
               {category.title}
             </Heading>
-            <Text color="gray.500" mb={4}>
+            <Text color={useColorModeValue('gray.600', 'gray.300')} fontSize="sm">
               {category.description}
             </Text>
           </Box>
@@ -501,29 +535,71 @@ function BlogSection() {
 
 
 
+
 function ChatbotSection() {
   return (
-    <Box py={10} mt={12} my={12} bg={useColorModeValue('gray.50', 'gray.800')} rounded="lg">
-      <Stack direction={{ base: 'column', md: 'row' }} spacing={10} align="center">
+    <Box 
+      py={10} 
+      mt={12} 
+      my={12} 
+      bg={useColorModeValue('gray.50', 'gray.800')} 
+      rounded="lg" 
+      shadow="md"
+      borderWidth={1}
+      borderColor={useColorModeValue('gray.200', 'gray.600')}
+    >
+      <Stack 
+        direction={{ base: 'column', md: 'row' }} 
+        spacing={10} 
+        align="center"
+        px={{ base: 4, md: 8 }}
+      >
+        {/* Texto de la sección */}
         <Box flex={1} textAlign={{ base: 'center', md: 'left' }}>
-          <Heading mb={4}>
+          <Heading 
+            mb={4} 
+            fontSize={{ base: '2xl', md: '3xl' }} 
+            color={useColorModeValue('gray.800', 'white')}
+          >
             Conoce Nuestro <Text as="span" color="red.400">Chatbot</Text>
           </Heading>
-          <Text color="gray.500" mb={6}>
+          <Text 
+            color={useColorModeValue('gray.600', 'gray.300')} 
+            mb={6}
+            fontSize={{ base: 'md', md: 'lg' }}
+          >
             Obtén asistencia inmediata para resolver tus dudas y recibir recomendaciones personalizadas para el cuidado de tu mascota.
           </Text>
 
         </Box>
-        <Box flex={1} display="flex" justifyContent="center" alignItems="center">
-          <Image
-            src="https://img.freepik.com/fotos-premium/perro-esta-tendido-suelo-perro-portatil-perro-mascota-blanco-lindo-jugando-computadora-portatil_1260626-3031.jpg?w=360"
-            alt="Chatbot"
-            w="300px"
-            h="300px"
-            rounded="full"
-            objectFit="cover"
+
+        {/* Imagen del chatbot */}
+        <Box 
+          flex={1} 
+          display="flex" 
+          justifyContent="center" 
+          alignItems="center"
+          position="relative"
+          transition="transform 0.3s ease"
+          _hover={{
+            transform: 'scale(1.05)',
+          }}
+        >
+          <Box
+            borderRadius="full"
+            overflow="hidden"
             boxShadow="lg"
-          />
+            borderWidth={1}
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+          >
+            <Image
+              src="https://img.freepik.com/fotos-premium/perro-esta-tendido-suelo-perro-portatil-perro-mascota-blanco-lindo-jugando-computadora-portatil_1260626-3031.jpg?w=360"
+              alt="Chatbot"
+              w="300px"
+              h="300px"
+              objectFit="cover"
+            />
+          </Box>
         </Box>
       </Stack>
     </Box>

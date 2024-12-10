@@ -10,6 +10,7 @@ import appointmentRoutes from './src/routes/appointment/appointmentRoutes.js';
 import cartRoutes from './src/routes/cart/cartRoutes.js';
 import orderRoutes from './src/routes/order/orderRoutes.js';
 import medicalRoutes from './src/routes/dashboard/medicalRoutes.js';
+import usersRoutes from './src/routes/dashboard/usersRoutes.js';
 import cors from 'cors';
 
 
@@ -61,7 +62,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/dashboard', profileRoutes);
 app.use('/api/dashboard/products', productRoutes);
 app.use('/api/dashboard/medical-records', medicalRoutes);
-
+app.use('/api/dashboard/users', usersRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 

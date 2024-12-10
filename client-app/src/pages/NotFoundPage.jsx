@@ -16,7 +16,7 @@ const NotFoundPage = () => {
         </Text>
       </Heading>
         <Text className={styles.message2}>
-          Lo sentimos, la página que estás buscando no existe.
+          Lo sentimos, la página que estás buscando no existe o no tienes acceso. 
         </Text>
         <Link to="/">
         <Button colorScheme="teal" bgGradient="linear(to-r, teal.400, teal.500, teal.600)" color="white" variant="solid"  mt={5}>

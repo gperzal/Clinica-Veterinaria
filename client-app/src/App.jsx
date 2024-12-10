@@ -33,6 +33,9 @@ import AppointmentsPage from './modules/dashboard/appointments/pages/Appointment
 import UsersPage from './modules/dashboard/users/pages/UsersPage';
 import RolesPage from './modules/dashboard/roles/pages/RolesPage';
 import ReportsPage from './modules/dashboard/reports/pages//ReportsPage';
+// Modulo de Users
+import { UsersProvider } from './modules/dashboard/users/context/UsersContext';
+
 // Modulo de Citas
 import ScheduleAppointmentPage from './modules/appointments/pages/ScheduleAppointmentPage';
 import AppointmentHistoryPage from './modules/appointments/pages/AppointmentHistoryPage';
@@ -63,6 +66,7 @@ function App() {
       <AppointmentsProvider>  
       <CartProvider>
       <OrderProvider>
+    
       <Router>
         <Routes>
           {/* Rutas generales con Navbar y Footer */}
@@ -264,7 +268,9 @@ function App() {
                 <Route path="medical-appointments" element={<MedicalAppointmentsPage />} />
                 <Route path="esthetic-appointments" element={<EstheticAppointmentsPage />} />
                 <Route path="appointments" element={<AppointmentsPage />} />
-                <Route path="users" element={<UsersPage />} />
+                <Route path="users" element={ <UsersProvider>
+                                              <UsersPage />
+                                            </UsersProvider>} />
                 <Route path="roles" element={<RolesPage />} />
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="*" element={<ComingSoonPage />} />

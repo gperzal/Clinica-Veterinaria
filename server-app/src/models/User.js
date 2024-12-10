@@ -9,11 +9,11 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String, enum: ['Cliente', 'Administrativo', 'Veterinario', 'Estilista', 'Administrador'], default: 'Cliente' },
     phone: { type: String },
-            altPhone: { type: String },
-            birthdate: { type: Date },
-            address: { type: String },
-            resetPasswordToken: { type: String },
-            resetPasswordExpires: { type: Date },
+    altPhone: { type: String },
+    birthdate: { type: Date },
+    address: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
 }, {
     timestamps: true,
 });
