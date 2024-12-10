@@ -1,41 +1,13 @@
 import React, { useState, useContext } from 'react';
-import {
-  Box,
-  Flex,
-  Icon,
-  Text,
-  Collapse,
-  VStack,
-  HStack,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Tooltip,
-  useColorModeValue,
-  Drawer,
-  DrawerBody,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  IconButton,
-  useDisclosure
-} from '@chakra-ui/react';
-import { useSwipeable } from 'react-swipeable'; // Importa react-swipeable
-import {
-  FiHome,
-  FiUser,
-  FiUsers,
-  FiClipboard,
-  FiShoppingCart,
-  FiSettings,
-  FiBell,
-  FiFile,
-  FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
-  FiLogOut
+import {   Box,   Flex,Icon,Text, Collapse,  VStack,  HStack,  Menu,  MenuButton,  MenuItem,  MenuList,  Tooltip,  useColorModeValue,  useColorMode,  Drawer,  DrawerBody,  DrawerOverlay,
+  DrawerContent,  DrawerCloseButton,  IconButton,  useDisclosure,  Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
+import {  MoonIcon,  SunIcon,} from '@chakra-ui/icons';
+import { useSwipeable } from 'react-swipeable'; 
+import {  FiHome,  FiUser,  FiUsers,  FiClipboard,  FiShoppingCart,  FiSettings,  FiBell,  FiFile,  FiChevronDown,  FiChevronLeft,  FiChevronRight,  FiLogOut
 } from 'react-icons/fi';
+import { LuClipboardList } from "react-icons/lu";
+import { BsClipboard2Pulse } from "react-icons/bs";
+import { MdOutlineInventory2 } from "react-icons/md";
 import { SiPetsathome } from "react-icons/si";
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { AuthContext } from '../modules/auth/context/AuthContext';
@@ -47,7 +19,7 @@ const menuSections = [
     items: [
       { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
       { name: 'Mi Perfil', icon: FiUser, path: '/dashboard/profile' },
-      { name: 'Historial Médico', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Historial Médico', icon: BsClipboard2Pulse, path: '/dashboard/medical-history' },
       { name: 'Historial Compras', icon: FiShoppingCart, path: '/dashboard/purchase-history' },
       { name: 'Configuración', icon: FiSettings, path: '/dashboard/settings' },
     ],
@@ -56,10 +28,9 @@ const menuSections = [
     sectionName: 'Administrativo',
     allowedRoles: ['Administrativo', 'Veterinario', 'Administrador'],
     items: [
-      { name: 'Catálogo', icon: FiClipboard, path: '/dashboard/catalog' },
+      { name: 'Catálogo', icon: MdOutlineInventory2, path: '/dashboard/catalog' },
       { name: 'Inventario', icon: FiShoppingCart, path: '/dashboard/inventory' },
-      { name: 'Citas Médicas', icon: FiClipboard, path: '/dashboard/coming-soon' },
-      { name: 'Citas Estilísticas', icon: FiClipboard, path: '/dashboard/coming-soon' },
+      { name: 'Gestión de Citass', icon: LuClipboardList , path: '/dashboard/coming-soon' },
     ],
   },
   {
@@ -134,6 +105,7 @@ const MenuSection = ({ section, isCollapsed }) => {
   return (
     <Box mt={4}>
       {!isCollapsed && (
+      
         <Flex
           align="center"
           justifyContent="space-between"
@@ -201,6 +173,8 @@ const NavItem = ({ icon, children, path, isCollapsed, ...rest }) => {
 
 const MobileNav = ({ user, logout, isCollapsed, ...rest }) => {
   const navigate = useNavigate();
+  const { colorMode, toggleColorMode } = useColorMode(); 
+  const location = window.location.pathname;
 
   const handleLogout = () => {
     logout();
@@ -211,33 +185,78 @@ const MobileNav = ({ user, logout, isCollapsed, ...rest }) => {
     navigate('/');
   };
 
+  // Mapear rutas con títulos legibles
+  const breadcrumbItems = {
+    '/dashboard': 'Dashboard',
+    '/dashboard/profile': 'Mi Perfil',
+    '/dashboard/purchase-history': 'Historial de Compras',
+    '/dashboard/settings': 'Configuración',
+    '/dashboard/catalog': 'Catálogo',
+    '/dashboard/inventory': 'Inventario',
+    '/dashboard/reports': 'Reportes',
+    '/dashboard/appointments': 'Citas',
+    '/dashboard/coming-soon': 'Próximamente',
+    '/dashboard/users': 'Usuarios',
+    '/dashboard/roles': 'Roles',
+    '/dashboard/notifications': 'Notificaciones',
+  };
+
+  // Obtener rutas segmentadas
+  const segments = location.split('/').filter(Boolean);
+
   return (
     <Flex
-      ml={{ base: 0, md: isCollapsed ? 16 : 60 }} // Ajusta el margen según el estado del sidebar
+      ml={{ base: 0, md: isCollapsed ? 16 : 60 }}
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
       bg={useColorModeValue('white', 'gray.900')}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-      justifyContent="flex-end" 
+      justifyContent="space-between"
       position="fixed"
       top="0"
       left="0"
       right="0"
-      zIndex="1000" 
+      zIndex="1000"
       {...rest}
     >
-      {/* Icono de notificaciones */}
-      <IconButton
-        size="lg"
-        variant="ghost"
-        aria-label="Notificaciones"
-        icon={<FiBell />}
-        mr="4"
-      />
-      {/* Menú del usuario */}
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        {segments.map((segment, index) => {
+          const path = `/${segments.slice(0, index + 1).join('/')}`;
+          return (
+            <BreadcrumbItem key={path}>
+              <BreadcrumbLink
+                href={path}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(path);
+                }}
+              >
+                {breadcrumbItems[path] || segment}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          );
+        })}
+      </Breadcrumb>
+
       <Flex alignItems="center">
+        {/* Botón para Modo Claro/Oscuro */}
+        <Tooltip label="Modo Claro/Oscuro">
+          <IconButton
+            onClick={toggleColorMode}
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            variant="ghost"
+            aria-label="Toggle Color Mode"
+            borderRadius="full"
+            bg={useColorModeValue('gray.100', 'gray.800')}
+            _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+            mr="4"
+          />
+        </Tooltip>
+
+        {/* Menú de Usuario */}
         <Menu>
           <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
             <HStack>
@@ -254,11 +273,16 @@ const MobileNav = ({ user, logout, isCollapsed, ...rest }) => {
             bg={useColorModeValue('white', 'gray.900')}
             borderColor={useColorModeValue('gray.200', 'gray.700')}
           >
-            {/* Botón para ir al inicio */}
+            <MenuItem onClick={() => navigate('/dashboard/notifications')}>
+              <Icon as={FiBell} mr={2} />
+              Notificaciones
+              <Box as="span" ml="2" color="red.500" fontWeight="bold">
+                (3)
+              </Box>
+            </MenuItem>
             <MenuItem icon={<SiPetsathome />} onClick={navigateToHome}>
               Volver a Inicio
             </MenuItem>
-            {/* Botón para cerrar sesión */}
             <MenuItem icon={<FiLogOut />} onClick={handleLogout}>
               Cerrar Sesión
             </MenuItem>
@@ -268,6 +292,8 @@ const MobileNav = ({ user, logout, isCollapsed, ...rest }) => {
     </Flex>
   );
 };
+
+
 
 
 

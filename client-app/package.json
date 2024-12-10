@@ -21,6 +21,7 @@
     "emailjs-com": "^3.2.0",
     "framer-motion": "^11.3.24",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.435.0",
     "prop-types": "^15.8.1",

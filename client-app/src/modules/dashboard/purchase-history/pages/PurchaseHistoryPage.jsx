@@ -1,4 +1,3 @@
-// src/pages/dashboard/PurchaseHistoryPage.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -39,9 +38,9 @@ const PurchaseHistoryPage = () => {
       } catch (error) {
         console.error('Error fetching orders:', error);
         toast({
-          title: "Error al cargar pedidos",
-          description: "No se pudieron cargar tus pedidos. Por favor, intenta de nuevo más tarde.",
-          status: "error",
+          title: 'Error al cargar pedidos',
+          description: 'No se pudieron cargar tus pedidos. Por favor, intenta de nuevo más tarde.',
+          status: 'error',
           duration: 5000,
           isClosable: true,
         });
@@ -51,11 +50,13 @@ const PurchaseHistoryPage = () => {
   }, [toast]);
 
   useEffect(() => {
-    const filtered = orders.filter(order => {
+    const filtered = orders.filter((order) => {
       const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesDate = dateRange.startDate && dateRange.endDate
-        ? new Date(order.createdAt) >= dateRange.startDate && new Date(order.createdAt) <= dateRange.endDate
-        : true;
+      const matchesDate =
+        dateRange.startDate && dateRange.endDate
+          ? new Date(order.createdAt) >= dateRange.startDate &&
+            new Date(order.createdAt) <= dateRange.endDate
+          : true;
       return matchesSearch && matchesDate;
     });
     setFilteredOrders(filtered);
@@ -76,28 +77,61 @@ const PurchaseHistoryPage = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <Box p={8} maxWidth="1200px" margin="0 auto">
-      <Heading mb={8}>Historial de Compras</Heading>
-      <Flex mb={8} direction={{ base: "column", md: "row" }} gap={4}>
-        <Flex flex={1} alignItems="center">
-          <Icon as={FaSearch} mr={2} color="gray.500" />
+    <Box p={4} maxWidth="1200px" margin="0 auto">
+       <Heading fontSize="2xl" fontWeight="bold" mb={4}>
+       Historial de Compras
+        </Heading>
+      <Flex
+        mb={8}
+        direction={{ base: 'column', md: 'row' }}
+        gap={4}
+        alignItems={{ base: 'stretch', md: 'center' }}
+        justifyContent="space-between"
+      >
+        {/* Input de búsqueda */}
+        <Flex
+          flex={1}
+          alignItems="center"
+          gap={2}
+          w="100%"
+          maxW={{ base: '100%', md: '48%' }}
+          flexWrap="wrap"
+        >
+          <Icon as={FaSearch} color="gray.500" />
           <Input
+            flex={1}
             placeholder="Buscar por ID de Pedido"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            size="md"
           />
         </Flex>
-        <Flex flex={1} alignItems="center">
-          <Icon as={FaCalendarAlt} mr={2} color="gray.500" />
-          <DateRangePicker onDateRangeChange={setDateRange} />
+
+        {/* Selector de rango de fechas */}
+        <Flex
+          flex={1}
+          alignItems="center"
+          gap={2}
+          w="100%"
+          maxW={{ base: '100%', md: '48%' }}
+          flexWrap="wrap"
+        >
+          <Icon as={FaCalendarAlt} color="gray.500" />
+          <Box flex={1} maxW={{ base: '100%', md: '48%', lg: '60%' }}>
+            <DateRangePicker onDateRangeChange={setDateRange} />
+          </Box>
         </Flex>
       </Flex>
+
+      {/* Contenido principal */}
       {filteredOrders.length === 0 ? (
-        <Text textAlign="center" fontSize="lg" color="gray.500">No se encontraron pedidos que coincidan con tu búsqueda.</Text>
+        <Text textAlign="center" fontSize="lg" color="gray.500">
+          No se encontraron pedidos que coincidan con tu búsqueda.
+        </Text>
       ) : (
         <>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {currentOrders.map(order => (
+            {currentOrders.map((order) => (
               <OrderCard key={order._id} order={order} onClick={() => handleOrderClick(order)} />
             ))}
           </SimpleGrid>
@@ -107,7 +141,7 @@ const PurchaseHistoryPage = () => {
                 key={i}
                 mx={1}
                 onClick={() => paginate(i + 1)}
-                colorScheme={currentPage === i + 1 ? "blue" : "gray"}
+                colorScheme={currentPage === i + 1 ? 'blue' : 'gray'}
               >
                 {i + 1}
               </Button>
