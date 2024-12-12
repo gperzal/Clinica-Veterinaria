@@ -254,7 +254,7 @@ const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) 
           >
             <option value="Pendiente">Pendiente</option>
             <option value="En proceso">En proceso</option>
-            <option value="Completada">Completada</option>
+            <option value="Finalizado">Finalizado</option>
           </Select>
           <Input
             maxW="200px"
