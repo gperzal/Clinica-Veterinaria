@@ -18,7 +18,7 @@ import {
   HStack,
   Select,
   Input,
-  VStack,
+  VStack,Spinner,Skeleton
 } from '@chakra-ui/react';
 import { FaClock, FaEye, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaSearch } from 'react-icons/fa';
 import { getAppointmentsBySpecialist } from '../services/appointmentService';
@@ -29,7 +29,7 @@ const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) 
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('day'); 
+  const [filter, setFilter] = useState('month'); 
   const [statusFilter, setStatusFilter] = useState(''); 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,12 +85,138 @@ const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) 
       return matchesPeriod && matchesStatus && matchesSearch;
     });
     setFilteredAppointments(filtered);
-    setCurrentPage(1); // Reset pagination when filter changes
+    setCurrentPage(1); 
   }, [filter, statusFilter, searchTerm, appointments]);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+      <Box p={4} bg={bgColor} borderRadius="lg" shadow="md">
+        {loading && (
+          <VStack justify="center" align="center" minHeight="100px" mb={4}>
+            <Spinner size="xl" thickness="4px" speed="0.65s" color="teal.500" />
+            <Text color="teal.600">Cargando citas...</Text>
+          </VStack>
+        )}
+        <TableContainer border="1px solid" borderColor={borderColor} borderRadius="lg">
+          <Table variant="simple">
+            <Thead bg={theadBgColor}>
+              <Tr>
+                <Th>Fecha y Hora</Th>
+                <Th>Paciente</Th>
+                <Th>Dueño</Th>
+                <Th>Estado</Th>
+                <Th>Acciones</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {loading
+                ? // Mostrar Skeleton mientras se cargan los datos
+                  Array.from({ length: appointmentsPerPage }).map((_, index) => (
+                    <Tr key={index}>
+                      <Td>
+                        <Skeleton height="20px" width="80%" />
+                      </Td>
+                      <Td>
+                        <Skeleton height="20px" width="60%" />
+                      </Td>
+                      <Td>
+                        <Skeleton height="20px" width="70%" />
+                      </Td>
+                      <Td>
+                        <Skeleton height="20px" width="50%" />
+                      </Td>
+                      <Td>
+                        <Skeleton height="20px" width="40px" />
+                      </Td>
+                    </Tr>
+                  ))
+                : // Mostrar citas cuando se cargan los datos
+                  currentAppointments.map((appointment) => (
+                    <Tr key={appointment._id}>
+                      <Td>
+                        <VStack align="start" spacing={0}>
+                          <HStack>
+                            <FaCalendarAlt color="gray.500" />
+                            <Text fontSize="sm" fontWeight="bold">
+                              {new Date(appointment.date).toLocaleDateString('es-ES', {
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </Text>
+                          </HStack>
+                          <HStack>
+                            <FaClock color="gray.500" />
+                            <Text fontSize="sm" color="gray.400">
+                              {appointment.time}
+                            </Text>
+                          </HStack>
+                        </VStack>
+                      </Td>
+                      <Td fontWeight="bold">{appointment.pet.name}</Td>
+                      <Td>{appointment.pet.owner.name}</Td>
+                      <Td>
+                        <Badge colorScheme={statusColors[appointment.status]}>
+                          {appointment.status}
+                        </Badge>
+                      </Td>
+                      <Td>
+                        <Tooltip label="Ver detalles" fontSize="sm">
+                          <IconButton
+                            icon={<FaEye />}
+                            colorScheme={activeAppointment ? "gray" : "teal"}
+                            variant="outline"
+                            onClick={() => onViewDetails(appointment._id)}
+                            isDisabled={activeAppointment}
+                          />
+                        </Tooltip>
+                      </Td>
+                    </Tr>
+                  ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+
+        {/* Paginación */}
+        {!loading && filteredAppointments.length > 0 && (
+          <Flex justify="space-between" align="center" mt={4}>
+            <Text fontSize="sm" color="gray.500">
+              Mostrando {indexOfFirstAppointment + 1} -{" "}
+              {Math.min(indexOfLastAppointment, filteredAppointments.length)} de{" "}
+              {filteredAppointments.length}
+            </Text>
+            <HStack spacing={2}>
+              <IconButton
+                icon={<FaChevronLeft />}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isDisabled={currentPage === 1}
+                aria-label="Página anterior"
+              />
+              <Text fontSize="sm">
+                {currentPage} / {totalPages}
+              </Text>
+              <IconButton
+                icon={<FaChevronRight />}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                isDisabled={currentPage === totalPages}
+                aria-label="Página siguiente"
+              />
+            </HStack>
+          </Flex>
+        )}
+
+        {!loading && filteredAppointments.length === 0 && (
+          <Text mt={4} textAlign="center" color="gray.500">
+            No hay citas para mostrar.
+          </Text>
+        )}
+     </Box>
+
+
+    );
   }
+  
 
   const indexOfLastAppointment = currentPage * appointmentsPerPage;
   const indexOfFirstAppointment = indexOfLastAppointment - appointmentsPerPage;
@@ -109,10 +235,10 @@ const MedicalAppointments = ({ onViewDetails, refreshKey, activeAppointment  }) 
           </Heading>
         </HStack>
         <HStack spacing={4}>
-          <Select
+            <Select
             maxW="200px"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)} 
             borderColor={borderColor}
           >
             <option value="day">Hoy</option>

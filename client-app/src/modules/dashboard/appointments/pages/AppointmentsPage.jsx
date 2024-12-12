@@ -83,23 +83,14 @@ const AppointmentsPage = () => {
         }
       } catch (error) {
         console.error("Error al obtener el TreatmentLog:", error);
-        toast({
-          title: "Error",
-          description: "No se pudo obtener el historial de tratamientos.",
-          status: "error",
-        });
       }
   
-      // Cambiar al tab de Ficha Médica
+ 
       setTabIndex(1);
       setAppointmentsRefreshKey((prevKey) => prevKey + 1);
     } catch (error) {
       console.error("Error al atender la cita:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo atender la cita. Inténtalo de nuevo.",
-        status: "error",
-      });
+
     }
   };
   

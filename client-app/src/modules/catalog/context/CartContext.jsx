@@ -58,11 +58,7 @@ export const CartProvider = ({ children }) => {
         variation
       );
       setCartItems(updatedCart.items);
-      showToast({
-        title: 'Producto agregado',
-        description: `${product.name} ha sido agregado al carrito`,
-        status: 'success',
-      });
+
     } catch (error) {
       showToast({
         title: 'Error al agregar al carrito',

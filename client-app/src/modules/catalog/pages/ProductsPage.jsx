@@ -1,42 +1,43 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  Container,
-  Flex,
-  SimpleGrid,
-  VStack,
-  Text,
-  Input,
-  Button,
-  IconButton,
-  useDisclosure,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
+import {  
+  Box,  
+  Container,  
+  Flex,  
+  SimpleGrid,  
+  VStack,  
+  Text,  
+  Input,  
+  Button,  
+  IconButton,  
+  useDisclosure,  
+  Drawer,  
+  DrawerOverlay,  
+  DrawerContent,  
   DrawerHeader,
-  DrawerBody,
-  InputGroup,
-  InputLeftElement,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
+  DrawerBody,  
+  InputGroup,  
+  InputLeftElement,  
+  Menu,  
+  MenuButton,  
+  MenuList,  
+  MenuItem,  
+  RangeSlider,  
+  RangeSliderTrack,  
+  RangeSliderFilledTrack,  
   RangeSliderThumb,
-  Skeleton,
-  HStack,
-  useColorModeValue,
-  NumberInput,
-  NumberInputField,
-  Divider,
-  Wrap,
-  WrapItem,
-  Tag,
-  Icon,
-  Checkbox,
+  Skeleton,  
+  HStack,  
+  useColorModeValue,  
+  NumberInput,  
+  NumberInputField,  
+  Divider,  
+  Wrap,  
+  WrapItem,  
+  Tag,  
+  Icon,  
+  Checkbox,  
   CloseButton,
+  Spinner
 } from '@chakra-ui/react';
 import { FiFilter, FiTag, FiDollarSign, FiStar } from 'react-icons/fi';
 import { SearchIcon } from '@chakra-ui/icons';
@@ -48,7 +49,7 @@ function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(10);
+  const [productsPerPage, setProductsPerPage] = useState(6);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -131,14 +132,32 @@ function ProductsPage() {
     setPriceRange([0, 200000]);
     setSelectedRatings([]);
     setSearchTerm('');
-    setCurrentPage(1); // Volver a la primera página después de limpiar los filtros
-    updateVisibleProducts(1, productsPerPage, products); // Mostrar todos los productos disponibles
+    setCurrentPage(1); 
+    updateVisibleProducts(1, productsPerPage, products); 
   };
 
+  // Loading Section
+  if (loading) {
+    return (
+      <Container maxW="8xl" py={8}>
+        <VStack justify="center" align="center" minHeight="400px">
+          <Spinner size="xl" thickness="4px" speed="0.65s" color="teal.500" />
+          <Text color="teal.600">Cargando productos...</Text>
+        </VStack>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10} mt={4}>
+          {Array(productsPerPage).fill(0).map((_, index) => (
+            <Skeleton key={index} height="300px" borderRadius="lg" />
+          ))}
+        </SimpleGrid>
+      </Container>
+    );
+  }
+
+  // Main Content Section
   return (
     <Container maxW="8xl" py={8}>
+      {/* Buscador y Filtros */}
       <Flex justify="space-between" align="center" mb={6} direction={{ base: 'column', md: 'row' }}>
-        {/* Buscador y Botones */}
         <Flex w="full" justifyContent="space-between" alignItems="center" mb={{ base: 4, md: 0 }}>
           <Flex alignItems="center">
             <IconButton icon={<FiFilter />} aria-label="Open Filters" onClick={onOpen} mr={1} />
@@ -153,9 +172,9 @@ function ProductsPage() {
             <Menu>
               <MenuButton as={IconButton} icon={<FaThList />} aria-label="Visualizar Cantidad" mr={2} />
               <MenuList>
-                <MenuItem onClick={() => handleProductsPerPageChange(5)}>5</MenuItem>
-                <MenuItem onClick={() => handleProductsPerPageChange(10)}>10</MenuItem>
-                <MenuItem onClick={() => handleProductsPerPageChange(25)}>25</MenuItem>
+                <MenuItem onClick={() => handleProductsPerPageChange(6)}>6</MenuItem>
+                <MenuItem onClick={() => handleProductsPerPageChange(12)}>12</MenuItem>
+                <MenuItem onClick={() => handleProductsPerPageChange(24)}>24</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -172,33 +191,29 @@ function ProductsPage() {
         </Flex>
       </Flex>
 
+      {/* Lista de Productos */}
       <Box>
         <Text mb={4}>Mostrando {visibleProducts.length} de {filteredProducts.length} productos</Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-          {loading
-            ? Array(10).fill(0).map((_, index) => (
-                <Skeleton key={index} height="300px" borderRadius="lg" />
-              ))
-            : visibleProducts.map(product => (
-                <ProductCard key={product._id} product={product} />
-              ))}
+          {visibleProducts.map(product => (
+            <ProductCard key={product._id} product={product} />
+          ))}
         </SimpleGrid>
-        {!loading && (
-          <Flex justify="center" align="center" mt={8}>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i}
-                onClick={() => handlePageChange(i + 1)}
-                colorScheme={currentPage === i + 1 ? 'blue' : 'gray'}
-                mx={1}
-              >
-                {i + 1}
-              </Button>
-            ))}
-          </Flex>
-        )}
+        <Flex justify="center" align="center" mt={8}>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <Button
+              key={i}
+              onClick={() => handlePageChange(i + 1)}
+              colorScheme={currentPage === i + 1 ? 'blue' : 'gray'}
+              mx={1}
+            >
+              {i + 1}
+            </Button>
+          ))}
+        </Flex>
       </Box>
 
+      {/* Drawer para Filtros */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
@@ -210,7 +225,7 @@ function ProductsPage() {
           </DrawerHeader>
           <DrawerBody>
             <VStack align="start" spacing={5} mt={4}>
-              {/* Categoría */}
+              {/* Categorías */}
               <Box>
                 <Text fontSize="lg" mb={2}>Categorías</Text>
                 <Wrap>

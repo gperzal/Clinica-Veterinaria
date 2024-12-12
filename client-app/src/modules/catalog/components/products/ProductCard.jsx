@@ -12,7 +12,9 @@ import {
   FormLabel,
   Select,
   useColorModeValue,
-  useColorMode,
+  useNumberInput,
+  HStack,
+  Input,
 } from '@chakra-ui/react';
 import { FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -27,24 +29,46 @@ function ProductCard({ product }) {
   const isNew = (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 15;
   const hasVariations = product.details.variations?.length > 0;
 
-  const [selectedVariation, setSelectedVariation] = useState(
-    hasVariations ? product.details.variations[0] : null
-  );
+  const [selectedVariation, setSelectedVariation] = useState(null); // Iniciar con el producto principal
+  const [quantity, setQuantity] = useState(1);
 
   const price = selectedVariation ? selectedVariation.price : product.price;
-  const discount = selectedVariation ? selectedVariation.discount : product.details.discount || 0;
+  const discount = selectedVariation
+    ? selectedVariation.discount
+    : product.details.discount || 0;
   const hasDiscount = discount > 0;
   const discountedPrice = hasDiscount ? price * (1 - discount / 100) : price;
   const stock = selectedVariation ? selectedVariation.stock : product.details.stock;
-  const imageURL = product.imageURL;
+  const imageURL = selectedVariation?.imageURL || product.imageURL;
+
+  const {
+    getInputProps,
+    getIncrementButtonProps,
+    getDecrementButtonProps,
+  } = useNumberInput({
+    step: 1,
+    value: quantity,
+    onChange: (valueAsString, valueAsNumber) => setQuantity(valueAsNumber),
+    min: 1,
+    max: stock,
+  });
 
   const handleAddToCart = () => {
     if (stock > 0) {
+      const variationName = selectedVariation ? selectedVariation.name : ''; 
       const cartItem = {
         ...product,
         selectedVariation: selectedVariation,
       };
-      addToCart(cartItem);
+  
+      // Pasar la cantidad seleccionada al método addToCart
+      addToCart(cartItem, quantity, variationName);
+  
+      showToast({
+        title: 'Producto agregado',
+        description: `${product.name}${variationName ? ` (${variationName})` : ''} ha sido agregado al carrito (${quantity} unidades).`,
+        status: 'success',
+      });
     } else {
       showToast({
         title: 'Producto agotado',
@@ -53,6 +77,8 @@ function ProductCard({ product }) {
       });
     }
   };
+  
+  
 
   return (
     <Flex p={4} w="full" alignItems="center" justifyContent="center">
@@ -60,6 +86,8 @@ function ProductCard({ product }) {
         as="div"
         bg={useColorModeValue('white', 'gray.800')}
         maxW="sm"
+        w="300px"
+        h="650px"
         borderWidth="1px"
         rounded="lg"
         shadow="lg"
@@ -67,7 +95,6 @@ function ProductCard({ product }) {
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
-        height="100%"
         transition="transform 0.2s"
         _hover={{ transform: 'translateY(-5px)', shadow: '2xl' }}
         overflow="hidden"
@@ -95,26 +122,28 @@ function ProductCard({ product }) {
           to={`/products/${product._id}`}
           onClick={(e) => e.stopPropagation()}
           position="relative"
+          h="200px"
+          w="full"
         >
           <Image
             src={imageURL}
             alt={`Imagen de ${product.name}`}
-            roundedTop="lg"
             objectFit="cover"
-            mx="auto"
-            boxSize="300px"
+            w="100%"
+            h="100%"
+            roundedTop="lg"
+            transition="transform 0.3s"
             border="2px solid"
             borderColor={useColorModeValue('gray.200', 'gray.600')}
             _hover={{
               borderColor: useColorModeValue('teal.400', 'teal.300'),
-              transform: 'scale(1.02)',
-              transition: 'transform 0.3s',
+              transform: 'scale(1.05)',
             }}
           />
         </Box>
 
         {/* Contenido */}
-        <Box p="6">
+        <Box p="4" flex="1">
           <Text fontSize="lg" fontWeight="bold" isTruncated>
             {product.name}
           </Text>
@@ -132,16 +161,22 @@ function ProductCard({ product }) {
             <FormControl mt={4}>
               <FormLabel>Variedades</FormLabel>
               <Select
-                value={selectedVariation?.name}
+                value={selectedVariation ? selectedVariation.name : ''}
                 onChange={(e) => {
-                  e.stopPropagation(); // Evitar navegación al interactuar
                   const variationName = e.target.value;
-                  const variation = product.details.variations.find(
-                    (v) => v.name === variationName
-                  );
-                  setSelectedVariation(variation);
+                  if (variationName === '') {
+                    // Producto principal seleccionado
+                    setSelectedVariation(null);
+                  } else {
+                    const variation = product.details.variations.find(
+                      (v) => v.name === variationName
+                    );
+                    setSelectedVariation(variation);
+                  }
+                  setQuantity(1); // Reset cantidad
                 }}
               >
+                <option value="">Producto principal</option>
                 {product.details.variations.map((variation) => (
                   <option key={variation._id} value={variation.name}>
                     {variation.name}
@@ -155,7 +190,6 @@ function ProductCard({ product }) {
           <Flex mt={4} justifyContent="space-between" alignItems="center">
             <Box textAlign="left" w="full">
               <Flex justifyContent="space-between" alignItems="center">
-                {/* Precio Original */}
                 {hasDiscount && (
                   <Text
                     fontSize="sm"
@@ -166,8 +200,6 @@ function ProductCard({ product }) {
                     ${price.toLocaleString()}
                   </Text>
                 )}
-
-                {/* Precio con Descuento */}
                 <Flex alignItems="center" gap={3}>
                   <Text
                     fontSize="2xl"
@@ -193,37 +225,45 @@ function ProductCard({ product }) {
               </Flex>
             </Box>
           </Flex>
+
+          {/* Cantidad */}
+          <Box mt={4}>
+            <FormLabel>Cantidad</FormLabel>
+            <HStack maxW="200px">
+              <Button {...getDecrementButtonProps()}>-</Button>
+              <Input {...getInputProps()} readOnly textAlign="center" />
+              <Button {...getIncrementButtonProps()}>+</Button>
+            </HStack>
+          </Box>
         </Box>
 
         {/* Botón de Agregar al Carrito */}
-          <Box p="6">
-            {stock > 0 ? (
-              <Tooltip label="Agregar al carrito" placement="top">
-                <Button
-                  colorScheme="teal"
-                  variant="solid"
-                  w="full"
-                  leftIcon={<FiShoppingCart />}
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevenir navegación al hacer clic
-                    handleAddToCart();
-                  }}
-                  _hover={{
-                    background: useColorModeValue('teal.500', 'teal.400'),
-                    transform: 'scale(1.02)',
-                  }}
-                >
-                  Agregar al Carrito
-                </Button>
-              </Tooltip>
-            ) : (
-              <Button colorScheme="red" variant="solid" w="full" isDisabled>
-                Agotado
+        <Box p="4">
+          {stock > 0 ? (
+            <Tooltip label="Agregar al carrito" placement="top">
+              <Button
+                colorScheme="teal"
+                variant="solid"
+                w="full"
+                leftIcon={<FiShoppingCart />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddToCart();
+                }}
+                _hover={{
+                  background: useColorModeValue('teal.500', 'teal.400'),
+                  transform: 'scale(1.02)',
+                }}
+              >
+                Agregar al Carrito
               </Button>
-            )}
-          </Box>
-
-
+            </Tooltip>
+          ) : (
+            <Button colorScheme="red" variant="solid" w="full" isDisabled>
+              Agotado
+            </Button>
+          )}
+        </Box>
       </Box>
     </Flex>
   );

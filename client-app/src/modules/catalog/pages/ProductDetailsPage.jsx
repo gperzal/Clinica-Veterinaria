@@ -103,8 +103,13 @@ function ProductDetailsPage() {
     // Obtener el nombre de la variación seleccionada
     const variationName = selectedVariation ? selectedVariation.name : '';
   
-    // Agregar al carrito
+   
     addToCart(product, quantity, variationName);
+    showToast({
+      title: 'Producto agregado',
+      description: `${product.name}${variationName ? ` (${variationName})` : ''} ha sido agregado al carrito (${quantity} unidades).`,
+      status: 'success',
+    });
   };
 
   if (loading) {
