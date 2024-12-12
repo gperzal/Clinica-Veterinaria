@@ -37,7 +37,7 @@ const BlogPage = () => {
       <Heading as="h1" size="lg" mb={6} textAlign="center" color="teal.400">
         Blog Veterinario
       </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} justifyItems="center">
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} justifyItems="center">
         {paginatedPosts.map((post) => (
           <BlogCard
             key={post.id}

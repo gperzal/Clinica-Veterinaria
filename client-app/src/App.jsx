@@ -30,6 +30,7 @@ import InventoryPage from './modules/dashboard/inventory/pages/InventoryPage';
 import MedicalAppointmentsPage from './modules/dashboard/medical-appointments/pages/MedicalAppointmentsPage';
 import EstheticAppointmentsPage from './modules/dashboard/esthetic-appointments/pages/EstheticAppointmentsPage';
 import AppointmentsPage from './modules/dashboard/appointments/pages/AppointmentsPage';
+import {MedicalAppointmentsProvider} from './modules/dashboard/appointments/context/MedicalAppointmentsContext';
 import UsersPage from './modules/dashboard/users/pages/UsersPage';
 import RolesPage from './modules/dashboard/roles/pages/RolesPage';
 import ReportsPage from './modules/dashboard/reports/pages//ReportsPage';
@@ -138,6 +139,7 @@ function App() {
                               <Navbar />
                               <Box flex="1">
                                 <ScheduleAppointmentPage />
+                                <Chatbot />
                               </Box>
                               <Footer />
                             </Flex>
@@ -151,6 +153,7 @@ function App() {
                     <Navbar />
                     <Box flex="1">
                       <ProductsPage />
+                      <Chatbot />
                     </Box>
                     <Footer />
                   </Flex>
@@ -162,6 +165,7 @@ function App() {
                     <Navbar />
                     <Box flex="1">
                       <ProductDetailsPage />
+                      <Chatbot />
                     </Box>
                     <Footer />
                   </Flex>
@@ -173,6 +177,7 @@ function App() {
                           <Navbar />
                           <Box flex="1">
                             <ContactPage />
+                            <Chatbot />
                           </Box>
                           <Footer />
                         </Flex>
@@ -184,6 +189,7 @@ function App() {
                           <Navbar />
                           <Box flex="1">
                             <FAQPage />
+                            <Chatbot />
                           </Box>
                           <Footer />
                         </Flex>
@@ -195,6 +201,7 @@ function App() {
                           <Navbar />
                           <Box flex="1">
                             <FeedbackPage />
+                            <Chatbot />
                           </Box>
                           <Footer />
                         </Flex>
@@ -207,6 +214,7 @@ function App() {
                 <Navbar />
                 <Box flex="1">
                   <AboutPage />
+                  <Chatbot />
                 </Box>
                 <Footer />
               </Flex>
@@ -219,6 +227,7 @@ function App() {
                 <Navbar />
                 <Box flex="1">
                   <BlogPage />
+                  <Chatbot />
                 </Box>
                 <Footer />
               </Flex>
@@ -245,6 +254,7 @@ function App() {
                   <Navbar />
                   <Box flex="1">
                     <ShoppingCart />
+                    <Chatbot />
                   </Box>
                   <Footer />
                 </Flex>
@@ -267,7 +277,9 @@ function App() {
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="medical-appointments" element={<MedicalAppointmentsPage />} />
                 <Route path="esthetic-appointments" element={<EstheticAppointmentsPage />} />
-                <Route path="appointments" element={<AppointmentsPage />} />
+                <Route path="appointments" element={<MedicalAppointmentsProvider>
+                                                    <AppointmentsPage />
+                                                    </MedicalAppointmentsProvider>} />
                 <Route path="users" element={ <UsersProvider>
                                               <UsersPage />
                                             </UsersProvider>} />

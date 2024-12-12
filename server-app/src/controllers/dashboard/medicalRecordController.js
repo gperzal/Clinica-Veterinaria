@@ -112,9 +112,6 @@ export const attendAppointment = async (req, res) => {
 };
 
 
-
-
-
 // Guardar la ficha médica y completar la citala cita
 export const saveMedicalRecord = async (req, res) => {
   try {
@@ -125,7 +122,8 @@ export const saveMedicalRecord = async (req, res) => {
       allergies,
       vaccinations,
       exams,
-      notes, // Notas de la cita
+      notes,
+      treatmentLog, // Asegúrate de incluir treatmentLog aquí
     } = req.body;
 
     const veterinarianId = req.userId;
@@ -139,6 +137,7 @@ export const saveMedicalRecord = async (req, res) => {
       vaccinations,
       exams,
       notes,
+      treatmentLog, // Asegúrate de incluir treatmentLog aquí
     });
 
     // Obtener la cita
@@ -179,6 +178,7 @@ export const saveMedicalRecord = async (req, res) => {
       existingEntry.medicalInfo = medicalEntry;
       existingEntry.notes = notes; // Asignar la nota a la entrada médica
       existingEntry.updatedAt = new Date();
+      existingEntry.treatmentLog = treatmentLog; // Actualizar treatmentLog si existe
     } else {
       // Crear una nueva entrada médica
       const newMedicalEntry = {
@@ -187,6 +187,7 @@ export const saveMedicalRecord = async (req, res) => {
         veterinarian: veterinarianId,
         medicalInfo: medicalEntry,
         notes: notes,
+        treatmentLog: treatmentLog, // Incluir treatmentLog aquí
       };
       medicalRecord.medicalEntries.push(newMedicalEntry);
     }
@@ -199,7 +200,6 @@ export const saveMedicalRecord = async (req, res) => {
       date: new Date(exam.date),
       result: String(exam.result),
     }));
-    if (treatmentHistory) medicalRecord.treatmentHistory = treatmentHistory;
 
     // Guardar el registro médico
     await medicalRecord.save();
@@ -213,6 +213,7 @@ export const saveMedicalRecord = async (req, res) => {
     res.status(500).json({ message: 'Error al guardar la ficha médica.', error });
   }
 };
+
 
 // Actualizar un sector de tratamiento
 export const updateTreatmentLog = async (req, res) => {
@@ -240,30 +241,60 @@ export const updateTreatmentLog = async (req, res) => {
 // Actualizar tratamientos de una entrada de tratamiento
 export const updateTreatments = async (req, res) => {
   try {
-    const { treatmentId } = req.params;
-    const { treatments } = req.body;
-    console.log("Datos recibidos1:", req.params);
-    console.log("Datos recibidos2:", {
-      treatmentId,
-      treatments,
-    });
+    const { treatmentId } = req.params; // ID del TreatmentLog principal
+    let { treatments } = req.body; // Datos del tratamiento(s) a actualizar
 
-    const treatmentLog = await TreatmentLog.findByIdAndUpdate(
-      treatmentId,
-      { treatments },
-      { new: true }
-    );
+    console.log("Datos recibidos updateTreatments:", { treatmentId, treatments });
+
+    // Convertir un solo objeto en un array para manejar ambos casos
+    if (!Array.isArray(treatments)) {
+      treatments = [treatments];
+    }
+
+    // Buscar el documento principal
+    const treatmentLog = await TreatmentLog.findById(treatmentId);
 
     if (!treatmentLog) {
       return res.status(404).json({ message: "TreatmentLog no encontrado." });
     }
 
-    res.status(200).json({ message: "Tratamientos actualizados.", treatmentLog });
+    // Actualizar únicamente los tratamientos existentes por _id
+    for (let updatedTreatment of treatments) {
+      if (!updatedTreatment._id) {
+        console.warn("Tratamiento sin _id, ignorado:", updatedTreatment);
+        continue; // Ignorar tratamientos sin _id
+      }
+
+      const existingTreatment = treatmentLog.treatments.id(updatedTreatment._id);
+      if (existingTreatment) {
+        // Actualizar los campos que se envían en el cuerpo
+        existingTreatment.date = updatedTreatment.date || existingTreatment.date;
+        existingTreatment.treatment = updatedTreatment.treatment || existingTreatment.treatment;
+        existingTreatment.notes = updatedTreatment.notes || existingTreatment.notes;
+        existingTreatment.confirmed =
+          updatedTreatment.confirmed !== undefined
+            ? updatedTreatment.confirmed
+            : existingTreatment.confirmed;
+      } else {
+        console.warn("Tratamiento no encontrado para _id:", updatedTreatment._id);
+      }
+    }
+
+    // Guardar los cambios después de la actualización
+    await treatmentLog.save();
+
+    return res.status(200).json({
+      message: "Tratamientos actualizados exitosamente.",
+      treatmentLog,
+    });
   } catch (error) {
     console.error("Error al actualizar tratamientos:", error);
     res.status(500).json({ message: "Error interno del servidor." });
   }
 };
+
+
+
 
 
 // oBTENER LA ID DE TRATAMIENTO 

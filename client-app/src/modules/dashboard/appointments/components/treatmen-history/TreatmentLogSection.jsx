@@ -12,45 +12,43 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { formatDate } from "../../utils/formatDate";
+import { useMedicalAppointments } from "../../context/MedicalAppointmentsContext";
 
-const TreatmentLogSection = ({ treatmentLogs, setTreatmentLogs, onUpdateTreatment }) => {
-  const [filter, setFilter] = useState("all"); // Filtro para los tratamientos
-  const [currentPage, setCurrentPage] = useState(1); // Página actual
-  const treatmentsPerPage = 3; // Número de cards por página
+const TreatmentLogSection = ({ treatmentLogs, setTreatmentLogs, treatmentLogId  }) => {
+  const { handleUpdateTreatments } = useMedicalAppointments();
+  const [filter, setFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const treatmentsPerPage = 3;
 
   const bgCardColor = useColorModeValue("gray.50", "gray.700");
   const borderColor = useColorModeValue("teal.300", "teal.500");
 
-  // Cambiar el estado de "confirmed" para un tratamiento específico
   const toggleConfirm = async (index) => {
+    const treatmentToUpdate = treatmentLogs[index]; 
+    const updatedTreatment = {
+      ...treatmentToUpdate,
+      confirmed: !treatmentToUpdate.confirmed, 
+    };
     const updatedLogs = treatmentLogs.map((log, i) =>
-      i === index ? { ...log, confirmed: !log.confirmed } : log
+      i === index ? updatedTreatment : log
     );
     setTreatmentLogs(updatedLogs);
-
-    // Actualización optimista
-    if (typeof onUpdateTreatment === "function") {
-      try {
-        await onUpdateTreatment(updatedLogs);
-      } catch (error) {
-        console.error("Error al actualizar el tratamiento:", error);
-      }
+  
+    try {
+      await handleUpdateTreatments(treatmentLogId, updatedTreatment);
+    } catch (error) {
+      console.error("Error al actualizar el tratamiento:", error);
+      setTreatmentLogs(treatmentLogs); 
     }
   };
+  
 
-  // Actualizar las notas de un tratamiento específico
   const updateNotes = (index, newNote) => {
     const updatedLogs = treatmentLogs.map((log, i) =>
       i === index ? { ...log, notes: newNote } : log
     );
     setTreatmentLogs(updatedLogs);
-
-    // Actualización optimista
-    if (typeof onUpdateTreatment === "function") {
-      onUpdateTreatment(updatedLogs).catch((error) =>
-        console.error("Error al actualizar las notas:", error)
-      );
-    }
   };
 
   // Filtrar los tratamientos según el filtro seleccionado
@@ -83,12 +81,11 @@ const TreatmentLogSection = ({ treatmentLogs, setTreatmentLogs, onUpdateTreatmen
           borderColor={borderColor}
         >
           <option value="all">Todos</option>
-          <option value="pending">Pendientes</option>
+          <option value="unconfirmed">Pendientes</option>
           <option value="confirmed">Confirmados</option>
         </Select>
       </HStack>
 
-      {/* Cards de tratamientos */}
       <SimpleGrid columns={1} spacing={4}>
         {paginatedLogs.map((log, index) => (
           <Box
@@ -102,7 +99,7 @@ const TreatmentLogSection = ({ treatmentLogs, setTreatmentLogs, onUpdateTreatmen
           >
             <HStack justify="space-between" mb={4}>
               <Badge colorScheme="teal" fontSize="md">
-                {log.date}
+                {log.date ? formatDate(log.date) : "Fecha no disponible"}
               </Badge>
               <Checkbox
                 isChecked={log.confirmed}
@@ -122,7 +119,7 @@ const TreatmentLogSection = ({ treatmentLogs, setTreatmentLogs, onUpdateTreatmen
           </Box>
         ))}
       </SimpleGrid>
-asd
+
       {/* Paginación */}
       <HStack justify="center" mt={6} spacing={4}>
         <IconButton

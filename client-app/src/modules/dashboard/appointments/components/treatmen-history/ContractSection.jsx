@@ -32,13 +32,12 @@ const ContractSection = ({ onSignContract }) => {
         overflowY="auto"
       >
         <Text fontSize="sm" fontWeight="bold" mb={4} color={labelColor}>
-          Cláusulas Principales:
+          <Box as="span" fontWeight="bold"> Cláusulas Principales: </Box>
         </Text>
         <List spacing={3} fontSize="sm" color="gray.100">
-          {/* Lista de cláusulas */}
           <ListItem>
             <ListIcon as={FaCheckCircle} color="green.500" />
-            Este contrato establece las responsabilidades del propietario y de la clínica...
+            <Box as="span" fontWeight="bold">1. Este contrato establece las responsabilidades del propietario y de la clínica.</Box>
           </ListItem>
           <ListItem>
             <ListIcon as={FaCheckCircle} color="green.500" />

@@ -1,26 +1,15 @@
-import React, { useState, useMemo, useEffect } from "react";
-import {
-  Box,
-  Heading,
-  Input,
-  Button,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  useColorModeValue,
-  Icon,
-  Tooltip,
-  HStack,
-} from "@chakra-ui/react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Box, Heading, Input, Button, Stat, StatLabel, StatNumber, StatHelpText, useColorModeValue, Icon, Tooltip, HStack } from "@chakra-ui/react";
 import { FaCalendarAlt, FaClock, FaPlayCircle } from "react-icons/fa";
 import useToastNotification from "../../../../../hooks/useToastNotification";
+import { useMedicalAppointments } from "../../context/MedicalAppointmentsContext";
 
-const GeneralRestSection = ({ onStartRest, treatmentLogData }) => {
+const GeneralRestSection = ({ onStartRest, treatmentLogData, treatmentLogId }) => {
+  const { handleUpdateTreatmentLog, handleUpdateTreatments } = useMedicalAppointments();
   const labelColor = useColorModeValue("teal.600", "teal.300");
   const showToast = useToastNotification();
 
-  const formatDate = (date) => date.split("T")[0]; // Convertir "2024-11-29T00:00:00.000Z" a "2024-11-29"
+  const formatDate = (date) => date.split("T")[0]; 
 
   const [treatmentDays, setTreatmentDays] = useState({
     startDate: treatmentLogData?.startDate
@@ -32,7 +21,6 @@ const GeneralRestSection = ({ onStartRest, treatmentLogData }) => {
   });
 
   useEffect(() => {
-    // Sincronizar datos al cambiar `treatmentLogData`
     if (treatmentLogData) {
       setTreatmentDays({
         startDate: treatmentLogData.startDate
@@ -61,7 +49,16 @@ const GeneralRestSection = ({ onStartRest, treatmentLogData }) => {
     setTreatmentDays((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleStartRestLocal = () => {
+  const handleStartRestLocal = async () => {
+    if (!treatmentLogId) {
+      showToast({
+        title: "Error",
+        description: "No se encontró un ID de registro de tratamiento.",
+        status: "error",
+      });
+      return;
+    }
+
     if (!treatmentDays.startDate || !treatmentDays.endDate) {
       showToast({
         title: "Error",
@@ -80,17 +77,55 @@ const GeneralRestSection = ({ onStartRest, treatmentLogData }) => {
       return;
     }
 
-    onStartRest({
+    const treatmentLog = {
       startDate: treatmentDays.startDate,
       endDate: treatmentDays.endDate,
-    });
+      contractSigned: true, 
+    };
 
-    showToast({
-      title: "Reposo Iniciado",
-      description: "Se han registrado las fechas del reposo clínico.",
-      status: "success",
-    });
-    
+    try {
+      // Actualizar las fechas y contrato firmado en el backend
+      await handleUpdateTreatmentLog(treatmentLogId, treatmentLog);
+
+      // Crear las fechas dinámicamente
+      const totalDays =
+        Math.ceil(
+          (new Date(treatmentDays.endDate) - new Date(treatmentDays.startDate)) /
+            (1000 * 60 * 60 * 24)
+        ) + 1;
+
+      const treatments = Array.from({ length: totalDays }, (_, i) => ({
+        date: new Date(
+          new Date(treatmentDays.startDate).getTime() + i * 86400000
+        )
+          .toISOString()
+          .split("T")[0],
+        treatment: `Tratamiento día ${i + 1}`,
+        notes: "",
+        confirmed: false,
+      }));
+
+      // Actualizar la lista de tratamientos en el backend
+      await handleUpdateTreatments(treatmentLogId, treatments);
+
+      onStartRest({
+        startDate: treatmentDays.startDate,
+        endDate: treatmentDays.endDate,
+      });
+
+      showToast({
+        title: "Reposo Iniciado",
+        description: "Se han registrado las fechas del reposo clínico.",
+        status: "success",
+      });
+    } catch (error) {
+      console.error("Error al iniciar el reposo clínico:", error);
+      showToast({
+        title: "Error",
+        description: "No se pudo guardar el reposo clínico. Inténtalo de nuevo.",
+        status: "error",
+      });
+    }
   };
 
   return (

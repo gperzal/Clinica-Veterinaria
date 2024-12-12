@@ -63,7 +63,6 @@ const AppointmentsPage = () => {
       const data = await attendAppointment(appointmentId);
       const { appointment } = data;
   
-      // Actualizar los estados relacionados con el paciente, dueño, etc.
       setSelectedPatient({ ownerId: appointment.pet.owner._id, petId: appointment.pet._id });
       setOwnerData(appointment.pet.owner);
       setPetData(appointment.pet);
@@ -72,11 +71,15 @@ const AppointmentsPage = () => {
       // Obtener el treatmentLogId asociado a esta cita
       try {
         const treatmentLogData = await getTreatmentLogByAppointment(appointmentId);
-    
+  
         if (treatmentLogData && treatmentLogData._id) {
-          setTreatmentLogId(treatmentLogData._id); // Guardar el treatmentLogId
+          setTreatmentLogId(treatmentLogData._id);
+  
+          // Activar el historial de tratamientos si hay tratamientos registrados
+          setShowTreatmentHistory(treatmentLogData.treatments.length > 0);
         } else {
           setTreatmentLogId(null);
+          setShowTreatmentHistory(false);
         }
       } catch (error) {
         console.error("Error al obtener el TreatmentLog:", error);
@@ -99,6 +102,7 @@ const AppointmentsPage = () => {
       });
     }
   };
+  
 
   useEffect(() => {
     if (tabIndex === 0) {
@@ -136,6 +140,7 @@ const AppointmentsPage = () => {
             <Icon as={RiHospitalFill} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Historial de Tratamientos</Text>
           </Tab>
+          
           <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={LuFilePlus} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Recetario</Text>
@@ -148,10 +153,10 @@ const AppointmentsPage = () => {
             <Icon as={FaChartLine} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Histórico de Salud</Text>
           </Tab>
-          <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
+          {/* <Tab _selected={{ color: 'white', bg: selectedColor }} fontWeight="bold" isDisabled={!isPatientSelected}>
             <Icon as={LuCalendarCheck} mr={2} />
             <Text fontSize={{ base: "xs", md: "sm" }}>Controles Médicos</Text>
-          </Tab>
+          </Tab> */}
         </TabList>
         
         <TabPanels>
@@ -167,7 +172,7 @@ const AppointmentsPage = () => {
               ownerData={ownerData}
               petData={petData}
               selectedAppointment={selectedAppointment}
-              treatmentLogId={treatmentLogId} // Pasar treatmentLogId
+              treatmentLogId={treatmentLogId} 
               onToggleTreatmentHistory={setShowTreatmentHistory}
               onBack={() => setTabIndex(0)}
             />
@@ -180,7 +185,7 @@ const AppointmentsPage = () => {
               <TreatmentHistory
                 petData={petData}
                 medicalEntryId={selectedAppointment?._id}
-                treatmentLogId={treatmentLogId} // Pasar treatmentLogId
+                treatmentLogId={treatmentLogId} 
               />
             ) : null}
           </TabPanel>

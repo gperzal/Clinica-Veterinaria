@@ -20,7 +20,7 @@ const TreatmentLogSchema = new mongoose.Schema({
   treatments: [TreatmentEntrySchema],
   contractSigned: { type: Boolean, default: false },
 }, {
-  timestamps: true, // Agrega campos createdAt y updatedAt
+  timestamps: true, 
 });
 
 export default mongoose.model('TreatmentLog', TreatmentLogSchema);

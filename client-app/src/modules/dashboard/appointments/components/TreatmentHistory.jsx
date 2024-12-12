@@ -43,7 +43,6 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
       setTreatmentLogs(updatedLog.treatments || logs); // Usa `logs` por defecto si la respuesta está vacía
       setContractSigned(updatedLog.contractSigned || true);
       setTreatmentLogData({ startDate, endDate }); // Actualiza los datos del registro
-;
     } catch (error) {
       console.error("Error al iniciar el reposo clínico:", error);
       showToast({
@@ -55,11 +54,14 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
   };
 
   useEffect(() => {
+    if (!treatmentLogId) {
+      console.error("treatmentLogId no está definido.");
+      return;
+    }
+  
     const fetchTreatmentLog = async () => {
       try {
-        const response = await getTreatmentLog(treatmentLogId); // Obtener datos del tratamiento
-        console.log("TreatmentLog Fetched: ", response);
-
+        const response = await getTreatmentLog(treatmentLogId);
         setTreatmentLogs(response.treatments || []);
         setContractSigned(response.contractSigned || false);
         setTreatmentLogData({
@@ -68,16 +70,12 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         });
       } catch (error) {
         console.error("Error al cargar TreatmentLog:", error);
-        showToast({
-          title: "Error",
-          description: "No se pudo cargar el registro de tratamientos.",
-          status: "error",
-        });
       }
     };
-
+  
     fetchTreatmentLog();
   }, [treatmentLogId]);
+  
 
   return (
     <Box p={6} bg={bgColor} borderRadius="lg" shadow="lg" maxWidth="90vw" mx="auto">
@@ -91,16 +89,17 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         <ContractSection onSignContract={() => setContractSigned(true)} />
       ) : (
         <>
-          <GeneralRestSection onStartRest={handleStartRest} treatmentLogData={treatmentLogData} />
+          <GeneralRestSection onStartRest={handleStartRest} treatmentLogData={treatmentLogData} treatmentLogId={treatmentLogId} />
           {treatmentLogs.length > 0 && (
             <TreatmentLogSection
-              treatmentLogs={treatmentLogs}
-              setTreatmentLogs={setTreatmentLogs}
-              onUpdateTreatment={async (logs) => {
-                const updatedLog = await updateTreatments(treatmentLogId, logs);
-                setTreatmentLogs(updatedLog.treatments || []);
-              }}
-            />
+            treatmentLogs={treatmentLogs}
+            setTreatmentLogs={setTreatmentLogs}
+            treatmentLogId={treatmentLogId} // Pasar el ID del log
+            onUpdateTreatment={async (logs) => {
+              const updatedLog = await updateTreatments(treatmentLogId, logs);
+              setTreatmentLogs(updatedLog.treatments || []);
+            }}
+          />
           )}
         </>
       )}

@@ -2,7 +2,13 @@
 export const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`; 
+    return `${day}-${month}-${year}`;
+};
+
+
+// utils/formatDate.js
+export const formatDateRange = (startDate, endDate) => {
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
 };
