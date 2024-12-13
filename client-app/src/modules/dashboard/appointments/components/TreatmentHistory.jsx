@@ -10,7 +10,7 @@ import { updateTreatmentLog, updateTreatments, getTreatmentLog } from "./../serv
 const TreatmentHistory = ({ petData, treatmentLogId }) => {
   const [treatmentLogs, setTreatmentLogs] = useState([]); // Estado para los tratamientos
   const [contractSigned, setContractSigned] = useState(false); // Estado para el contrato firmado
-  const [isSigning, setIsSigning] = useState(false); // Estado para animación de firma
+  const [isSimulating, setIsSimulating] = useState(false); // Nuevo estado para controlar la simulación
   const [treatmentLogData, setTreatmentLogData] = useState({}); // Almacenar startDate y endDate
   const bgColor = useColorModeValue("gray.50", "gray.800");
 
@@ -22,7 +22,6 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         throw new Error("No se encontró un ID de registro de tratamiento.");
       }
 
-      // Generar tratamientos dinámicamente según las fechas
       const totalDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
       const logs = Array.from({ length: totalDays }, (_, i) => ({
         date: new Date(new Date(startDate).getTime() + i * 86400000).toISOString().split("T")[0],
@@ -31,18 +30,16 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         confirmed: false,
       }));
 
-      // Llama al endpoint para actualizar el registro de tratamientos
       const updatedLog = await updateTreatmentLog(treatmentLogId, {
         startDate,
         endDate,
         treatments: logs,
-        contractSigned: true, // Marcar el contrato como firmado
+        contractSigned: true,
       });
 
-      // Actualiza el estado local basado en la respuesta del servidor
-      setTreatmentLogs(updatedLog.treatments || logs); // Usa `logs` por defecto si la respuesta está vacía
+      setTreatmentLogs(updatedLog.treatments || logs);
       setContractSigned(updatedLog.contractSigned || true);
-      setTreatmentLogData({ startDate, endDate }); // Actualiza los datos del registro
+      setTreatmentLogData({ startDate, endDate });
     } catch (error) {
       console.error("Error al iniciar el reposo clínico:", error);
       showToast({
@@ -53,12 +50,20 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
     }
   };
 
+  const handleContractSigned = () => {
+    setIsSimulating(true);
+    setTimeout(() => {
+      setIsSimulating(false); // Finaliza la simulación
+      setContractSigned(true); // Marca el contrato como firmado
+    }, 6000); 
+  };
+
   useEffect(() => {
     if (!treatmentLogId) {
       console.error("treatmentLogId no está definido.");
       return;
     }
-  
+
     const fetchTreatmentLog = async () => {
       try {
         const response = await getTreatmentLog(treatmentLogId);
@@ -72,10 +77,9 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         console.error("Error al cargar TreatmentLog:", error);
       }
     };
-  
+
     fetchTreatmentLog();
   }, [treatmentLogId]);
-  
 
   return (
     <Box p={6} bg={bgColor} borderRadius="lg" shadow="lg" maxWidth="90vw" mx="auto">
@@ -83,23 +87,23 @@ const TreatmentHistory = ({ petData, treatmentLogId }) => {
         Reposo Clínico de {petData?.name || "Mascota"}
       </Heading>
 
-      {isSigning ? (
+      {isSimulating ? (
         <Signature />
       ) : !contractSigned ? (
-        <ContractSection onSignContract={() => setContractSigned(true)} />
+        <ContractSection onSignContract={handleContractSigned} />
       ) : (
         <>
           <GeneralRestSection onStartRest={handleStartRest} treatmentLogData={treatmentLogData} treatmentLogId={treatmentLogId} />
           {treatmentLogs.length > 0 && (
             <TreatmentLogSection
-            treatmentLogs={treatmentLogs}
-            setTreatmentLogs={setTreatmentLogs}
-            treatmentLogId={treatmentLogId} // Pasar el ID del log
-            onUpdateTreatment={async (logs) => {
-              const updatedLog = await updateTreatments(treatmentLogId, logs);
-              setTreatmentLogs(updatedLog.treatments || []);
-            }}
-          />
+              treatmentLogs={treatmentLogs}
+              setTreatmentLogs={setTreatmentLogs}
+              treatmentLogId={treatmentLogId}
+              onUpdateTreatment={async (logs) => {
+                const updatedLog = await updateTreatments(treatmentLogId, logs);
+                setTreatmentLogs(updatedLog.treatments || []);
+              }}
+            />
           )}
         </>
       )}

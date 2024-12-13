@@ -76,7 +76,7 @@ const ContractSection = ({ onSignContract }) => {
 
           <ListItem>
             <ListIcon as={FaCheckCircle} color="green.500" />
-            <Box as="span" fontWeight="bold">9. Resolución de Conflictos:</Box> Cualquier conflicto se resolverá ante los tribunales competentes en la ciudad de _______________.
+            <Box as="span" fontWeight="bold">9. Resolución de Conflictos:</Box> Cualquier conflicto se resolverá ante los tribunales competentes en la ciudad de Santiago.
           </ListItem>
 
         </List>
