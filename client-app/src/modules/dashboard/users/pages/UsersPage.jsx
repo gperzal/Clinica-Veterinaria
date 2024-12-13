@@ -3,11 +3,14 @@ import {
   Box, Heading, Table, Thead, Tbody, Tr, Th, Td, HStack,
   IconButton, useToast, Avatar, FormControl, InputGroup,
   InputLeftElement, Input, Select, Button, Flex, Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   SearchIcon, EditIcon, DeleteIcon, InfoIcon, AddIcon,
   AttachmentIcon, ChevronLeftIcon, ChevronRightIcon,
+  DownloadIcon,
 } from '@chakra-ui/icons';
+import * as XLSX from 'xlsx'; // Importa la biblioteca XLSX
 import { useUsers } from '../context/UsersContext';
 import UserModal from '../components/UserModal';
 import UserInfoModal from '../components/UserInfoModal';
@@ -43,6 +46,45 @@ const UsersPage = () => {
             console.error('Error al cargar el archivo:', error);
         }
     }
+  };
+
+  const handleDownloadTemplate = () => {
+    const headers = [
+        { header: 'name', key: 'name', width: 15 },
+        { header: 'email', key: 'email', width: 20 },
+        { header: 'password', key: 'password', width: 15 },
+        { header: 'role', key: 'role', width: 15 },
+        { header: 'phone', key: 'phone', width: 15 },
+        { header: 'altPhone', key: 'altPhone', width: 15 },
+        { header: 'birthdate', key: 'birthdate', width: 15 },
+        { header: 'address', key: 'address', width: 25 },
+    ];
+
+    const exampleData = [
+        ['Carlos Pérez', 'carlos.perez@example.com', '123456', 'Cliente', '1234567890', '987654321', '01-01-1990', 'Calle Falsa 123'],
+    ];
+
+    const instructions = [
+        ['NOTA: Por favor, borre el ejemplo antes de cargar la plantilla que esta en la primera fila y la hoja de instrucciones '],
+    ];
+1
+    const workbook = XLSX.utils.book_new();
+
+    // Crear hoja de instrucciones
+    const instructionSheet = XLSX.utils.aoa_to_sheet(instructions);
+    XLSX.utils.book_append_sheet(workbook, instructionSheet, 'Instrucciones');
+
+    // Crear hoja de datos
+    const worksheetData = [headers.map((header) => header.header), ...exampleData]; 
+    const dataSheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Aplicar formato opcional (ejemplo en negrita)
+    dataSheet['A2'].s = { font: { bold: true } };
+
+    XLSX.utils.book_append_sheet(workbook, dataSheet, 'Plantilla_Carga');
+
+    // Descargar el archivo
+    XLSX.writeFile(workbook, 'Plantilla_Carga_Usuarios.xlsx');
 };
 
 
@@ -146,6 +188,15 @@ const UsersPage = () => {
           </FormControl>
         </HStack>
         <HStack spacing={4}>
+          <Tooltip label="Descargar plantilla para carga masiva" fontSize="md">
+            <Button
+              colorScheme="green"
+              leftIcon={<DownloadIcon />}
+              onClick={handleDownloadTemplate}
+            >
+              Plantilla
+            </Button>
+          </Tooltip>
           <Button colorScheme="blue" leftIcon={<AddIcon />} onClick={() => handleOpenModal()}>
             Agregar Usuario
           </Button>
